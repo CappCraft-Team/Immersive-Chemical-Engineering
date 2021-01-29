@@ -1,0 +1,18 @@
+[
+  {
+    "modid": "icheme",
+    "name": "Immersive Chemical Engineering",
+    "description": "Chemical technology addon for Immersive Engineering",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "",
+    "updateUrl": "",
+    "authorList": [
+      "CappCraft Team"
+    ],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]
