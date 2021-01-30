@@ -17,7 +17,20 @@ repositories {
     jcenter()
     mavenCentral()
     maven("https://files.minecraftforge.net/maven")
+    //Korgelin
     maven("https://dl.bintray.com/toliner/Korgelin")
+    //TOP
+    maven("http://maven.tterrag.com/")
+    //CraftTweaker
+    //Immersive Engineering
+    maven("http://maven.blamejared.com/")
+    //Redstone Flux
+    maven("http://maven.covers1624.net/")
+    //JEI
+    maven("http://dvs1.progwml6.com/files/maven")
+    //HWYLA
+    maven("http://tehnut.info/maven")
+    
 }
 
 sourceSets.main.get().resources { srcDir("src/generated/resources") }
@@ -25,10 +38,20 @@ sourceSets.main.get().resources { srcDir("src/generated/resources") }
 dependencies {
     minecraft("net.minecraftforge:forge:1.12.2-14.23.5.2854")
     implementation("net.toliner.korgelin:korgelin-1.12:1.1.0-1.3.31")
+    implementation("mezz.jei:jei_1.12.2:4.+")
+    implementation("cofh:RedstoneFlux:1.12-2.+:deobf")
+    implementation("mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.+")
+    implementation("CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.+")
+    implementation("blusunrize:ImmersiveEngineering:0.12-+")
 }
 
 minecraft {
     mappings("snapshot", "20171003-1.12")
+    buildDir.resolve("generatedATs").walk().filter {
+        it.isFile && it.name == "accesstransformer.cfg"
+    }.let {
+        accessTransformers.addAll(it)
+    }
     runs {
         create("client") {
             workingDirectory = project.file("run").toString()
@@ -65,6 +88,23 @@ minecraft {
 }
 
 tasks {
+    task("transformAccessTransformers") {
+        group = "access_transformer"
+        doLast {
+            buildDir.resolve("generatedATs").deleteRecursively()
+            project.configurations.runtimeClasspath.get().filter {
+                !it.name.startsWith("forge")
+            }.forEach {
+                zipTree(it).filter { content ->
+                    content.name.endsWith("_at.cfg")
+                }.forEach { at ->
+                    println("Found AccessTransFormer: ${at.name} in ${it.name}")
+                    at.copyTo(buildDir.resolve("generatedATs/${at.nameWithoutExtension}/accesstransformer.cfg"))
+                }
+            }
+        }
+    }
+    
     processResources {
         inputs.properties(
             "version" to version,
