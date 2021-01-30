@@ -43,6 +43,7 @@ dependencies {
     implementation("mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.+")
     implementation("CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.+")
     implementation("blusunrize:ImmersiveEngineering:0.12-+")
+    implementation(kotlin("stdlib-jdk8"))
 }
 
 minecraft {
