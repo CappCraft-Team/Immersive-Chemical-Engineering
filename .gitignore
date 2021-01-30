@@ -19,10 +19,10 @@ build
 
 # other
 
-/run
+run
 
 gradlew
 gradlew.bat
 
-/gradle
+gradle
 

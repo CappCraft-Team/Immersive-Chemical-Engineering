@@ -9,7 +9,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:4.+'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
         classpath 'commons-io:commons-io:2.5'
     }
 }
@@ -137,3 +137,8 @@ processResources {
 }
 
 jar.finalizedBy('reobfJar')
+
+
+sourceSets {
+    main { output.resourcesDir = output.classesDir }
+}
