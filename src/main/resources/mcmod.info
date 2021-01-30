@@ -1,18 +1,16 @@
 [
-  {
-    "modid": "icheme",
-    "name": "Immersive Chemical Engineering",
-    "description": "Chemical technology addon for Immersive Engineering",
-    "version": "${version}",
-    "mcversion": "${mcversion}",
-    "url": "",
-    "updateUrl": "",
-    "authorList": [
-      "CappCraft Team"
-    ],
-    "credits": "",
-    "logoFile": "",
-    "screenshots": [],
-    "dependencies": []
-  }
+{
+  "modid": "examplemod",
+  "name": "Example Mod",
+  "description": "Example placeholder mod.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["ExampleDude"],
+  "credits": "The Forge and FML guys, for making this example",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
 ]
