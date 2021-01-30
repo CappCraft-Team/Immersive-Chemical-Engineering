@@ -134,6 +134,7 @@ tasks {
             copy {
                 from(this@withType.source)
                 with(buildDir.resolve("generatedKotlin")) {
+                    this.deleteRecursively()
                     into(this)
                     this@withType.source = fileTree(this)
                 }
