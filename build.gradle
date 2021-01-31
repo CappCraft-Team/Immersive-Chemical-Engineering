@@ -47,11 +47,6 @@ minecraft {
     }
 }
 
-minecraft.accessTransformers.addAll(FileUtils.listFiles(
-        file("$buildDir/generatedATs"),
-        FileFilterUtils.nameFileFilter("accesstransformer.cfg"),
-        TrueFileFilter.INSTANCE))
-
 repositories {
     maven {
         name = 'ModMaven'
@@ -105,6 +100,11 @@ jar {
 
 task("transformAccessTransformer") {
     group = "access_transformer"
+    if (file("$buildDir/generatedATs").exists())
+        minecraft.accessTransformers.addAll(FileUtils.listFiles(
+                file("$buildDir/generatedATs"),
+                FileFilterUtils.nameFileFilter("accesstransformer.cfg"),
+                TrueFileFilter.INSTANCE))
     doLast {
         FileUtils.deleteDirectory(file("$buildDir/generatedATs"))
         project.configurations["runtimeClasspath"].filter {
@@ -115,7 +115,7 @@ task("transformAccessTransformer") {
             }.forEach { at ->
                 println("Found AccessTransFormer: ${at.name} in ${it.name}")
                 FileUtils.copyFile(
-                        at,
+                        at as File,
                         file("$buildDir/generatedATs/${at.name.substring(0, at.name.lastIndexOf("."))}/accesstransformer.cfg"))
             }
         }
