@@ -1,0 +1,19 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "cube",
+    "textures": {
+      "particle": "icheme:blocks/side",
+      "north": "icheme:blocks/side",
+      "south": "icheme:blocks/side",
+      "west": "icheme:blocks/side",
+      "east": "icheme:blocks/side",
+      "up": "icheme:blocks/top",
+      "down": "icheme:blocks/bottom"
+    }
+  },
+  "variants":{
+    "normal": [{}],
+    "inventory": [{}]
+  }
+}
