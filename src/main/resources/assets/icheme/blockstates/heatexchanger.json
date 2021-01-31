@@ -3,13 +3,12 @@
   "defaults": {
     "model": "cube",
     "textures": {
-      "particle": "icheme:blocks/side",
-      "north": "icheme:blocks/side",
-      "south": "icheme:blocks/side",
+      "north": "icheme:blocks/side_in",
+      "south": "icheme:blocks/side_out",
       "west": "icheme:blocks/side",
       "east": "icheme:blocks/side",
-      "up": "icheme:blocks/top",
-      "down": "icheme:blocks/bottom"
+      "up": "icheme:blocks/side_in",
+      "down": "icheme:blocks/side_out"
     }
   },
   "variants":{
