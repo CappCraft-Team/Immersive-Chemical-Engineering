@@ -3,6 +3,7 @@ package team.cappcraft.icheme.common.tileentity;
 import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.IDirectionalTile;
 import blusunrize.immersiveengineering.common.blocks.TileEntityIEBase;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
@@ -14,7 +15,7 @@ public class TileHeatExchanger extends TileEntityIEBase implements ITickable, ID
     public FluidTank tankInputB = new FluidTank(MAX_CONTENTS);
     public FluidTank tankOunputA = new FluidTank(MAX_CONTENTS);
     public FluidTank tankOunputB = new FluidTank(MAX_CONTENTS);
-    
+
 
     @Override
     public void update() {
@@ -60,5 +61,9 @@ public class TileHeatExchanger extends TileEntityIEBase implements ITickable, ID
     @Override
     public void writeCustomNBT(NBTTagCompound nbt, boolean descPacket) {
 
+    }
+
+    public boolean canInteractWith(EntityPlayer playerIn) {
+        return !isInvalid() && playerIn.getDistanceSq(pos.add(0.5D, 0.5D, 0.5D)) <= 64D;
     }
 }

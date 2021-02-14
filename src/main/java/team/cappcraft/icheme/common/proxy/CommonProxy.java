@@ -9,8 +9,12 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import team.cappcraft.icheme.ImmersiveChemicalEngineering;
 import team.cappcraft.icheme.ModBlocks;
 import team.cappcraft.icheme.common.blocks.BlockHeatExchanger;
+import team.cappcraft.icheme.common.tileentity.TileHeatExchanger;
 
 @Mod.EventBusSubscriber
 public class CommonProxy {
@@ -18,6 +22,7 @@ public class CommonProxy {
     }
 
     public void init(FMLInitializationEvent e) {
+        NetworkRegistry.INSTANCE.registerGuiHandler(ImmersiveChemicalEngineering.instance, new GuiHandler());
     }
 
     public void postInit(FMLPostInitializationEvent e) {
@@ -26,6 +31,7 @@ public class CommonProxy {
     @SubscribeEvent
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
         event.getRegistry().register(new BlockHeatExchanger());
+        GameRegistry.registerTileEntity(TileHeatExchanger.class, ImmersiveChemicalEngineering.MODID + "_heatexchanger_tile");
     }
 
     @SubscribeEvent
