@@ -5,8 +5,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
+import team.cappcraft.icheme.client.gui.GuiHeatExchanger;
 import team.cappcraft.icheme.common.container.ContainerHeatExchanger;
-import team.cappcraft.icheme.common.gui.GuiHeatExchanger;
 import team.cappcraft.icheme.common.tileentity.TileHeatExchanger;
 
 import javax.annotation.Nullable;
@@ -30,7 +30,7 @@ public class GuiHandler implements IGuiHandler {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof TileHeatExchanger) {
             TileHeatExchanger containerTileEntity = (TileHeatExchanger) te;
-            return new GuiHeatExchanger(containerTileEntity, new ContainerHeatExchanger(player.inventory, containerTileEntity));
+            return new GuiHeatExchanger(containerTileEntity, player.inventory);
         }
         return null;
     }

@@ -5,12 +5,12 @@ import net.minecraftforge.fluids.FluidStack;
 public class HeatExchangerRecipeEntry {
     private final FluidStack input;
     private final FluidStack output;
-    private final int temperature;
+    private final int heatValue;
 
-    public HeatExchangerRecipeEntry(FluidStack in, FluidStack out, int temperatureDifference) {
+    public HeatExchangerRecipeEntry(FluidStack in, FluidStack out, int heatValue) {
         this.input = in;
         this.output = out;
-        this.temperature = temperatureDifference;
+        this.heatValue = heatValue;
     }
 
     public FluidStack getInput() {
@@ -21,8 +21,8 @@ public class HeatExchangerRecipeEntry {
         return output;
     }
 
-    public int getTemperature() {
-        return temperature;
+    public int getHeatValue() {
+        return heatValue;
     }
 
     @Override
@@ -30,7 +30,7 @@ public class HeatExchangerRecipeEntry {
         return "HeatExchangerRecipeEntry{" +
                 "input=" + input +
                 ", output=" + output +
-                ", temperature=" + temperature +
+                ", heatValue=" + heatValue +
                 '}';
     }
 }

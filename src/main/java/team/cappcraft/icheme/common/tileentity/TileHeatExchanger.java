@@ -5,17 +5,22 @@ import blusunrize.immersiveengineering.common.blocks.TileEntityIEBase;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 
 public class TileHeatExchanger extends TileEntityIEBase implements ITickable, IDirectionalTile {
     public static final int MAX_CONTENTS = 5000;
-    public FluidTank tankInputA = new FluidTank(MAX_CONTENTS);
-    public FluidTank tankInputB = new FluidTank(MAX_CONTENTS);
-    public FluidTank tankOunputA = new FluidTank(MAX_CONTENTS);
-    public FluidTank tankOunputB = new FluidTank(MAX_CONTENTS);
+    public FluidTank[] tank = {new FluidTank(MAX_CONTENTS), new FluidTank(MAX_CONTENTS), new FluidTank(MAX_CONTENTS), new FluidTank(MAX_CONTENTS)};
 
+    public FluidStack[] liquidInFilter = new FluidStack[2];
+    public FluidStack[] liquidOutFilter = new FluidStack[2];
+
+    // PUR TESTING PURPOSE
+    public TileHeatExchanger() {
+    }
 
     @Override
     public void update() {
@@ -54,16 +59,50 @@ public class TileHeatExchanger extends TileEntityIEBase implements ITickable, ID
     }
 
     @Override
-    public void readCustomNBT(NBTTagCompound nbt, boolean descPacket) {
-
-    }
-
-    @Override
-    public void writeCustomNBT(NBTTagCompound nbt, boolean descPacket) {
-
+    public void receiveMessageFromClient(NBTTagCompound message) {
+        if (message.hasKey("filter_slot_in")) {
+            int slot = message.getInteger("filter_slot_in");
+            this.liquidInFilter[slot] = FluidStack.loadFluidStackFromNBT(message.getCompoundTag("filter_content"));
+        } else if (message.hasKey("filter_slot_out")) {
+            int slot = message.getInteger("filter_slot_out");
+            this.liquidOutFilter[slot] = FluidStack.loadFluidStackFromNBT(message.getCompoundTag("filter_content"));
+        }
+        this.markDirty();
     }
 
     public boolean canInteractWith(EntityPlayer playerIn) {
         return !isInvalid() && playerIn.getDistanceSq(pos.add(0.5D, 0.5D, 0.5D)) <= 64D;
     }
+
+    @Override
+    public void readCustomNBT(NBTTagCompound nbt, boolean descPacket) {
+        NBTTagList filterInList = nbt.getTagList("filtersIn", 10);
+        NBTTagList filterOutList = nbt.getTagList("filtersOut", 10);
+        for (int i = 0; i < filterInList.tagCount(); i++) {
+            liquidInFilter[i] = FluidStack.loadFluidStackFromNBT(filterInList.getCompoundTagAt(i));
+        }
+        for (int i = 0; i < filterOutList.tagCount(); i++) {
+            liquidOutFilter[i] = FluidStack.loadFluidStackFromNBT(filterOutList.getCompoundTagAt(i));
+        }
+    }
+
+    @Override
+    public void writeCustomNBT(NBTTagCompound nbt, boolean descPacket) {
+        NBTTagList filterInList = new NBTTagList();
+        NBTTagList filterOutList = new NBTTagList();
+        for (int i = 0; i < liquidInFilter.length; i++) {
+            NBTTagCompound tag = new NBTTagCompound();
+            if (liquidInFilter[i] != null) liquidInFilter[i].writeToNBT(tag);
+            filterInList.appendTag(tag);
+        }
+        for (int i = 0; i < liquidOutFilter.length; i++) {
+            NBTTagCompound tag = new NBTTagCompound();
+            if (liquidOutFilter[i] != null) liquidOutFilter[i].writeToNBT(tag);
+            filterOutList.appendTag(tag);
+        }
+        nbt.setTag("filtersIn", filterInList);
+        nbt.setTag("filtersOut", filterOutList);
+    }
+    
+
 }
