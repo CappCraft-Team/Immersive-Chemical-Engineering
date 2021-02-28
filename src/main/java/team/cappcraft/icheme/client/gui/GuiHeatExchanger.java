@@ -37,17 +37,21 @@ public class GuiHeatExchanger extends GuiIEContainerBase {
         super.mouseClicked(mouseX, mouseY, mouseButton);
         if (this.checkClickArea(mouseX, mouseY, 35, 34)) {//input A, top left slot
             FluidStack fs = FluidUtil.getFluidContained(playerInventory.getItemStack());
-            this.setFluidInSlot(0, fs);
+            this.setFluidSlot(0, fs);
             return;
         } else if (this.checkClickArea(mouseX, mouseY, 125, 34)) {//input B, top right slot
             FluidStack fs = FluidUtil.getFluidContained(playerInventory.getItemStack());
-            this.setFluidInSlot(1, fs);
+            this.setFluidSlot(1, fs);
             return;
-        } else if (this.checkClickArea(mouseX, mouseY, 35, 79)) { // click to clear
-            this.setFluidOutSlot(0, null);
+        } else if (this.checkClickArea(mouseX, mouseY, 35, 55)) { // click to clear
+            this.setFluidSlot(0, null);
             return;
-        } else if (this.checkClickArea(mouseX, mouseY, 125, 79)) {
-            this.setFluidOutSlot(1, null);
+        } else if (this.checkClickArea(mouseX, mouseY, 125, 55)) {
+            this.setFluidSlot(1, null);
+            return;
+        } else if (this.checkClickArea(mouseX, mouseY, 80, 79)) {
+            this.setFluidSlot(0, null);
+            this.setFluidSlot(1, null);
             return;
         }
         return;
@@ -58,6 +62,21 @@ public class GuiHeatExchanger extends GuiIEContainerBase {
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) { // draw the content
         ClientUtils.bindTexture(background);
         this.drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
+
+        // Draw Buttons
+        this.drawTexturedModalRect(guiLeft + 35, guiTop + 56, 177, 1, 16, 15); //reset left
+        this.drawTexturedModalRect(guiLeft + 125, guiTop + 56, 177, 1, 16, 15); //reset right
+        this.drawTexturedModalRect(guiLeft + 80, guiTop + 79, 177, 17, 16, 15);
+        if (this.tile.isRunning()) {
+            this.drawTexturedModalRect(guiLeft + 81, guiTop + 55, 177, 32, 16, 15);
+        } else if (this.tile.isHalt()) {
+            this.drawTexturedModalRect(guiLeft + 81, guiTop + 55, 177, 48, 16, 15);
+        } else if (this.tile.isError()) {
+            this.drawTexturedModalRect(guiLeft + 81, guiTop + 55, 177, 62, 16, 15);
+        } else if (this.tile.isIdle()) {
+            this.drawTexturedModalRect(guiLeft + 81, guiTop + 55, 177, 77, 16, 15);
+        }
+        // Draw liquid in Filter
         ClientUtils.bindAtlas();
         if (this.tile.liquidInFilter[0] != null) {
             TextureAtlasSprite spriteInputA = ClientUtils.getSprite(this.tile.liquidInFilter[0].getFluid().getStill());
@@ -84,18 +103,10 @@ public class GuiHeatExchanger extends GuiIEContainerBase {
         return mouseX > tempX && mouseX < tempX + 16 && mouseY > tempY && mouseY < tempY + 16;
     }
 
-    public void setFluidInSlot(int slot, FluidStack fluid) {
+    public void setFluidSlot(int slot, FluidStack fluid) {
         tile.liquidInFilter[slot] = fluid;
         NBTTagCompound tag = new NBTTagCompound();
-        tag.setInteger("filter_slot_in", slot);
-        if (fluid != null) tag.setTag("filter_content", fluid.writeToNBT(new NBTTagCompound()));
-        ImmersiveChemicalEngineering.packetHandler.sendToServer(new MessageTileSync(tile, tag));
-    }
-
-    public void setFluidOutSlot(int slot, FluidStack fluid) {
-        tile.liquidInFilter[slot] = fluid;
-        NBTTagCompound tag = new NBTTagCompound();
-        tag.setInteger("filter_slot_out", slot);
+        tag.setInteger("filter_slot", slot);
         if (fluid != null) tag.setTag("filter_content", fluid.writeToNBT(new NBTTagCompound()));
         ImmersiveChemicalEngineering.packetHandler.sendToServer(new MessageTileSync(tile, tag));
     }

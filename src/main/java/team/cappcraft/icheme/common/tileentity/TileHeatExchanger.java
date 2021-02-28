@@ -18,13 +18,14 @@ public class TileHeatExchanger extends TileEntityIEBase implements ITickable, ID
     public FluidStack[] liquidInFilter = new FluidStack[2];
     public FluidStack[] liquidOutFilter = new FluidStack[2];
 
+    private boolean isRunning = false;
+
     // PUR TESTING PURPOSE
     public TileHeatExchanger() {
     }
 
     @Override
     public void update() {
-
     }
 
 
@@ -60,18 +61,32 @@ public class TileHeatExchanger extends TileEntityIEBase implements ITickable, ID
 
     @Override
     public void receiveMessageFromClient(NBTTagCompound message) {
-        if (message.hasKey("filter_slot_in")) {
-            int slot = message.getInteger("filter_slot_in");
+        if (message.hasKey("filter_slot")) {
+            int slot = message.getInteger("filter_slot");
             this.liquidInFilter[slot] = FluidStack.loadFluidStackFromNBT(message.getCompoundTag("filter_content"));
-        } else if (message.hasKey("filter_slot_out")) {
-            int slot = message.getInteger("filter_slot_out");
-            this.liquidOutFilter[slot] = FluidStack.loadFluidStackFromNBT(message.getCompoundTag("filter_content"));
         }
         this.markDirty();
     }
 
     public boolean canInteractWith(EntityPlayer playerIn) {
         return !isInvalid() && playerIn.getDistanceSq(pos.add(0.5D, 0.5D, 0.5D)) <= 64D;
+    }
+
+    // status check
+    public boolean isRunning() {
+        return this.isRunning;
+    }
+
+    public boolean isHalt() {
+        return false;
+    }
+
+    public boolean isError() {
+        return false;
+    }
+
+    public boolean isIdle() {
+        return this.liquidInFilter[0] == null && this.liquidInFilter[1] == null;
     }
 
     @Override
