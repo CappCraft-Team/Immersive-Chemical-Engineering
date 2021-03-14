@@ -23,7 +23,7 @@ public class SmallHeatExchangerCTRecipe {
         if (integrityCheck(input, output, heatValue)) return;
         FluidStack fluidin = CraftTweakerHelper.toFluidStack(input);
         FluidStack fluidOut = CraftTweakerHelper.toFluidStack(output);
-        HeatExchangerRecipeEntry r = new HeatExchangerRecipeEntry(CraftTweakerHelper.toFluidStack(input), CraftTweakerHelper.toFluidStack(output), heatValue);
+        HeatExchangerRecipeEntry r = new HeatExchangerRecipeEntry(CraftTweakerHelper.toFluidStack(input).getFluid(), CraftTweakerHelper.toFluidStack(output).getFluid(), heatValue);
         CraftTweakerAPI.apply(new SmallHeatExchangerCTRecipe.AddSmallHeatExchangeRecipe(fluidin, fluidOut, heatValue));
     }
 

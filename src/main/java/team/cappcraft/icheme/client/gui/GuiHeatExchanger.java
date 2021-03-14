@@ -64,17 +64,17 @@ public class GuiHeatExchanger extends GuiIEContainerBase {
         this.drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
 
         // Draw Buttons
-        this.drawTexturedModalRect(guiLeft + 35, guiTop + 56, 177, 1, 16, 15); //reset left
-        this.drawTexturedModalRect(guiLeft + 125, guiTop + 56, 177, 1, 16, 15); //reset right
-        this.drawTexturedModalRect(guiLeft + 80, guiTop + 79, 177, 17, 16, 15);
+        this.drawTexturedModalRect(guiLeft + 35, guiTop + 56, 177, 0, 16, 16); //reset left
+        this.drawTexturedModalRect(guiLeft + 125, guiTop + 56, 177, 0, 16, 16); //reset right
+        this.drawTexturedModalRect(guiLeft + 80, guiTop + 79, 177, 16, 16, 16);
         if (this.tile.isRunning()) {
             this.drawTexturedModalRect(guiLeft + 81, guiTop + 55, 177, 32, 16, 15);
         } else if (this.tile.isHalt()) {
             this.drawTexturedModalRect(guiLeft + 81, guiTop + 55, 177, 48, 16, 15);
-        } else if (this.tile.isError()) {
-            this.drawTexturedModalRect(guiLeft + 81, guiTop + 55, 177, 62, 16, 15);
         } else if (this.tile.isIdle()) {
             this.drawTexturedModalRect(guiLeft + 81, guiTop + 55, 177, 77, 16, 15);
+        } else if (this.tile.isError()) {
+            this.drawTexturedModalRect(guiLeft + 81, guiTop + 55, 177, 62, 16, 15);
         }
         // Draw liquid in Filter
         ClientUtils.bindAtlas();

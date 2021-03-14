@@ -1,23 +1,23 @@
 package team.cappcraft.icheme.common.recipe;
 
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.Fluid;
 
 public class HeatExchangerRecipeEntry {
-    private final FluidStack input;
-    private final FluidStack output;
+    private final Fluid input;
+    private final Fluid output;
     private final int heatValue;
 
-    public HeatExchangerRecipeEntry(FluidStack in, FluidStack out, int heatValue) {
+    public HeatExchangerRecipeEntry(Fluid in, Fluid out, int heatValue) {
         this.input = in;
         this.output = out;
         this.heatValue = heatValue;
     }
 
-    public FluidStack getInput() {
+    public Fluid getInput() {
         return input;
     }
 
-    public FluidStack getOutput() {
+    public Fluid getOutput() {
         return output;
     }
 
