@@ -1,0 +1,6 @@
+#en_us
+itemGroup.immersivechemical=Immersive Chemical Engineering
+#tiles
+tile.immersivechemical.multiblock_heat_exchanger.heat_exchanger_small.name=Heat Exchanger(Small)
+tile.immersivechemical.multiblock_heat_exchanger.heat_exchanger_medium.name=Heat Exchanger(Medium)
+tile.immersivechemical.multiblock_heat_exchanger.heat_exchanger_large.name=Heat Exchanger(Large)

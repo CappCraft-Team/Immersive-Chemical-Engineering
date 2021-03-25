@@ -1,6 +1,6 @@
 [
   {
-    "modid": "icheme",
+    "modid": "immersivechemical",
     "name": "Immersive Chemical Engineering",
     "description": "Chemical technology addon for Immersive Engineering",
     "version": "${version}",
