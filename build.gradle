@@ -9,8 +9,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
-        classpath 'commons-io:commons-io:2.5'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:4.+'
     }
 }
 
@@ -48,6 +47,7 @@ minecraft {
 }
 
 repositories {
+    maven { url = 'https://files.minecraftforge.net/maven' }
     maven {
         name = 'ModMaven'
         url 'https://modmaven.dev'
@@ -64,24 +64,28 @@ repositories {
         name = 'JEI Maven'
         url = 'http://dvs1.progwml6.com/files/maven'
     }
-
-    maven {
-        name = "CurseForge"
-        url = "https://minecraft.curseforge.com/api/maven/"
-    }
     maven {
         name = 'Immersive Maven'
         url = 'http://maven.blamejared.com'
+    }
+    maven {
+        url "https://www.cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
     }
 }
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2854'
+
     implementation 'mezz.jei:jei_1.12.2:4.+'
     implementation 'cofh:RedstoneFlux:1.12-2.+:deobf'
     implementation 'mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.+'
     implementation 'CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.+'
-    implementation 'blusunrize:ImmersiveEngineering:0.12-+'
+    implementation fg.deobf('blusunrize:ImmersiveEngineering:0.12-92-559')
+
+    runtimeOnly('curse.maven:nbtEdit-247580:2448708')
 }
 
 jar {
@@ -98,28 +102,49 @@ jar {
     }
 }
 
-task("transformAccessTransformer") {
-    group = "access_transformer"
-    if (file("$buildDir/generatedATs").exists())
-        minecraft.accessTransformers.addAll(FileUtils.listFiles(
-                file("$buildDir/generatedATs"),
-                FileFilterUtils.nameFileFilter("accesstransformer.cfg"),
-                TrueFileFilter.INSTANCE))
-    doLast {
-        FileUtils.deleteDirectory(file("$buildDir/generatedATs"))
-        project.configurations["runtimeClasspath"].filter {
+class MakeATsTask extends DefaultTask {
+    @Input
+    FileCollection runtimeLibraries
+    @OutputDirectories
+    File dirATs
+
+    String FILENAME_AT = "accesstransformer.cfg"
+
+    MakeATsTask() {
+        runtimeLibraries = project.configurations["runtimeClasspath"].filter {
             !it.name.startsWith("forge")
-        }.forEach {
-            zipTree(it).filter { content ->
+        }
+        dirATs = new File("$project.buildDir/generatedATs")
+    }
+
+    @TaskAction
+    def makeAT() {
+        project.delete(dirATs)//Clean first
+        runtimeLibraries.forEach {
+            project.zipTree(it).filter { content ->
                 content.name.endsWith("_at.cfg")
             }.forEach { at ->
                 println("Found AccessTransFormer: ${at.name} in ${it.name}")
-                FileUtils.copyFile(
-                        at as File,
-                        file("$buildDir/generatedATs/${at.name.substring(0, at.name.lastIndexOf("."))}/accesstransformer.cfg"))
+                project.copy {
+                    from(at)
+                    into(project.file("$dirATs/${at.name.substring(0, at.name.lastIndexOf("."))}"))
+                    rename {
+                        FILENAME_AT
+                    }
+                }
             }
         }
     }
+}
+
+task "transformAccessTransformer"(type: MakeATsTask) {
+    group = "access_transformer"
+
+    if (dirATs.exists())
+        minecraft.accessTransformers.addAll(FileUtils.listFiles(
+                dirATs,
+                FileFilterUtils.nameFileFilter(FILENAME_AT),
+                TrueFileFilter.INSTANCE))
 }
 
 compileJava {
@@ -131,14 +156,17 @@ processResources {
             "version": version,
             "mcversion": mcVersion
     )
+    from(sourceSets.main.resources.srcDirs)
+    copy {
+        from(sourceSets.main.resources.srcDirs)
+        into("$buildDir/classes/java/main")
+        filesMatching("mcmod.info") {
+            expand("version": version, "mcversion": mcVersion)
+        }
+    }
     filesMatching("mcmod.info") {
         expand("version": version, "mcversion": mcVersion)
     }
 }
 
 jar.finalizedBy('reobfJar')
-
-
-sourceSets {
-    main { output.resourcesDir = output.classesDir }
-}
