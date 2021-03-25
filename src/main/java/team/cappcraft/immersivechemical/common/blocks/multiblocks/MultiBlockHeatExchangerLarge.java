@@ -68,7 +68,7 @@ public class MultiBlockHeatExchangerLarge implements MultiblockHandler.IMultiblo
             pos = pos.down();//The Origin need to be at Y=0
             for (int h = 0; h < 3; h++)
                 for (int l = 0; l < 7; l++)
-                    for (int w = -1; w <= 2; w++) {
+                    for (int w = -1; w <= 1; w++) {
                         final int offsetX = -side.getFrontOffsetZ() * w * (mirrored ? -1 : 1) + side.getFrontOffsetX() * l;
                         final int offsetZ = side.getFrontOffsetX() * w * (mirrored ? -1 : 1) + side.getFrontOffsetZ() * l;
                         final BlockPos blockPos = pos.add(offsetX, h, offsetZ);
