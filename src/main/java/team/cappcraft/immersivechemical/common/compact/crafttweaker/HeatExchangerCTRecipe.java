@@ -79,7 +79,7 @@ public class HeatExchangerCTRecipe {
                     || !ImmersiveChemicalEngineering.proxy.heatExchangerRecipeRegistry.getKeys().contains(RegistryName))
                 describeInvalid = String.format("RegistryName null or duplicate: %s", RegistryName);
             else if (RegistryName.endsWith(POSTFIX_REVERSE))
-                describeInvalid = String.format("RegistryName contains invalid SUFFIX: %s", POSTFIX_REVERSE);
+                describeInvalid = String.format("RegistryName contains invalid POSTFIX: %s", POSTFIX_REVERSE);
             if (ExchangeA == null || ExchangeB == null)
                 describeInvalid = String.format("ExchangeEntry could not be null: ExchangeA:%s, ExchangeB:%s", ExchangeA, ExchangeB);
             try {
