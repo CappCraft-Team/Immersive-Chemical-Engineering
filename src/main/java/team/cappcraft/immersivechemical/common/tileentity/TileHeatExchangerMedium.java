@@ -15,10 +15,10 @@ public class TileHeatExchangerMedium extends AbstractTileHeatExchanger {
     /**
      * Fluid IO block's pos
      */
-    protected static final int FluidAccessPointInputA = 10;
-    protected static final int FluidAccessPointOutputA = 5;
-    protected static final int FluidAccessPointInputB = 16;
-    protected static final int FluidAccessPointOutputB = 1;
+    protected static final int FluidAccessPointInputA = 15;
+    protected static final int FluidAccessPointOutputA = 0;
+    protected static final int FluidAccessPointInputB = 6;
+    protected static final int FluidAccessPointOutputB = 11;
 
     public TileHeatExchangerMedium() {
         super(new int[]{2, 2, 5}, 5000 * 2, HeatExchangerSize.MEDIUM, 0.4f);
@@ -36,10 +36,10 @@ public class TileHeatExchangerMedium extends AbstractTileHeatExchanger {
                     if (side == EnumFacing.DOWN)
                         return new IFluidTank[]{Tanks[1]};
                 case FluidAccessPointInputB:
-                    if (side == EnumFacing.UP)
+                    if (side == EnumFacing.DOWN)
                         return new IFluidTank[]{Tanks[2]};
                 case FluidAccessPointOutputB:
-                    if (side == EnumFacing.DOWN)
+                    if (side == EnumFacing.UP)
                         return new IFluidTank[]{Tanks[3]};
             }
         return new IFluidTank[0];
@@ -50,8 +50,9 @@ public class TileHeatExchangerMedium extends AbstractTileHeatExchanger {
         if (side.getAxis() == EnumFacing.Axis.Y)
             switch (pos) {
                 case FluidAccessPointInputA:
-                case FluidAccessPointInputB:
                     return side == EnumFacing.UP;
+                case FluidAccessPointInputB:
+                    return side == EnumFacing.DOWN;
             }
         return false;
     }
@@ -61,8 +62,9 @@ public class TileHeatExchangerMedium extends AbstractTileHeatExchanger {
         if (side.getAxis() == EnumFacing.Axis.Y)
             switch (pos) {
                 case FluidAccessPointOutputA:
-                case FluidAccessPointOutputB:
                     return side == EnumFacing.DOWN;
+                case FluidAccessPointOutputB:
+                    return side == EnumFacing.UP;
             }
         return false;
     }

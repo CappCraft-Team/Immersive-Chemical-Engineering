@@ -1,5 +1,6 @@
 package team.cappcraft.immersivechemical.common.blocks.multiblocks;
 
+import blusunrize.immersiveengineering.api.IEProperties;
 import blusunrize.immersiveengineering.common.blocks.BlockIEMultiblock;
 import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces;
 import blusunrize.immersiveengineering.common.blocks.ItemBlockIEBase;
@@ -30,7 +31,8 @@ public class BlockHeatExchanger extends BlockIEMultiblock<BlockTypes_HeatExchang
         super("multiblock_heat_exchanger",
                 Material.IRON,
                 PropertyEnum.create("type", BlockTypes_HeatExchanger.class),
-                ItemBlockIEBase.class);
+                ItemBlockIEBase.class,
+                IEProperties.BOOLEANS[0]);
         setHardness(3.0F);
         setResistance(15.0F);
         setAllNotNormalBlock();

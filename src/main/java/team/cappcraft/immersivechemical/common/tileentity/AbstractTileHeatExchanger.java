@@ -1,6 +1,7 @@
 package team.cappcraft.immersivechemical.common.tileentity;
 
 import blusunrize.immersiveengineering.api.ApiUtils;
+import blusunrize.immersiveengineering.api.IEProperties;
 import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces;
 import blusunrize.immersiveengineering.common.blocks.TileEntityMultiblockPart;
 import net.minecraft.item.ItemStack;
@@ -21,7 +22,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.concurrent.Executors;
 
-public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart<AbstractTileHeatExchanger> implements IEBlockInterfaces.IGuiTile, IEBlockInterfaces.IProcessTile {
+public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart<AbstractTileHeatExchanger>
+        implements IEBlockInterfaces.IGuiTile, IEBlockInterfaces.IProcessTile, IEBlockInterfaces.IMirrorAble {
     public static final String TAG_TANKS = "Tanks";
     public static final String TAG_PROCESSING = "Processing";
     public static final String TAG_STATE = "State";
@@ -142,6 +144,17 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
             nbt.setBoolean(TAG_PROCESSING, currentState instanceof TileHeatExchangerTickAction.Processing);
             nbt.setInteger(TAG_STATE, ((Enum) currentState).ordinal());
         }
+    }
+
+    @Nonnull
+    @Override
+    public IEProperties.PropertyBoolInverted getBoolProperty(@Nonnull Class<? extends IEBlockInterfaces.IUsesBooleanProperty> inf) {
+        return IEProperties.BOOLEANS[0];
+    }
+
+    @Override
+    public boolean getIsMirrored() {
+        return mirrored;
     }
 
     @Nonnull

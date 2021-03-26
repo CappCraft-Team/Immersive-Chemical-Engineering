@@ -34,6 +34,4 @@ public class ClientProxy extends CommonProxy {
         ImmersiveChemicalEngineering.packetHandler.registerMessage(MessageTileSync.HandlerClient.class, MessageTileSync.class, 0, Side.CLIENT);
         ImmersiveChemicalEngineering.packetHandler.registerMessage(MessageTileSync.HandlerServer.class, MessageTileSync.class, 0, Side.SERVER);
     }
-
-
 }
