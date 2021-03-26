@@ -4,11 +4,14 @@ import blusunrize.immersiveengineering.api.IEProperties;
 import blusunrize.immersiveengineering.api.Lib;
 import blusunrize.immersiveengineering.api.MultiblockHandler;
 import blusunrize.immersiveengineering.api.crafting.IngredientStack;
+import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.common.IEContent;
 import blusunrize.immersiveengineering.common.blocks.BlockTypes_MetalsAll;
 import blusunrize.immersiveengineering.common.blocks.metal.BlockTypes_MetalDecoration0;
 import blusunrize.immersiveengineering.common.util.Utils;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -134,13 +137,25 @@ public class MultiBlockHeatExchangerMedium implements MultiblockHandler.IMultibl
         return 16f;
     }
 
+    static ItemStack renderStack = ItemStack.EMPTY;
+
     @Override
     public boolean canRenderFormedStructure() {
-        return false;
+        return true;
     }
 
     @Override
     public void renderFormedStructure() {
+        if (renderStack.isEmpty())
+            renderStack = new ItemStack(ICHEME_Contents.blockHeatExchanger, 1, BlockTypes_HeatExchanger.HEAT_EXCHANGER_MEDIUM.getMeta());
 
+        GlStateManager.translate(1, 1, 2);
+        GlStateManager.rotate(-45, 0, 1, 0);
+        GlStateManager.rotate(-20, 1, 0, 0);
+        GlStateManager.scale(4, 4, 4);
+
+        GlStateManager.disableCull();
+        ClientUtils.mc().getRenderItem().renderItem(renderStack, ItemCameraTransforms.TransformType.GUI);
+        GlStateManager.enableCull();
     }
 }

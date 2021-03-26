@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import org.apache.logging.log4j.Logger;
+import team.cappcraft.immersivechemical.common.blocks.multiblocks.BlockTypes_HeatExchanger;
 import team.cappcraft.immersivechemical.common.proxy.CommonProxy;
 
 import javax.annotation.Nonnull;
@@ -34,7 +35,7 @@ public class ImmersiveChemicalEngineering {
         @Nonnull
         @Override
         public ItemStack getTabIconItem() {
-            return ItemStack.EMPTY;
+            return new ItemStack(ICHEME_Contents.blockHeatExchanger, 1, BlockTypes_HeatExchanger.HEAT_EXCHANGER_SMALL.getMeta());
         }
     };
 
