@@ -48,6 +48,25 @@ public class BlockHeatExchanger extends BlockIEMultiblock<BlockTypes_HeatExchang
     }
 
     @Override
+    public boolean useCustomStateMapper() {
+        return true;
+    }
+
+    @Nonnull
+    @Override
+    public String getCustomStateMapping(int meta, boolean itemBlock) {
+        switch (meta) {
+            case 0:
+                return "small";
+            case 1:
+                return "medium";
+            case 2:
+                return "large";
+        }
+        throw new IllegalArgumentException(String.format("Unknown meta:%d", meta));
+    }
+
+    @Override
     public boolean onBlockActivated(World world, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EntityPlayer player, @Nonnull EnumHand hand, @Nonnull EnumFacing side, float hitX, float hitY, float hitZ) {
         TileEntity tile = world.getTileEntity(pos);
         if (tile instanceof IEBlockInterfaces.IGuiTile && hand == EnumHand.MAIN_HAND && !player.isSneaking()) {

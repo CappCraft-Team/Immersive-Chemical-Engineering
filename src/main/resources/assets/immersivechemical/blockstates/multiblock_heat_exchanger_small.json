@@ -10,12 +10,24 @@
     }
   },
   "variants": {
+    "inventory,type=heat_exchanger_small": [
+      {
+        "model": "immersivechemical:multiblock/heat_exchanger_small.obj",
+        "transform": {
+          "scale": 0.3,
+          "rotation": [
+            {
+              "x": 20
+            },
+            {
+              "y": -45
+            }
+          ]
+        }
+      }
+    ],
     "type": {
       "heat_exchanger_small": {
-      },
-      "heat_exchanger_medium": {
-      },
-      "heat_exchanger_large": {
       }
     },
     "facing": {
@@ -55,8 +67,12 @@
       }
     },
     "boolean0": {
-      "false": {},
-      "true": {}
+      "false": {
+        "model": "immersivechemical:multiblock/heat_exchanger_small.obj"
+      },
+      "true": {
+        "model": "immersivechemical:multiblock/heat_exchanger_small_mirror.obj"
+      }
     }
   }
 }
