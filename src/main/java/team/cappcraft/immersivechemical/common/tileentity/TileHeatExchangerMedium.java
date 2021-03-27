@@ -87,8 +87,9 @@ public class TileHeatExchangerMedium extends AbstractTileHeatExchanger {
         if (w == 0)
             return new float[]{0, 0, 0, 1, 1, 1};
         else {
-            final float X_1 = l == 0 ? 0.09f : 0;
-            final float X_2 = l == 1 ? 0.91f : 1;
+            final boolean Front = l == (facing.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? 0 : 1);
+            final float X_1 = Front ? 0.09f : 0;
+            final float X_2 = !Front ? 0.91f : 1;
 
             final float Y_1 = h == 0 && ((w == 1 && l == 1) || w == 3) ? 0 : 0.09f;
             final float Y_2 = l == 0 && h == 1 && w == 1 ? 1 : 0.91f;
