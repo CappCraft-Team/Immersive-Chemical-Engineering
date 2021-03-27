@@ -219,7 +219,7 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
     }
 
     /**
-     * Clear fluid events
+     * Clear fluid events, use block event to ensure thread safe
      *
      * @param id 1 -> Left Slot
      *           2 -> Right Slot
