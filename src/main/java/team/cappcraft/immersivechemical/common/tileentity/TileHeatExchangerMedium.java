@@ -91,8 +91,8 @@ public class TileHeatExchangerMedium extends AbstractTileHeatExchanger {
             final float X_1 = Front ? 0.09f : 0;
             final float X_2 = !Front ? 0.91f : 1;
 
-            final float Y_1 = h == 0 && ((w == 1 && l == 1) || w == 3) ? 0 : 0.09f;
-            final float Y_2 = l == 0 && h == 1 && w == 1 ? 1 : 0.91f;
+            final float Y_1 = 0;
+            final float Y_2 = 1;
 
             final float Z_1 = 0;
             final float Z_2 = 1;

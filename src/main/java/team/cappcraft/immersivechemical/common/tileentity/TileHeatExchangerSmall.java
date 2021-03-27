@@ -79,11 +79,11 @@ public class TileHeatExchangerSmall extends AbstractTileHeatExchanger {
         }
         if (facing.getAxis() == EnumFacing.Axis.X)
             return new float[]{
-                    0.12f, 0.12f, 0,
-                    0.88f, 0.88f, 1};
+                    0.1f, 0, 0,
+                    0.9f, 1, 1};
         else
             return new float[]{
-                    0, 0.12f, 0.12f,
-                    1, 0.88f, 0.88f};
+                    0, 0, 0.1f,
+                    1, 1, 0.9f};
     }
 }
