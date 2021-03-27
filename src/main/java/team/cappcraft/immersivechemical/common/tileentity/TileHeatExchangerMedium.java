@@ -81,6 +81,25 @@ public class TileHeatExchangerMedium extends AbstractTileHeatExchanger {
     @Nonnull
     @Override
     public float[] getBlockBounds() {
-        return new float[]{0, 0, 0, 1, 1, 1};
+        final int h = pos / 10;
+        final int l = pos % 10 / 5;
+        final int w = pos % 5;
+        if (w == 0)
+            return new float[]{0, 0, 0, 1, 1, 1};
+        else {
+            final float X_1 = l == 0 ? 0.09f : 0;
+            final float X_2 = l == 1 ? 0.91f : 1;
+
+            final float Y_1 = h == 0 && ((w == 1 && l == 1) || w == 3) ? 0 : 0.09f;
+            final float Y_2 = l == 0 && h == 1 && w == 1 ? 1 : 0.91f;
+
+            final float Z_1 = 0;
+            final float Z_2 = 1;
+
+            if (facing.getAxis() == EnumFacing.Axis.X)
+                return new float[]{X_1, Y_1, Z_1, X_2, Y_2, Z_2};
+            else
+                return new float[]{Z_1, Y_1, X_1, Z_2, Y_2, X_2};
+        }
     }
 }
