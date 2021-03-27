@@ -27,20 +27,21 @@ public class TileHeatExchangerLarge extends AbstractTileHeatExchanger {
     @Nonnull
     @Override
     protected IFluidTank[] getAccessibleFluidTanks(@Nonnull EnumFacing side) {
-        if (side.getAxis() == EnumFacing.Axis.Y)
+        AbstractTileHeatExchanger master = null;
+        if (side.getAxis() == EnumFacing.Axis.Y && (master = master()) != null)
             switch (pos) {
                 case FluidAccessPointInputA:
                     if (side == EnumFacing.UP)
-                        return new IFluidTank[]{Tanks[0]};
+                        return new IFluidTank[]{master.Tanks[0]};
                 case FluidAccessPointOutputA:
                     if (side == EnumFacing.DOWN)
-                        return new IFluidTank[]{Tanks[1]};
+                        return new IFluidTank[]{master.Tanks[1]};
                 case FluidAccessPointInputB:
                     if (side == EnumFacing.DOWN)
-                        return new IFluidTank[]{Tanks[2]};
+                        return new IFluidTank[]{master.Tanks[2]};
                 case FluidAccessPointOutputB:
                     if (side == EnumFacing.UP)
-                        return new IFluidTank[]{Tanks[3]};
+                        return new IFluidTank[]{master.Tanks[3]};
             }
         return new IFluidTank[0];
     }

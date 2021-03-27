@@ -8,8 +8,10 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.relauncher.Side;
 import team.cappcraft.immersivechemical.ICHEME_Contents;
 import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
+import team.cappcraft.immersivechemical.common.network.MessageBlockEvent;
 import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRecipeRegistry;
 
 import javax.annotation.Nonnull;
@@ -28,6 +30,7 @@ public class CommonProxy {
 
     public void init(FMLInitializationEvent e) {
         NetworkRegistry.INSTANCE.registerGuiHandler(ImmersiveChemicalEngineering.instance, new GuiHandler());
+        ImmersiveChemicalEngineering.packetHandler.registerMessage(MessageBlockEvent.HandlerServer.class, MessageBlockEvent.class, 0, Side.SERVER);
         ICHEME_Contents.init();
     }
 

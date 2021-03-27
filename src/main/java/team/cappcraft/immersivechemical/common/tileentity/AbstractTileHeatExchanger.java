@@ -42,7 +42,7 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
      * InputB = 2
      * OutputB = 3
      */
-    protected final LockableFluidTank[] Tanks;
+    public final LockableFluidTank[] Tanks;
     /**
      * When restore, we need to refresh the recipe by current input
      */
@@ -112,8 +112,11 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
         if (isDummy()) return;
         if (world.isRemote) {
             //TODO: handle client side logic
-        } else
-            currentState = currentState.nextState(this);
+        } else {
+            final ITickableStateMachine<AbstractTileHeatExchanger> newState = this.currentState.nextState(this);
+            if (currentState != newState) markContainingBlockForUpdate(null);
+            this.currentState = newState;
+        }
     }
 
     @Override
@@ -216,16 +219,45 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
     }
 
     /**
-     * Clear the fluid in the tanks and unlock it
+     * Clear fluid events
+     *
+     * @param id 1 -> Left Slot
+     *           2 -> Right Slot
+     *           3 -> All SLot
+     */
+    @Override
+    public boolean receiveClientEvent(int id, int type) {
+        if (!super.receiveClientEvent(id, type)) {
+            switch (id) {
+                case 1:
+                    clearFluidSlot(0);
+                    clearFluidSlot(1);
+                    return true;
+                case 2:
+                    clearFluidSlot(2);
+                    clearFluidSlot(3);
+                    return true;
+                case 3:
+                    clearFluidSlot(0);
+                    clearFluidSlot(1);
+                    clearFluidSlot(2);
+                    clearFluidSlot(3);
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Clear the fluid in the specified slot and unlock it
      * Wont action if in WAITING_FOR_RECIPE_MATCH state
      */
-    private void clearFluidSlotAll() {
+    private void clearFluidSlot(int slot) {
         if (currentState == TileHeatExchangerTickAction.DecideRecipe.WAITING_FOR_RECIPE_MATCH) return;
         currentState = TileHeatExchangerTickAction.DecideRecipe.WAITING_INPUT_SLOT_CHANGE;
-        for (LockableFluidTank tank : Tanks) {
-            tank.setLockedType(false);
-            tank.setFluid(null);
-        }
+        final LockableFluidTank tank = Tanks[slot];
+        tank.setLockedType(false);
+        tank.setFluid(null);
     }
 
     private void modifyIdle(boolean increase) {
@@ -233,8 +265,8 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
         idleTime = net.minecraft.util.math.MathHelper.clamp(idleTime, -CoolDownBase, CoolDownBase * 3);
     }
 
-    protected static class TileHeatExchangerTickAction {
-        protected enum DecideRecipe implements ITickableStateMachine<AbstractTileHeatExchanger> {
+    public static class TileHeatExchangerTickAction {
+        public enum DecideRecipe implements ITickableStateMachine<AbstractTileHeatExchanger> {
             WAITING_INPUT_SLOT_CHANGE,
             MATCH_COOL_DOWN {
                 @Override
@@ -275,7 +307,7 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
          * When in processing state, cachedRecipe should not be null
          */
         @SuppressWarnings("ConstantConditions")
-        protected enum Processing implements ITickableStateMachine<AbstractTileHeatExchanger> {
+        public enum Processing implements ITickableStateMachine<AbstractTileHeatExchanger> {
             COOL_DOWN {
                 @Override
                 public ITickableStateMachine<AbstractTileHeatExchanger> nextState(AbstractTileHeatExchanger tickAble) {
