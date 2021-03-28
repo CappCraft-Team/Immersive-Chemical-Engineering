@@ -59,9 +59,10 @@ public class GuiHeatExchanger extends GuiIEContainerBase {
         ArrayList<String> tooltip = new ArrayList<String>();
 
         handleFluidAmount(mouseX, mouseY, tooltip);
-        if (isShiftKeyDown()) {
+        if (isShiftKeyDown() && isCtrlKeyDown()) {
             tooltip.add(String.format("Mouse X:%d, Y:%d", mouseX, mouseY));
             tooltip.add(String.format("Current State:%s", tile.currentState));
+            tooltip.add(String.format("IdleTime:%d", tile.idleTime));
         }
         if (!tooltip.isEmpty()) {
             ClientUtils.drawHoveringText(tooltip, mouseX, mouseY, fontRenderer, guiLeft + xSize, -1);
