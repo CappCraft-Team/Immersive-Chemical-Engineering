@@ -2,6 +2,7 @@ package team.cappcraft.immersivechemical.common.compact.crafttweaker;
 
 import crafttweaker.CraftTweakerAPI;
 import crafttweaker.IAction;
+import crafttweaker.annotations.ZenRegister;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
@@ -15,6 +16,7 @@ import static team.cappcraft.immersivechemical.common.recipe.HeatExchangerRecipe
 
 @SuppressWarnings("unused")
 @ZenClass("team.cappcraft.icheme.HeatExchanger")
+@ZenRegister
 public class HeatExchangerCTRecipe {
     /**
      * Add recipe to all type of HeatExchanger
@@ -76,7 +78,7 @@ public class HeatExchangerCTRecipe {
         @Override
         public boolean validate() {
             if (RegistryName == null
-                    || !ImmersiveChemicalEngineering.proxy.heatExchangerRecipeRegistry.getKeys().contains(RegistryName))
+                    || ImmersiveChemicalEngineering.proxy.heatExchangerRecipeRegistry.getKeys().contains(RegistryName))
                 describeInvalid = String.format("RegistryName null or duplicate: %s", RegistryName);
             else if (RegistryName.endsWith(POSTFIX_REVERSE))
                 describeInvalid = String.format("RegistryName contains invalid POSTFIX: %s", POSTFIX_REVERSE);

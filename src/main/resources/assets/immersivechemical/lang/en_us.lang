@@ -14,3 +14,5 @@ ie.manual.entry.heatExchangerBlock1= and click the Radiator Block with an Engine
 ie.manual.entry.heatExchangerSmall=Use an Engineer's Hammer to click any Radiator Block.
 ie.manual.entry.heatExchangerMedium=Use an Engineer's Hammer to click the left top(or right top) Radiator Block.
 ie.manual.entry.heatExchangerLarge=Use an Engineer's Hammer to click the Radiator Block in center.
+#JEI
+category.heat_exchanger.name=Heat Exchanger

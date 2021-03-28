@@ -8,6 +8,7 @@ import team.cappcraft.immersivechemical.common.tileentity.LockableFluidTank;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
@@ -48,6 +49,10 @@ public class HeatExchangerRecipeRegistry implements IRegistry<String, HeatExchan
     @Override
     public Iterator<HeatExchangerRecipe> iterator() {
         return recipeBiMap.values().iterator();
+    }
+
+    public Collection<HeatExchangerRecipe> getRegisteredRecipes() {
+        return recipeBiMap.values();
     }
 
     public Optional<HeatExchangerRecipe> findRecipe(HeatExchangerSize size, LockableFluidTank tankA, LockableFluidTank tankB) {
