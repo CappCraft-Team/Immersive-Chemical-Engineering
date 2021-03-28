@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
+import team.cappcraft.immersivechemical.Config;
 import team.cappcraft.immersivechemical.common.recipe.constant.HeatExchangerSize;
 
 import javax.annotation.Nonnull;
@@ -21,7 +22,10 @@ public class TileHeatExchangerLarge extends AbstractTileHeatExchanger {
     protected static final int FluidAccessPointOutputB = 58;
 
     public TileHeatExchangerLarge() {
-        super(new int[]{3, 7, 3}, 5000 * 6, HeatExchangerSize.LARGE, 0.2f);
+        super(new int[]{3, 7, 3},
+                Config.HeatExchangerCapacity.Large,
+                HeatExchangerSize.LARGE,
+                Config.HeatExchangerTickMultiplier.Large);
     }
 
     @Nonnull
