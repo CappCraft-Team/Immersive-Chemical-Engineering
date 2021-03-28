@@ -14,7 +14,7 @@
       {
         "model": "immersivechemical:multiblock/heat_exchanger_large.obj",
         "transform": {
-          "scale": 0.3,
+          "scale": 0.1,
           "rotation": [
             {
               "x": 20
