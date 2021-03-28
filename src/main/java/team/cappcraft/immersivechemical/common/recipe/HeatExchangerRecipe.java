@@ -24,8 +24,10 @@ public class HeatExchangerRecipe implements IJEIRecipe {
     /**
      * the minimum fluid amount per exchange
      */
-    public final int UnitAmountExchangeA;
-    public final int UnitAmountExchangeB;
+    public final int UnitInputA;
+    public final int UnitOutputA;
+    public final int UnitInputB;
+    public final int UnitOutputB;
 
     public final HeatExchangerSize Size;
 
@@ -33,8 +35,14 @@ public class HeatExchangerRecipe implements IJEIRecipe {
         ExchangeA = exchangeA;
         ExchangeB = exchangeB;
         UnitHeatValue = MathHelper.LeastCommonMultiple(ExchangeA.HeatValue, ExchangeB.HeatValue);
-        UnitAmountExchangeA = UnitHeatValue / ExchangeA.HeatValue;
-        UnitAmountExchangeB = UnitHeatValue / ExchangeB.HeatValue;
+
+        final int UnitA = UnitHeatValue / ExchangeA.HeatValue;
+        final int UnitB = UnitHeatValue / ExchangeB.HeatValue;
+
+        UnitInputA = ExchangeA.Input.amount * UnitA;
+        UnitOutputA = ExchangeA.Output.amount * UnitA;
+        UnitInputB = ExchangeB.Input.amount * UnitB;
+        UnitOutputB = ExchangeB.Output.amount * UnitB;
 
         this.Size = size;
     }
@@ -45,8 +53,10 @@ public class HeatExchangerRecipe implements IJEIRecipe {
                 "ExchangeA=" + ExchangeA +
                 ", ExchangeB=" + ExchangeB +
                 ", UnitHeatValue=" + UnitHeatValue +
-                ", UnitAmountExchangeA=" + UnitAmountExchangeA +
-                ", UnitAmountExchangeB=" + UnitAmountExchangeB +
+                ", UnitInputA=" + UnitInputA +
+                ", UnitOutputA=" + UnitOutputA +
+                ", UnitInputB=" + UnitInputB +
+                ", UnitOutputB=" + UnitOutputB +
                 ", Size=" + Size +
                 '}';
     }
@@ -63,17 +73,21 @@ public class HeatExchangerRecipe implements IJEIRecipe {
 
     @Override
     public List<FluidStack> getJEITotalFluidInputs() {
-        return ImmersiveChemicalEngineering.proxy.heatExchangerRecipeRegistry.getKey(this).endsWith(HeatExchangerRecipeRegistry.POSTFIX_REVERSE) ?
-                Collections.emptyList() : Arrays.asList(
-                new FluidStack(ExchangeA.Input, UnitAmountExchangeA),
-                new FluidStack(ExchangeB.Input, UnitAmountExchangeB));
+        return Arrays.asList(
+                new FluidStack(ExchangeA.Input, UnitInputA),
+                new FluidStack(ExchangeB.Input, UnitInputB));
     }
 
     @Override
     public List<FluidStack> getJEITotalFluidOutputs() {
-        return ImmersiveChemicalEngineering.proxy.heatExchangerRecipeRegistry.getKey(this).endsWith(HeatExchangerRecipeRegistry.POSTFIX_REVERSE) ?
-                Collections.emptyList() : Arrays.asList(
-                new FluidStack(ExchangeA.Output, UnitAmountExchangeA),
-                new FluidStack(ExchangeB.Output, UnitAmountExchangeB));
+        return Arrays.asList(
+                new FluidStack(ExchangeA.Output, UnitOutputA),
+                new FluidStack(ExchangeB.Output, UnitOutputB));
+    }
+
+    @Override
+    public boolean listInJEI() {
+        return ImmersiveChemicalEngineering.proxy.heatExchangerRecipeRegistry.getKey(this)
+                .endsWith(HeatExchangerRecipeRegistry.POSTFIX_REVERSE);
     }
 }

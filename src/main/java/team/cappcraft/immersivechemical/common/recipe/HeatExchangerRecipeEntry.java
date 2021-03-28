@@ -2,7 +2,6 @@ package team.cappcraft.immersivechemical.common.recipe;
 
 import crafttweaker.annotations.ZenRegister;
 import crafttweaker.api.liquid.ILiquidStack;
-import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
@@ -17,9 +16,9 @@ import java.util.Objects;
 @ZenRegister
 public class HeatExchangerRecipeEntry {
     @Nonnull
-    public final Fluid Input;
+    public final FluidStack Input;
     @Nonnull
-    public final Fluid Output;
+    public final FluidStack Output;
     public final int HeatValue;
 
     /**
@@ -27,18 +26,20 @@ public class HeatExchangerRecipeEntry {
      *
      * @param in        need to be registered in FluidRegistry
      * @param out       need to be registered in FluidRegistry
-     * @param heatValue how much heat to release/consume for one mb fluid to be processed, this always positive
+     * @param heatValue how much heat to release/consume from Input to Output,
+     *                  with their correspond amount of fluid to be consumed or produced,
+     *                  this always positive
      */
     @SuppressWarnings("unused")
     @ZenConstructor
     public HeatExchangerRecipeEntry(ILiquidStack in, ILiquidStack out, int heatValue) {
         this(
-                Objects.requireNonNull(FluidRegistry.getFluid(in.getName())),
-                Objects.requireNonNull(FluidRegistry.getFluid(out.getName())),
+                new FluidStack(Objects.requireNonNull(FluidRegistry.getFluid(in.getName())), in.getAmount()),
+                new FluidStack(Objects.requireNonNull(FluidRegistry.getFluid(out.getName())), out.getAmount()),
                 heatValue);
     }
 
-    public HeatExchangerRecipeEntry(@Nonnull Fluid in, @Nonnull Fluid out, int heatValue) {
+    public HeatExchangerRecipeEntry(@Nonnull FluidStack in, @Nonnull FluidStack out, int heatValue) {
         this.Input = in;
         this.Output = out;
         this.HeatValue = heatValue;
@@ -49,7 +50,7 @@ public class HeatExchangerRecipeEntry {
     }
 
     public boolean isInputMatches(@Nullable FluidStack fluidStack) {
-        return fluidStack != null && fluidStack.getFluid() == Input;
+        return fluidStack != null && fluidStack.getFluid() == Input.getFluid();
     }
 
     public boolean isOutputMatches(@Nonnull FluidTank fluidTank) {
@@ -57,7 +58,7 @@ public class HeatExchangerRecipeEntry {
     }
 
     public boolean isOutputMatches(@Nullable FluidStack fluidStack) {
-        return fluidStack == null || fluidStack.getFluid() == Input;
+        return fluidStack == null || fluidStack.getFluid() == Input.getFluid();
     }
 
     @Override
