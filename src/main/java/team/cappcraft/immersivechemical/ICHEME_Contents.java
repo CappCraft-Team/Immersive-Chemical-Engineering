@@ -10,8 +10,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import team.cappcraft.immersivechemical.common.blocks.multiblocks.*;
 import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRegistry;
 import team.cappcraft.immersivechemical.common.tileentity.TileHeatExchangerLarge;
@@ -62,9 +60,5 @@ public class ICHEME_Contents {
         String s = tile.getSimpleName();
         s = s.substring(s.indexOf("Tile") + "Tile".length());
         GameRegistry.registerTileEntity(tile, ImmersiveChemicalEngineering.MODID + ":" + s);
-    }
-
-    @SideOnly(Side.CLIENT)
-    public static void initModels() {
     }
 }
