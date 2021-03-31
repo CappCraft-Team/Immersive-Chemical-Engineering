@@ -1,0 +1,14 @@
+# Blender MTL File: 'heat_exchanger_small.blend'
+# Material Count: 2
+
+newmtl cube
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+d 1.000000
+map_Kd immersivechemical:blocks/cube_small
+
+newmtl pipe
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+d 1.000000
+map_Kd immersivechemical:blocks/pipe_small

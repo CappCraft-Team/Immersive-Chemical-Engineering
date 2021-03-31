@@ -1,0 +1,62 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "transform": "forge:default-block",
+    "custom": {
+      "flip-v": true
+    },
+    "textures": {
+      "particle": "immersiveengineering:blocks/storage_steel"
+    }
+  },
+  "variants": {
+    "type": {
+      "heat_exchanger_small": {
+      },
+      "heat_exchanger_medium": {
+      },
+      "heat_exchanger_large": {
+      }
+    },
+    "facing": {
+      "north": {
+        "transform": {
+          "rotation": {
+            "y": 0
+          }
+        }
+      },
+      "south": {
+        "transform": {
+          "rotation": {
+            "y": 180
+          }
+        }
+      },
+      "west": {
+        "transform": {
+          "rotation": {
+            "y": 90
+          }
+        }
+      },
+      "east": {
+        "transform": {
+          "rotation": {
+            "y": -90
+          }
+        }
+      }
+    },
+    "_0multiblockslave": {
+      "false": {},
+      "true": {
+        "model": "immersiveengineering:ie_empty"
+      }
+    },
+    "boolean0": {
+      "false": {},
+      "true": {}
+    }
+  }
+}

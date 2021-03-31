@@ -1,0 +1,18 @@
+#en_us
+itemGroup.immersivechemical=Immersive Chemical Engineering
+#tiles
+tile.immersivechemical.multiblock_heat_exchanger.heat_exchanger_small.name=Heat Exchanger(Small)
+tile.immersivechemical.multiblock_heat_exchanger.heat_exchanger_medium.name=Heat Exchanger(Medium)
+tile.immersivechemical.multiblock_heat_exchanger.heat_exchanger_large.name=Heat Exchanger(Large)
+#Manual
+ie.manual.category.heatExchanger.name=Heat exchange technique
+ie.manual.entry.heatExchanger.name=Heat Exchanger
+ie.manual.entry.heatExchanger.subtext=Exchange heat!
+ie.manual.entry.heatExchanger0=This page talks about the heat exchanger, where we can exchange heat between fluids!
+ie.manual.entry.heatExchangerBlock0=To form an exchanger, follow the instruction in the next page,
+ie.manual.entry.heatExchangerBlock1= and click the Radiator Block with an Engineer's Hammer.
+ie.manual.entry.heatExchangerSmall=Use an Engineer's Hammer to click any Radiator Block.
+ie.manual.entry.heatExchangerMedium=Use an Engineer's Hammer to click the left top(or right top) Radiator Block.
+ie.manual.entry.heatExchangerLarge=Use an Engineer's Hammer to click the Radiator Block in center.
+#JEI
+category.heat_exchanger.name=Heat Exchanger

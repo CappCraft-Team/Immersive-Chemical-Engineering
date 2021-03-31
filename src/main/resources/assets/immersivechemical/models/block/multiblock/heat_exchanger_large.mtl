@@ -1,0 +1,20 @@
+# Blender MTL File: 'heat_exchanger_large.blend'
+# Material Count: 3
+
+newmtl Cube
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+d 1.000000
+map_Kd immersivechemical:blocks/cube_large
+
+newmtl LargePipe
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+d 1.000000
+map_Kd immersivechemical:blocks/pipe
+
+newmtl Tube
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+d 1.000000
+map_Kd immersivechemical:blocks/tube
