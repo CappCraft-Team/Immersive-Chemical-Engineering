@@ -12,14 +12,11 @@ import net.minecraftforge.fml.relauncher.Side;
 import team.cappcraft.immersivechemical.ICHEME_Contents;
 import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
 import team.cappcraft.immersivechemical.common.network.MessageBlockEvent;
-import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRecipeRegistry;
 
 import javax.annotation.Nonnull;
 
 @Mod.EventBusSubscriber
 public class CommonProxy {
-    public HeatExchangerRecipeRegistry heatExchangerRecipeRegistry = new HeatExchangerRecipeRegistry();
-
     public static <T extends TileEntity & IEBlockInterfaces.IGuiTile> void openGuiForTile(@Nonnull EntityPlayer player, @Nonnull T tile) {
         player.openGui(ImmersiveChemicalEngineering.instance, tile.getGuiID(), tile.getWorld(), tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ());
     }

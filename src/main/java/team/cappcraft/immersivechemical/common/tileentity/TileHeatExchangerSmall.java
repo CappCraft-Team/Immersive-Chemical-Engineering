@@ -7,8 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
-import team.cappcraft.immersivechemical.Config;
-import team.cappcraft.immersivechemical.common.recipe.constant.HeatExchangerSize;
+import team.cappcraft.immersivechemical.common.tileentity.constant.HeatExchangerSizeVariants;
 
 import javax.annotation.Nonnull;
 
@@ -20,16 +19,13 @@ public class TileHeatExchangerSmall extends AbstractTileHeatExchanger {
     protected static final int FluidAccessPointB = 3;
 
     public TileHeatExchangerSmall() {
-        super(new int[]{1, 1, 4},
-                Config.HeatExchangerCapacity.Small,
-                HeatExchangerSize.SMALL,
-                Config.HeatExchangerTickMultiplier.Small);
+        super(new int[]{1, 1, 4}, HeatExchangerSizeVariants.SMALL);
     }
 
     @Nonnull
     @Override
     protected IFluidTank[] getAccessibleFluidTanks(@Nonnull EnumFacing side) {
-        AbstractTileHeatExchanger master = null;
+        AbstractTileHeatExchanger master;
         if (side.getAxis() == EnumFacing.Axis.Y && (master = master()) != null)
             switch (pos) {
                 case FluidAccessPointA:

@@ -13,14 +13,16 @@ import net.minecraftforge.fluids.FluidEvent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
+import team.cappcraft.immersivechemical.common.recipe.ConvertDirection;
+import team.cappcraft.immersivechemical.common.recipe.HeatExchangerEntry;
 import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRecipe;
-import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRecipeEntry;
-import team.cappcraft.immersivechemical.common.recipe.constant.HeatExchangerSize;
+import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRegistry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart<AbstractTileHeatExchanger>
         implements IEBlockInterfaces.IGuiTile, IEBlockInterfaces.IProcessTile, IEBlockInterfaces.IMirrorAble {
@@ -29,13 +31,7 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
     public static final String TAG_STATE = "State";
     public static final String TAG_IDLE_TIME = "IdleTime";
     public final int CoolDownBase = 20 * 10;
-    @Nonnull
-    public final HeatExchangerSize Size;
-    public final int Capacity;
-    /**
-     * Tick required to exchange one heat
-     */
-    public final float TickRequiredToExchange;
+    public final IHeatExchangerProperties Properties;
     /**
      * Input/Output Tanks
      * InputA = 0
@@ -50,30 +46,27 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
     @Nonnull
     public ITickableStateMachine<AbstractTileHeatExchanger> currentState = TileHeatExchangerTickAction.DecideRecipe.IS_INPUT_READY_FOR_MATCH;
     /**
-     * Wont save to NBT, rely on the InputSlot
-     * available recipes may changing
-     */
-    @Nullable
-    protected HeatExchangerRecipe cachedRecipe;
-    /**
      * Use to decide cool down time
      * increase when not exchange heat, otherwise decrease
      */
     public int idleTime = 0;
-    protected int exchangeTimes;
+    /**
+     * Wont save to NBT, rely on the InputSlot
+     * available recipes may changing
+     */
+    protected HeatExchangerRecipe cachedRecipe;
     protected int coolDown;
+    protected int cachedHeat;
     protected int tickSinceLastExchange;
     protected int tickRequired;
 
-
-    public AbstractTileHeatExchanger(int[] structureDimensions, int capacity, @Nonnull HeatExchangerSize size, float tickRequiredToExchange) {
+    public AbstractTileHeatExchanger(int[] structureDimensions, IHeatExchangerProperties properties) {
         super(structureDimensions);
         //region Apply Props
-        Capacity = capacity;
-        Size = size;
-        TickRequiredToExchange = tickRequiredToExchange;
+        Properties = properties;
         //endregion
         //region Setup FluidTanks
+        final int Capacity = Properties.getCapacity();
         Tanks = new LockableFluidTank[]{
                 new LockableFluidTank(Capacity, this::onInputSlotChanged),
                 new LockableFluidTank(Capacity, this::onOutputSlotChanged),
@@ -110,14 +103,11 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
     @Override
     public void update() {
         ApiUtils.checkForNeedlessTicking(this);
-        if (isDummy()) return;
-        if (world.isRemote) {
-            //TODO: handle client side logic
-        } else {
-            final ITickableStateMachine<AbstractTileHeatExchanger> newState = this.currentState.nextState(this);
-            if (currentState != newState) markContainingBlockForUpdate(null);
-            this.currentState = newState;
-        }
+        if (isDummy() || world.isRemote) return;
+
+        final ITickableStateMachine<AbstractTileHeatExchanger> newState = this.currentState.nextState(this);
+        if (currentState != newState) markContainingBlockForUpdate(null);
+        this.currentState = newState;
     }
 
     @Override
@@ -178,7 +168,7 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
         AbstractTileHeatExchanger master = master();
         if (master != this && master != null)
             return master.getCurrentProcessesMax();
-        return new int[]{tickRequired};
+        return new int[]{currentState instanceof TileHeatExchangerTickAction.Processing ? tickRequired : 0};
     }
 
     @Override
@@ -198,27 +188,18 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
     }
 
     protected void onInputSlotChanged(FluidEvent event) {
-        if (currentState == TileHeatExchangerTickAction.DecideRecipe.WAITING_INPUT_SLOT_CHANGE) {
-            coolDown = 5 * 20; //Wait 5 seconds, for clear Fluid action
-            currentState = TileHeatExchangerTickAction.DecideRecipe.MATCH_COOL_DOWN;
+        if (event instanceof FluidEvent.FluidFillingEvent) {
+            if (currentState == TileHeatExchangerTickAction.DecideRecipe.WAITING_INPUT_SLOT_CHANGE) {
+                coolDown = 5 * 20; //Wait 5 seconds, for clear Fluid action
+                currentState = TileHeatExchangerTickAction.DecideRecipe.MATCH_COOL_DOWN;
+            }
+            ((ILockableSlot) ((FluidEvent.FluidFillingEvent) event).getTank()).setLockedType(true);
         }
     }
 
     protected void onOutputSlotChanged(FluidEvent event) {
-    }
-
-    private void setInputSlotLockType(boolean locked) {
-        for (int i = 0; i < Tanks.length; i++) {
-            if (i % 2 == 0) Tanks[i].setLockedType(locked);
-        }
-        markDirty();
-    }
-
-    private void setOutputSlotLockType(boolean locked) {
-        for (int i = 0; i < Tanks.length; i++) {
-            if (i % 2 != 0) Tanks[i].setLockedType(locked);
-        }
-        markDirty();
+        if (event instanceof FluidEvent.FluidFillingEvent)
+            ((ILockableSlot) ((FluidEvent.FluidFillingEvent) event).getTank()).setLockedType(true);
     }
 
     /**
@@ -255,7 +236,7 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
      * Clear the fluid in the specified slot and unlock it
      * Wont action if in WAITING_FOR_RECIPE_MATCH state
      */
-    private void clearFluidSlot(int slot) {
+    protected void clearFluidSlot(int slot) {
         if (currentState == TileHeatExchangerTickAction.DecideRecipe.WAITING_FOR_RECIPE_MATCH) return;
         currentState = TileHeatExchangerTickAction.DecideRecipe.WAITING_INPUT_SLOT_CHANGE;
         final LockableFluidTank tank = Tanks[slot];
@@ -263,7 +244,35 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
         tank.setFluid(null);
     }
 
-    private void deltaIdle(int delta) {
+    /**
+     * Wont action if in WAITING_FOR_RECIPE_MATCH state
+     */
+    protected void setFluidFilter(int slot, FluidStack fluidStack) {
+        if (currentState == TileHeatExchangerTickAction.DecideRecipe.WAITING_FOR_RECIPE_MATCH) return;
+        currentState = TileHeatExchangerTickAction.DecideRecipe.MATCH_COOL_DOWN;
+        final LockableFluidTank tank = Tanks[slot];
+        tank.setLockedType(true);
+        tank.setFluid(new FluidStack(fluidStack, 0));
+    }
+
+    private int exchange(HeatExchangerEntry entry, ConvertDirection direction, LockableFluidTank input, LockableFluidTank output) {
+        final FluidStack In = entry.getInput(direction);
+        final FluidStack Out = entry.getOutput(direction);
+
+        if (input.getFluidAmount() >= In.amount && output.getSpareVolume() >= Out.amount) {
+            input.drainInternal(In, true);
+            output.fillInternal(Out, true);
+            return entry.HeatValue;
+        }
+        return 0;
+    }
+
+    /**
+     * Delta the idle time of the machine, to reduce useless tick
+     *
+     * @param delta delta value
+     */
+    protected void deltaIdle(int delta) {
         idleTime += delta;
         idleTime = net.minecraft.util.math.MathHelper.clamp(idleTime, -CoolDownBase, CoolDownBase * 3);
     }
@@ -282,18 +291,29 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
                 @Override
                 public ITickableStateMachine<AbstractTileHeatExchanger> nextState(AbstractTileHeatExchanger tickAble) {
                     if (tickAble.Tanks[0].getFluid() != null && tickAble.Tanks[2].getFluid() != null) {
-                        Executors.newSingleThreadExecutor().submit(() -> {
-                            tickAble.cachedRecipe =
-                                    ImmersiveChemicalEngineering.proxy.heatExchangerRecipeRegistry.
-                                            findRecipe(tickAble.Size, tickAble.Tanks[0], tickAble.Tanks[2]).orElse(null);
-                            if (tickAble.cachedRecipe != null) {
-                                tickAble.currentState = Processing.ASSERT_IO_FLUID_TYPE;
-                                tickAble.tickRequired = (int) (tickAble.cachedRecipe.UnitHeatValue * tickAble.TickRequiredToExchange);
-                            } else {
-                                tickAble.currentState = WAITING_INPUT_SLOT_CHANGE;
-                                tickAble.tickRequired = 0;
-                            }
-                        });
+                        try {
+                            HeatExchangerRegistry.REGISTRY.RecipeFinder.submit(() -> {
+                                tickAble.cachedRecipe =
+                                        HeatExchangerRegistry.REGISTRY.findRecipe(
+                                                tickAble.Tanks[0],
+                                                tickAble.Tanks[2],
+                                                tickAble.Tanks[1],
+                                                tickAble.Tanks[3]
+                                        ).orElse(null);
+                            }).get(20, TimeUnit.SECONDS);
+                        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                            ImmersiveChemicalEngineering.logger.error("Exception occurred while searching recipes", e);
+                            tickAble.cachedRecipe = null;
+                        } finally {
+                            //Ensure state is changed after this tick
+                            ApiUtils.addFutureServerTask(tickAble.world, () -> {
+                                if (tickAble.cachedRecipe != null) {
+                                    tickAble.currentState = Processing.DO_EXCHANGE;
+                                } else {
+                                    tickAble.currentState = WAITING_INPUT_SLOT_CHANGE;
+                                }
+                            });
+                        }
                         return WAITING_FOR_RECIPE_MATCH;
                     }
                     return WAITING_INPUT_SLOT_CHANGE;
@@ -309,71 +329,64 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
         /**
          * When in processing state, cachedRecipe should not be null
          */
-        @SuppressWarnings("ConstantConditions")
         public enum Processing implements ITickableStateMachine<AbstractTileHeatExchanger> {
             COOL_DOWN {
                 @Override
                 public ITickableStateMachine<AbstractTileHeatExchanger> nextState(AbstractTileHeatExchanger tickAble) {
-                    if (--tickAble.coolDown <= 0) return ASSERT_IO_FLUID_TYPE;
+                    if (--tickAble.coolDown <= 0) return DO_EXCHANGE;
                     return this;
-                }
-            },
-            ASSERT_IO_FLUID_TYPE {
-                @Override
-                public ITickableStateMachine<AbstractTileHeatExchanger> nextState(AbstractTileHeatExchanger tickAble) {
-                    final HeatExchangerRecipeEntry RecipeA = tickAble.cachedRecipe.ExchangeA;
-                    final HeatExchangerRecipeEntry RecipeB = tickAble.cachedRecipe.ExchangeB;
-                    if (RecipeA.isInputMatches(tickAble.Tanks[0])
-                            && RecipeA.isOutputMatches(tickAble.Tanks[1])
-                            && RecipeB.isInputMatches(tickAble.Tanks[2])
-                            && RecipeB.isOutputMatches(tickAble.Tanks[3])) {
-                        //Lock fluid type here, we wont check type in the following states
-                        tickAble.setInputSlotLockType(true);
-                        return ASSERT_IO_FLUID_AMOUNT;
-                    }
-                    return DecideRecipe.IS_INPUT_READY_FOR_MATCH;
-                }
-            },
-            ASSERT_IO_FLUID_AMOUNT {
-                @Override
-                public ITickableStateMachine<AbstractTileHeatExchanger> nextState(AbstractTileHeatExchanger tickAble) {
-                    tickAble.deltaIdle(1);
-
-                    final HeatExchangerRecipe cachedRecipe = tickAble.cachedRecipe;
-                    tickAble.exchangeTimes = Arrays.stream(new int[]{
-                            tickAble.Tanks[0].getFluidAmount() / cachedRecipe.UnitInputA,
-                            tickAble.Tanks[1].getSpareVolume() / cachedRecipe.UnitOutputA,
-                            tickAble.Tanks[2].getFluidAmount() / cachedRecipe.UnitInputB,
-                            tickAble.Tanks[3].getSpareVolume() / cachedRecipe.UnitOutputB
-                    }).min().getAsInt();
-
-                    //nothing to exchange, just wait for the fluid
-                    if (tickAble.exchangeTimes == 0) {
-                        tickAble.coolDown = tickAble.CoolDownBase + tickAble.idleTime;
-                        //Unlock to allow new type in
-                        tickAble.setInputSlotLockType(false);
-                        return COOL_DOWN;
-                    }
-                    tickAble.deltaIdle(-1);
-                    return DO_EXCHANGE;
                 }
             },
             DO_EXCHANGE {
                 @Override
                 public ITickableStateMachine<AbstractTileHeatExchanger> nextState(AbstractTileHeatExchanger tickAble) {
-                    if (++tickAble.tickSinceLastExchange >= tickAble.tickRequired) {
+                    if (++tickAble.tickSinceLastExchange > tickAble.tickRequired) {
                         tickAble.tickSinceLastExchange = 0;
+                        tickAble.tickRequired = 0;
+                        tickAble.deltaIdle(1);
 
-                        final HeatExchangerRecipe cachedRecipe = tickAble.cachedRecipe;
+                        HeatExchangerEntry ExchangeA = tickAble.cachedRecipe.ExchangeA;
+                        HeatExchangerEntry ExchangeB = tickAble.cachedRecipe.ExchangeB;
 
-                        tickAble.Tanks[0].drainInternal(cachedRecipe.UnitInputA, true);
-                        tickAble.Tanks[1].fillInternal(new FluidStack(cachedRecipe.ExchangeA.Output, cachedRecipe.UnitOutputA), true);
-                        tickAble.Tanks[2].drainInternal(cachedRecipe.UnitInputB, true);
-                        tickAble.Tanks[3].fillInternal(new FluidStack(cachedRecipe.ExchangeB.Output, cachedRecipe.UnitOutputB), true);
+                        ConvertDirection DirectionA = tickAble.cachedRecipe.DirectionA;
+                        final int oldHeat = tickAble.cachedHeat;
+                        //Heat A->B
+                        if (DirectionA == ConvertDirection.COOL_DOWN) {
+                            if (tickAble.cachedHeat < ExchangeB.HeatValue) {
+                                tickAble.cachedHeat += exchangeA(tickAble);
+                            } else {
+                                final int doExchanged = exchangeB(tickAble);
+                                tickAble.tickRequired = (int) (doExchanged * tickAble.Properties.getTickMultiplier());
+                                tickAble.cachedHeat -= doExchanged;
+                            }
+                        } else {
+                            if (tickAble.cachedHeat < ExchangeA.HeatValue) {
+                                tickAble.cachedHeat += exchangeB(tickAble);
+                            } else {
+                                final int doExchanged = exchangeA(tickAble);
+                                tickAble.tickRequired = (int) (doExchanged * tickAble.Properties.getTickMultiplier());
+                                tickAble.cachedHeat -= doExchanged;
+                            }
+                        }
 
-                        tickAble.exchangeTimes--;
+                        if (oldHeat != tickAble.cachedHeat) {
+                            tickAble.deltaIdle(-1);
+                            return this;
+                        }
+
+                        //exchanged nothing, just wait for the fluid
+                        tickAble.coolDown = tickAble.CoolDownBase + tickAble.idleTime;
+                        return COOL_DOWN;
                     }
-                    return tickAble.exchangeTimes > 0 ? DO_EXCHANGE : ASSERT_IO_FLUID_AMOUNT;
+                    return this;
+                }
+
+                private int exchangeA(AbstractTileHeatExchanger tickAble) {
+                    return tickAble.exchange(tickAble.cachedRecipe.ExchangeA, tickAble.cachedRecipe.DirectionA, tickAble.Tanks[0], tickAble.Tanks[1]);
+                }
+
+                private int exchangeB(AbstractTileHeatExchanger tickAble) {
+                    return tickAble.exchange(tickAble.cachedRecipe.ExchangeB, tickAble.cachedRecipe.DirectionB, tickAble.Tanks[2], tickAble.Tanks[3]);
                 }
             }
         }

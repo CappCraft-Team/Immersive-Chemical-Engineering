@@ -10,57 +10,50 @@ import mezz.jei.api.recipe.IRecipeWrapper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
-import team.cappcraft.immersivechemical.ICHEME_Contents;
 import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
-import team.cappcraft.immersivechemical.common.blocks.multiblocks.BlockTypes_HeatExchanger;
-import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRecipe;
+import team.cappcraft.immersivechemical.common.recipe.HeatExchangerEntry;
+import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRegistry;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class HeatExchangerRecipeCategory extends IERecipeCategory<HeatExchangerRecipe, HeatExchangerRecipeWrapper> {
+public class HeatExchangerRecipeCategory extends IERecipeCategory<HeatExchangerEntry, HeatExchangerRecipeWrapper> {
+    public static final ResourceLocation resourceLocation =
+            new ResourceLocation(ImmersiveChemicalEngineering.MODID, "textures/gui/heatexchanger_category.png");
 
     public HeatExchangerRecipeCategory(IGuiHelper guiHelper) {
         super("heatExchanger",
                 "category.heat_exchanger.name",
                 guiHelper.createDrawable(
-                        new ResourceLocation(ImmersiveChemicalEngineering.MODID, "textures/gui/heatexchanger_category.png"),
+                        resourceLocation,
                         0, 0,
-                        135, 140),
-                HeatExchangerRecipe.class,
-                new ItemStack(ICHEME_Contents.blockHeatExchanger, 1, BlockTypes_HeatExchanger.HEAT_EXCHANGER_SMALL.getMeta()),
-                new ItemStack(ICHEME_Contents.blockHeatExchanger, 1, BlockTypes_HeatExchanger.HEAT_EXCHANGER_MEDIUM.getMeta()),
-                new ItemStack(ICHEME_Contents.blockHeatExchanger, 1, BlockTypes_HeatExchanger.HEAT_EXCHANGER_LARGE.getMeta()));
+                        135, 100),
+                HeatExchangerEntry.class,
+                HeatExchangerRegistry.REGISTRY.getRegisteredHeatExchanger().values().toArray(new ItemStack[0]));
     }
 
     @Override
     public void setRecipe(@Nonnull IRecipeLayout recipeLayout, @Nonnull HeatExchangerRecipeWrapper recipeWrapper, @Nonnull IIngredients ingredients) {
         final IGuiFluidStackGroup fluidStacks = recipeLayout.getFluidStacks();
-        int x = 31;
-        int y = 18;
+        int x = 33;
+        int y = 24;
+
         int i = 0;
-        for (List<FluidStack> input : ingredients.getInputs(VanillaTypes.FLUID)) {
-            fluidStacks.init(i, true, x, y, 16, 16,
-                    i == 0 ? recipeWrapper.MinCapacityA : recipeWrapper.MinCapacityB,
-                    true, null);
-            fluidStacks.set(i++, input);
-            x += 57;
-        }
-        x = 31;
-        y += 23;
-        for (List<FluidStack> output : ingredients.getOutputs(VanillaTypes.FLUID)) {
-            fluidStacks.init(i, false, x, y, 16, 16,
-                    i == 2 ? recipeWrapper.MinCapacityA : recipeWrapper.MinCapacityB,
-                    true, null);
-            fluidStacks.set(i++, output);
-            x += 57;
-        }
+
+        List<FluidStack> input = ingredients.getInputs(VanillaTypes.FLUID).get(0);
+        fluidStacks.init(i, true, x, y, 16, 16, recipeWrapper.MinCapacity, true, null);
+        fluidStacks.set(i++, input);
+
+        x += 53;
+        List<FluidStack> output = ingredients.getOutputs(VanillaTypes.FLUID).get(0);
+        fluidStacks.init(i, false, x, y, 16, 16, recipeWrapper.MinCapacity, true, null);
+        fluidStacks.set(i, output);
     }
 
     @Nonnull
     @Override
-    public IRecipeWrapper getRecipeWrapper(@Nonnull HeatExchangerRecipe recipe) {
-        return new HeatExchangerRecipeWrapper(recipe);
+    public IRecipeWrapper getRecipeWrapper(@Nonnull HeatExchangerEntry entry) {
+        return new HeatExchangerRecipeWrapper(entry);
     }
 
     @Nonnull

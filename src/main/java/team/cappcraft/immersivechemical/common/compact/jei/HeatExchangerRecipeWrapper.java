@@ -1,92 +1,51 @@
 package team.cappcraft.immersivechemical.common.compact.jei;
 
+import mezz.jei.api.gui.IDrawableStatic;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.ingredients.VanillaTypes;
 import mezz.jei.api.recipe.IRecipeWrapper;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
-import team.cappcraft.immersivechemical.Config;
-import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRecipe;
-import team.cappcraft.immersivechemical.common.recipe.constant.HeatExchangerSize;
+import team.cappcraft.immersivechemical.common.recipe.ConvertDirection;
+import team.cappcraft.immersivechemical.common.recipe.HeatExchangerEntry;
 
 import javax.annotation.Nonnull;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.stream.Collectors;
 
 public class HeatExchangerRecipeWrapper implements IRecipeWrapper {
     private static final int TEXT_COLOR = 0xffffff;
-    public final int MinDeviceCapacity;
-    public final int MinCapacityA;
-    public final int MinCapacityB;
-    private final HeatExchangerRecipe recipe;
+    private static final int ICON_X = 135;
+    private static final int ICON_WIDTH = 15;
+    private static final int ICON_HEIGHT = 5;
+    private static final int ICON_HOT_Y = 6;
+    private static final int ICON_DRAW_X = 59;
+    private static final int ICON_DRAW_Y_COLD = 25;
+    private static final int ICON_DRAW_Y_HOT = ICON_DRAW_Y_COLD + ICON_HEIGHT + 4;
+    private static final IDrawableStatic COLD_ICON =
+            JEIPlugin.guiHelper.createDrawable(HeatExchangerRecipeCategory.resourceLocation, ICON_X, 0, ICON_WIDTH, ICON_HEIGHT);
+    private static final IDrawableStatic HOT_ICON =
+            JEIPlugin.guiHelper.createDrawable(HeatExchangerRecipeCategory.resourceLocation, ICON_X, ICON_HOT_Y, ICON_WIDTH, ICON_HEIGHT);
+    public final int MinCapacity;
+    private final HeatExchangerEntry Entry;
 
-    public HeatExchangerRecipeWrapper(HeatExchangerRecipe recipe) {
-        this.recipe = recipe;
-        MinCapacityA = Math.max(recipe.UnitInputA, recipe.UnitOutputA);
-        MinCapacityB = Math.max(recipe.UnitInputB, recipe.UnitOutputB);
-        MinDeviceCapacity = Math.max(MinCapacityA, MinCapacityB);
+    public HeatExchangerRecipeWrapper(HeatExchangerEntry Entry) {
+        this.Entry = Entry;
+        MinCapacity = Math.max(Entry.FluidHot.amount, Entry.FluidCold.amount);
     }
 
     @Override
     public void getIngredients(@Nonnull IIngredients ingredients) {
-        ingredients.setInputLists(VanillaTypes.FLUID,
-                recipe.getJEITotalFluidInputs().stream().map(Arrays::asList).collect(Collectors.toList()));
-        ingredients.setOutputLists(VanillaTypes.FLUID,
-                recipe.getJEITotalFluidOutputs().stream().map(Arrays::asList).collect(Collectors.toList()));
+        ingredients.setInput(VanillaTypes.FLUID, Entry.FluidHot);
+        ingredients.setOutput(VanillaTypes.FLUID, Entry.FluidCold);
     }
 
     @Override
     public void drawInfo(@Nonnull Minecraft minecraft, int recipeWidth, int recipeHeight, int mouseX, int mouseY) {
-        final int x = 7;
-        int y = 85;
-        minecraft.fontRenderer.drawString(String.format("Heat: %d", recipe.UnitHeatValue),
-                x, y, TEXT_COLOR);
-        if (recipe.Size != HeatExchangerSize.GENERAL) {
-            y += minecraft.fontRenderer.FONT_HEIGHT;
-            minecraft.fontRenderer.drawString(String.format("Require: %s",
-                    I18n.format("tile.immersivechemical.multiblock_heat_exchanger.heat_exchanger_" + recipe.Size.toString().toLowerCase(Locale.ENGLISH) + ".name")),
-                    x, y, TEXT_COLOR);
-            drawTickString(minecraft, recipe.Size, x, y);
-        } else {
-            y = drawTickString(minecraft, HeatExchangerSize.SMALL, x, y);
-            y = drawTickString(minecraft, HeatExchangerSize.MEDIUM, x, y);
-            drawTickString(minecraft, HeatExchangerSize.LARGE, x, y);
-        }
-    }
+        minecraft.fontRenderer.drawString(String.format("Heat: %d", Entry.HeatValue), 20, 56, TEXT_COLOR);
 
-    private int drawTickString(@Nonnull Minecraft minecraft, HeatExchangerSize size, int x, int y) {
-        if (getCapacity(size) >= MinDeviceCapacity) {
-            y += minecraft.fontRenderer.FONT_HEIGHT;
-            minecraft.fontRenderer.drawString(String.format("%s Tick: %d",
-                    I18n.format("tile.immersivechemical.multiblock_heat_exchanger.heat_exchanger_" + size.toString().toLowerCase(Locale.ENGLISH) + ".name"),
-                    getTick(recipe.UnitHeatValue, size)),
-                    x, y, TEXT_COLOR);
+        if (Entry.Direction == ConvertDirection.COOL_DOWN || Entry.Direction == ConvertDirection.TWO_WAY) {
+            COLD_ICON.draw(minecraft, ICON_DRAW_X, ICON_DRAW_Y_COLD);
         }
-        return y;
-    }
-
-    private int getTick(int heatValue, HeatExchangerSize size) {
-        switch (size) {
-            case SMALL:
-                return (int) (heatValue * Config.HeatExchangerTickMultiplier.Small);
-            case MEDIUM:
-                return (int) (heatValue * Config.HeatExchangerTickMultiplier.Medium);
-            case LARGE:
-                return (int) (heatValue * Config.HeatExchangerTickMultiplier.Large);
+        if (Entry.Direction == ConvertDirection.HEAT_UP || Entry.Direction == ConvertDirection.TWO_WAY) {
+            HOT_ICON.draw(minecraft, ICON_DRAW_X + 1, ICON_DRAW_Y_HOT);
         }
-        return 0;
-    }
-
-    private int getCapacity(HeatExchangerSize size) {
-        switch (size) {
-            case SMALL:
-                return Config.HeatExchangerCapacity.Small;
-            case MEDIUM:
-                return Config.HeatExchangerCapacity.Medium;
-            case LARGE:
-                return Config.HeatExchangerCapacity.Large;
-        }
-        return 0;
     }
 }

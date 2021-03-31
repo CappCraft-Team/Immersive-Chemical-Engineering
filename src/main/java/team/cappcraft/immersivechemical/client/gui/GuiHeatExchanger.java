@@ -56,7 +56,7 @@ public class GuiHeatExchanger extends GuiIEContainerBase {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
-        ArrayList<String> tooltip = new ArrayList<String>();
+        ArrayList<String> tooltip = new ArrayList<>();
 
         handleFluidAmount(mouseX, mouseY, tooltip);
         if (isShiftKeyDown() && isCtrlKeyDown()) {
@@ -75,16 +75,16 @@ public class GuiHeatExchanger extends GuiIEContainerBase {
                 && mouseY >= guiTop + TOP_SLOT_Y && mouseY <= guiTop + BOTTOM_SLOT_Y + 16) {
             if (mouseX <= guiLeft + LEFT_SLOT_X + 16 && mouseY <= guiTop + TOP_SLOT_Y + 16) {
                 //InputA
-                ClientUtils.addFluidTooltip(tile.Tanks[0].getFluid(), tooltip, tile.Capacity);
+                ClientUtils.addFluidTooltip(tile.Tanks[0].getFluid(), tooltip, tile.Properties.getCapacity());
             } else if (mouseX >= guiLeft + RIGHT_SLOT_X && mouseY <= guiTop + TOP_SLOT_Y + 16) {
                 //InputB
-                ClientUtils.addFluidTooltip(tile.Tanks[2].getFluid(), tooltip, tile.Capacity);
+                ClientUtils.addFluidTooltip(tile.Tanks[2].getFluid(), tooltip, tile.Properties.getCapacity());
             } else if (mouseX <= guiLeft + LEFT_SLOT_X + 16 && mouseY >= guiTop + BOTTOM_SLOT_Y) {
                 //OutputA
-                ClientUtils.addFluidTooltip(tile.Tanks[1].getFluid(), tooltip, tile.Capacity);
+                ClientUtils.addFluidTooltip(tile.Tanks[1].getFluid(), tooltip, tile.Properties.getCapacity());
             } else if (mouseX >= guiLeft + RIGHT_SLOT_X && mouseY >= guiTop + BOTTOM_SLOT_Y) {
                 //OutputB
-                ClientUtils.addFluidTooltip(tile.Tanks[3].getFluid(), tooltip, tile.Capacity);
+                ClientUtils.addFluidTooltip(tile.Tanks[3].getFluid(), tooltip, tile.Properties.getCapacity());
             }
         }
     }
@@ -127,6 +127,5 @@ public class GuiHeatExchanger extends GuiIEContainerBase {
             TextureAtlasSprite sprite = ClientUtils.getSprite(this.tile.Tanks[3].getFluid().getFluid().getStill());
             ClientUtils.drawTexturedRect(guiLeft + RIGHT_SLOT_X, guiTop + BOTTOM_SLOT_Y, 16, 16, sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), sprite.getMaxV());
         }
-        ClientUtils.bindTexture(BACKGROUND);
     }
 }

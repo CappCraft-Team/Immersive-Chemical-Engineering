@@ -1,8 +1,6 @@
 package team.cappcraft.immersivechemical.common.compact.jei;
 
-import blusunrize.immersiveengineering.api.crafting.IJEIRecipe;
 import blusunrize.immersiveengineering.common.util.compat.jei.IERecipeCategory;
-import com.google.common.collect.Collections2;
 import mezz.jei.api.IGuiHelper;
 import mezz.jei.api.IJeiHelpers;
 import mezz.jei.api.IModPlugin;
@@ -10,9 +8,9 @@ import mezz.jei.api.IModRegistry;
 import mezz.jei.api.recipe.IRecipeCategory;
 import mezz.jei.api.recipe.IRecipeCategoryRegistration;
 import mezz.jei.api.recipe.IRecipeWrapper;
-import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
 import team.cappcraft.immersivechemical.client.gui.GuiHeatExchanger;
 import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRecipe;
+import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRegistry;
 
 import javax.annotation.Nonnull;
 import java.util.LinkedHashMap;
@@ -48,9 +46,7 @@ public class JEIPlugin implements IModPlugin {
             modRegistry.handleRecipes(cat.getRecipeClass(), cat, cat.getRecipeCategoryUid());
         }
 
-        modRegistry.addRecipes(Collections2.filter(ImmersiveChemicalEngineering.proxy.heatExchangerRecipeRegistry.getRegisteredRecipes(),
-                IJEIRecipe::listInJEI),
-                HEAT_EXCHANGER_RECIPE_CATE_ID);
+        modRegistry.addRecipes(HeatExchangerRegistry.REGISTRY.getRegisteredEntries(), HEAT_EXCHANGER_RECIPE_CATE_ID);
 
         modRegistry.addRecipeClickArea(GuiHeatExchanger.class,
                 GuiHeatExchanger.STATE_X, GuiHeatExchanger.STATE_Y,

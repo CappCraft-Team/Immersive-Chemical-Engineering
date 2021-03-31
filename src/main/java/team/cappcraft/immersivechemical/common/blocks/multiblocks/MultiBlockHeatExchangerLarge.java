@@ -150,10 +150,10 @@ public class MultiBlockHeatExchangerLarge implements MultiblockHandler.IMultiblo
         if (renderStack.isEmpty())
             renderStack = new ItemStack(ICHEME_Contents.blockHeatExchanger, 1, BlockTypes_HeatExchanger.HEAT_EXCHANGER_LARGE.getMeta());
 
-        GlStateManager.translate(1, 1, 1);
+        GlStateManager.translate(3, 1, 1);
         GlStateManager.rotate(-45, 0, 1, 0);
         GlStateManager.rotate(-20, 1, 0, 0);
-        GlStateManager.scale(2, 2, 2);
+        GlStateManager.scale(4, 4, 4);
 
         GlStateManager.disableCull();
         ClientUtils.mc().getRenderItem().renderItem(renderStack, ItemCameraTransforms.TransformType.GUI);

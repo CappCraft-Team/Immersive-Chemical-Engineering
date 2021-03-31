@@ -19,22 +19,22 @@ public class Config {
     @net.minecraftforge.common.config.Config(modid = ImmersiveChemicalEngineering.MODID, category = "Heat_Exchanger_Tick_Multiplier")
     public static class HeatExchangerTickMultiplier {
         @RangeDouble(min = 1e-7, max = 1e7)
-        public static float Small = 0.8f;
+        public static Float Small = 0.8f;
 
         @RangeDouble(min = 1e-7, max = 1e7)
-        public static float Medium = 0.4f;
+        public static Float Medium = 0.4f;
 
         @RangeDouble(min = 1e-7, max = 1e7)
-        public static float Large = 0.2f;
+        public static Float Large = 0.2f;
     }
 
     @net.minecraftforge.common.config.Config(modid = ImmersiveChemicalEngineering.MODID, category = "Heat_Exchanger_Capacity")
     public static class HeatExchangerCapacity {
         @RangeInt(min = 1)
-        public static int Small = 5000;
+        public static Integer Small = 5000;
         @RangeInt(min = 1)
-        public static int Medium = 5000 * 2;
+        public static Integer Medium = 5000 * 2;
         @RangeInt(min = 1)
-        public static int Large = 5000 * 6;
+        public static Integer Large = 5000 * 6;
     }
 }

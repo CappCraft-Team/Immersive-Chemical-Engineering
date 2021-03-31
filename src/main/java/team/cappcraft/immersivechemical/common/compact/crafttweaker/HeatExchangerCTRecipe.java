@@ -3,93 +3,71 @@ package team.cappcraft.immersivechemical.common.compact.crafttweaker;
 import crafttweaker.CraftTweakerAPI;
 import crafttweaker.IAction;
 import crafttweaker.annotations.ZenRegister;
+import crafttweaker.api.liquid.ILiquidStack;
+import net.minecraftforge.fluids.FluidRegistry;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
-import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
-import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRecipe;
-import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRecipeEntry;
-import team.cappcraft.immersivechemical.common.recipe.constant.HeatExchangerSize;
+import team.cappcraft.immersivechemical.common.recipe.ConvertDirection;
+import team.cappcraft.immersivechemical.common.recipe.HeatExchangerEntry;
+import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRegistry;
 
-import java.util.Arrays;
-
-import static team.cappcraft.immersivechemical.common.recipe.HeatExchangerRecipeRegistry.POSTFIX_REVERSE;
+import java.util.Objects;
 
 @SuppressWarnings("unused")
 @ZenClass("team.cappcraft.icheme.HeatExchanger")
 @ZenRegister
 public class HeatExchangerCTRecipe {
-    /**
-     * Add recipe to all type of HeatExchanger
-     *
-     * @param registryName Unique name of the recipe
-     * @param exchangeA    One of exchange fluid
-     * @param exchangeB    One of exchange fluid
-     * @apiNote the two fluid to exchange heat is shapeless
-     * @see HeatExchangerSize
-     * @see HeatExchangerRecipeEntry
-     */
     @ZenMethod
-    public static void addRecipe(String registryName, HeatExchangerRecipeEntry exchangeA, HeatExchangerRecipeEntry exchangeB) {
-        addRecipe(registryName, exchangeA, exchangeB, "GENERAL");
+    public static void addCoolDownEntry(ILiquidStack in, ILiquidStack out, int heat) {
+        CraftTweakerAPI.apply(new AddHeatExchangerEntryAction(in, out, heat, ConvertDirection.COOL_DOWN));
     }
 
-    /**
-     * Add recipe to HeatExchanger
-     *
-     * @param registryName Unique name of the recipe
-     * @param exchangeA    One of exchange fluid
-     * @param exchangeB    One of exchange fluid
-     * @param size         need to be one of team.cappcraft.icheme.common.recipe.constant.HeatExchangerSize
-     * @apiNote the two fluid to exchange heat is shapeless
-     * @see team.cappcraft.immersivechemical.common.recipe.constant.HeatExchangerSize
-     * @see team.cappcraft.immersivechemical.common.recipe.HeatExchangerRecipeEntry
-     */
     @ZenMethod
-    public static void addRecipe(String registryName, HeatExchangerRecipeEntry exchangeA, HeatExchangerRecipeEntry exchangeB, String size) {
-        CraftTweakerAPI.apply(new AddHeatExchangerRecipeAction(registryName, exchangeA, exchangeB, size));
+    public static void addHeatUpEntry(ILiquidStack in, ILiquidStack out, int heat) {
+        CraftTweakerAPI.apply(new AddHeatExchangerEntryAction(in, out, heat, ConvertDirection.HEAT_UP));
     }
 
-    private static class AddHeatExchangerRecipeAction implements IAction {
-        private final String RegistryName;
-        private final HeatExchangerRecipeEntry ExchangeA;
-        private final HeatExchangerRecipeEntry ExchangeB;
-        private final String Size;
-        private HeatExchangerRecipe recipe;
+    @ZenMethod
+    public static void addBiDirectionEntry(ILiquidStack in, ILiquidStack out, int heat) {
+        CraftTweakerAPI.apply(new AddHeatExchangerEntryAction(in, out, heat, ConvertDirection.TWO_WAY));
+    }
+
+    private static class AddHeatExchangerEntryAction implements IAction {
+        private final ILiquidStack In;
+        private final ILiquidStack Out;
+        private final int Heat;
+        private final ConvertDirection Direction;
         private String describeInvalid;
+        private HeatExchangerEntry entry;
 
-        public AddHeatExchangerRecipeAction(String registryName, HeatExchangerRecipeEntry exchangeA, HeatExchangerRecipeEntry exchangeB, String size) {
-            RegistryName = registryName;
-            ExchangeA = exchangeA;
-            ExchangeB = exchangeB;
-            Size = size;
+        public AddHeatExchangerEntryAction(ILiquidStack in, ILiquidStack out, int heat, ConvertDirection direction) {
+            In = in;
+            Out = out;
+            Heat = heat;
+            Direction = direction;
         }
 
         @Override
         public void apply() {
-            recipe = new HeatExchangerRecipe(ExchangeA, ExchangeB, HeatExchangerSize.valueOf(Size));
-            ImmersiveChemicalEngineering.proxy.heatExchangerRecipeRegistry.putObject(RegistryName, recipe);
+            entry = new HeatExchangerEntry(
+                    Objects.requireNonNull(FluidRegistry.getFluidStack(In.getName(), In.getAmount())),
+                    Objects.requireNonNull(FluidRegistry.getFluidStack(Out.getName(), Out.getAmount())),
+                    Heat,
+                    Direction
+            );
+            HeatExchangerRegistry.REGISTRY.registerFluid(entry);
         }
 
         @Override
         public String describe() {
-            return String.format("Added %s", recipe);
+            return String.format("Added %s", entry);
         }
 
         @Override
         public boolean validate() {
-            if (RegistryName == null
-                    || ImmersiveChemicalEngineering.proxy.heatExchangerRecipeRegistry.getKeys().contains(RegistryName))
-                describeInvalid = String.format("RegistryName null or duplicate: %s", RegistryName);
-            else if (RegistryName.endsWith(POSTFIX_REVERSE))
-                describeInvalid = String.format("RegistryName contains invalid POSTFIX: %s", POSTFIX_REVERSE);
-            if (ExchangeA == null || ExchangeB == null)
-                describeInvalid = String.format("ExchangeEntry could not be null: ExchangeA:%s, ExchangeB:%s", ExchangeA, ExchangeB);
-            try {
-                HeatExchangerSize.valueOf(Size);
-            } catch (Exception e) {
-                describeInvalid = String.format("Size:'%s' isn't any valueOf: %s", Size,
-                        Arrays.toString(HeatExchangerSize.values()));
-            }
+            if (FluidRegistry.getFluid(In.getName()) == null || FluidRegistry.getFluid(Out.getName()) == null)
+                describeInvalid = "Input/Output Fluid isn't registered in FluidRegistry";
+            if (Heat <= 0) describeInvalid = "Heat value <= 0";
             return describeInvalid == null;
         }
 

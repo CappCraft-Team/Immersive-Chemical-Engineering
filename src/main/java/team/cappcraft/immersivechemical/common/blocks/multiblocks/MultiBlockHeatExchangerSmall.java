@@ -142,10 +142,10 @@ public class MultiBlockHeatExchangerSmall implements MultiblockHandler.IMultiblo
         if (renderStack.isEmpty())
             renderStack = new ItemStack(ICHEME_Contents.blockHeatExchanger, 1, BlockTypes_HeatExchanger.HEAT_EXCHANGER_SMALL.getMeta());
 
-        GlStateManager.translate(1, 1, 1);
+        GlStateManager.translate(1.5, 0.8, 1);
         GlStateManager.rotate(-45, 0, 1, 0);
         GlStateManager.rotate(-20, 1, 0, 0);
-        GlStateManager.scale(3, 3, 3);
+        GlStateManager.scale(4, 4, 4);
 
         GlStateManager.disableCull();
         ClientUtils.mc().getRenderItem().renderItem(renderStack, ItemCameraTransforms.TransformType.GUI);

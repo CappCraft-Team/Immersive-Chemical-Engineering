@@ -27,7 +27,6 @@ import javax.annotation.Nullable;
 
 public class BlockHeatExchanger extends BlockIEMultiblock<BlockTypes_HeatExchanger> {
     public BlockHeatExchanger() {
-        //TODO:check additionalProperties
         super("multiblock_heat_exchanger",
                 Material.IRON,
                 PropertyEnum.create("type", BlockTypes_HeatExchanger.class),
@@ -36,7 +35,6 @@ public class BlockHeatExchanger extends BlockIEMultiblock<BlockTypes_HeatExchang
         setHardness(3.0F);
         setResistance(15.0F);
         setAllNotNormalBlock();
-        //TODO:check meta setting
         lightOpacity = 0;
     }
 

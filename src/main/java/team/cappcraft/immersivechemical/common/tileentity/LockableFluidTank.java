@@ -156,6 +156,7 @@ public class LockableFluidTank extends FluidTank implements ILockableSlot {
         this.locked = locked;
         if (!locked && fluid != null && fluid.amount <= 0)
             fluid = null;
+        if (tile != null) tile.markDirty();
     }
 
     @Override
@@ -168,5 +169,6 @@ public class LockableFluidTank extends FluidTank implements ILockableSlot {
         lockedType = locked;
         if (!locked && fluid != null && fluid.amount <= 0)
             fluid = null;
+        if (tile != null) tile.markDirty();
     }
 }
