@@ -370,7 +370,7 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
                         }
 
                         if (oldHeat != tickAble.cachedHeat) {
-                            tickAble.deltaIdle(-1);
+                            tickAble.deltaIdle(-2);
                             return this;
                         }
 
