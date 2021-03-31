@@ -69,8 +69,9 @@ public class MultiBlockHeatExchangerLarge implements MultiblockHandler.IMultiblo
             state = state.withProperty(IEProperties.FACING_HORIZONTAL, side);
 
             pos = pos.down();//The Origin need to be at Y=0
+            pos = pos.offset(side, 3);//Forward 3 block to make the origin in the middle
             for (int h = 0; h < 3; h++)
-                for (int l = 0; l < 7; l++)
+                for (int l = -3; l <= 3; l++)
                     for (int w = -1; w <= 1; w++) {
                         final int offsetX = -side.getFrontOffsetZ() * w * (mirrored ? -1 : 1) + side.getFrontOffsetX() * l;
                         final int offsetZ = side.getFrontOffsetX() * w * (mirrored ? -1 : 1) + side.getFrontOffsetZ() * l;
@@ -84,7 +85,7 @@ public class MultiBlockHeatExchangerLarge implements MultiblockHandler.IMultiblo
                             final AbstractTileHeatExchanger tileHeatExchanger = (AbstractTileHeatExchanger) tileEntity;
                             tileHeatExchanger.formed = true;
                             //See blusunrize.immersiveengineering.common.blocks.TileEntityMultiblockPart.getBlockPosForPos
-                            tileHeatExchanger.pos = h * 21 + l * 3 + (w + 1);
+                            tileHeatExchanger.pos = h * 21 + (l + 3) * 3 + (w + 1);
                             tileHeatExchanger.offset = new int[]{offsetX, h, offsetZ};
                             tileHeatExchanger.mirrored = mirrored;
                             tileHeatExchanger.markDirty();
