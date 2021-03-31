@@ -3,7 +3,6 @@ package team.cappcraft.immersivechemical.client.gui;
 import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.client.gui.GuiIEContainerBase;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.player.InventoryPlayer;
 import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
 import team.cappcraft.immersivechemical.common.container.ContainerHeatExchanger;
@@ -29,7 +28,7 @@ public class GuiHeatExchanger extends GuiIEContainerBase {
 
     public GuiHeatExchanger(AbstractTileHeatExchanger tileEntity, InventoryPlayer playerInventory) {
         super(new ContainerHeatExchanger(playerInventory, tileEntity));
-        this.tile = tileEntity;
+        tile = tileEntity;
         this.playerInventory = playerInventory;
         xSize = GUI_WIDTH;
         ySize = GUI_HEIGHT;
@@ -92,40 +91,35 @@ public class GuiHeatExchanger extends GuiIEContainerBase {
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) { // draw the content
         ClientUtils.bindTexture(BACKGROUND);
-        this.drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
+        drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
 
         // Draw RESET Buttons
         //Left
-        this.drawTexturedModalRect(guiLeft + LEFT_SLOT_X, guiTop + 56, ICON_OFFSET_X, 0, 16, 16);
+        drawTexturedModalRect(guiLeft + LEFT_SLOT_X, guiTop + 56, ICON_OFFSET_X, 0, 16, 16);
         //Right
-        this.drawTexturedModalRect(guiLeft + RIGHT_SLOT_X, guiTop + 56, ICON_OFFSET_X, 0, 16, 16);
+        drawTexturedModalRect(guiLeft + RIGHT_SLOT_X, guiTop + 56, ICON_OFFSET_X, 0, 16, 16);
         //Center
-        this.drawTexturedModalRect(guiLeft + 80, guiTop + 79, ICON_OFFSET_X, 16, 16, 16);
+        drawTexturedModalRect(guiLeft + 80, guiTop + 79, ICON_OFFSET_X, 16, 16, 16);
 
         //State
         if (tile.currentState instanceof AbstractTileHeatExchanger.TileHeatExchangerTickAction.Processing)
             //Running
-            this.drawTexturedModalRect(guiLeft + STATE_X, guiTop + STATE_Y, ICON_OFFSET_X, 32, 16, 15);
+            drawTexturedModalRect(guiLeft + STATE_X, guiTop + STATE_Y, ICON_OFFSET_X, 32, 16, 15);
         else//Idle
-            this.drawTexturedModalRect(guiLeft + STATE_X, guiTop + STATE_Y, ICON_OFFSET_X, 77, 16, 15);
+            drawTexturedModalRect(guiLeft + STATE_X, guiTop + STATE_Y, ICON_OFFSET_X, 77, 16, 15);
 
         // Draw liquid in Filter
-        ClientUtils.bindAtlas();
         if (tile.Tanks[0].getFluid() != null) {
-            TextureAtlasSprite sprite = ClientUtils.getSprite(this.tile.Tanks[0].getFluid().getFluid().getStill());
-            ClientUtils.drawTexturedRect(guiLeft + LEFT_SLOT_X, guiTop + TOP_SLOT_Y, 16, 16, sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), sprite.getMaxV());
+            ClientUtils.drawRepeatedFluidSprite(tile.Tanks[0].getFluid(), guiLeft + LEFT_SLOT_X, guiTop + TOP_SLOT_Y, 16, 16);
         }
         if (tile.Tanks[1].getFluid() != null) {
-            TextureAtlasSprite sprite = ClientUtils.getSprite(this.tile.Tanks[1].getFluid().getFluid().getStill());
-            ClientUtils.drawTexturedRect(guiLeft + LEFT_SLOT_X, guiTop + BOTTOM_SLOT_Y, 16, 16, sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), sprite.getMaxV());
+            ClientUtils.drawRepeatedFluidSprite(tile.Tanks[1].getFluid(), guiLeft + LEFT_SLOT_X, guiTop + BOTTOM_SLOT_Y, 16, 16);
         }
         if (tile.Tanks[2].getFluid() != null) {
-            TextureAtlasSprite sprite = ClientUtils.getSprite(this.tile.Tanks[2].getFluid().getFluid().getStill());
-            ClientUtils.drawTexturedRect(guiLeft + RIGHT_SLOT_X, guiTop + TOP_SLOT_Y, 16, 16, sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), sprite.getMaxV());
+            ClientUtils.drawRepeatedFluidSprite(tile.Tanks[2].getFluid(), guiLeft + RIGHT_SLOT_X, guiTop + TOP_SLOT_Y, 16, 16);
         }
         if (tile.Tanks[3].getFluid() != null) {
-            TextureAtlasSprite sprite = ClientUtils.getSprite(this.tile.Tanks[3].getFluid().getFluid().getStill());
-            ClientUtils.drawTexturedRect(guiLeft + RIGHT_SLOT_X, guiTop + BOTTOM_SLOT_Y, 16, 16, sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), sprite.getMaxV());
+            ClientUtils.drawRepeatedFluidSprite(tile.Tanks[3].getFluid(), guiLeft + RIGHT_SLOT_X, guiTop + BOTTOM_SLOT_Y, 16, 16);
         }
     }
 }
