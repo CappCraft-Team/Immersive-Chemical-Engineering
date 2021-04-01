@@ -24,7 +24,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'idea'
 
 def mcVersion = '1.12.2'
-version = '1.0'
+version = '1.0.0'
 group = 'team.cappcraft.icheme'
 archivesBaseName = 'immersive-chemical-engineering'
 
@@ -157,7 +157,7 @@ class MakeATsTask extends DefaultTask {
     }
 }
 
-task "transformAccessTransformer"(type: MakeATsTask) {
+task transformAccessTransformer(type: MakeATsTask) {
     group = "access_transformer"
 
     if (dirATs.exists())
@@ -167,8 +167,18 @@ task "transformAccessTransformer"(type: MakeATsTask) {
                 TrueFileFilter.INSTANCE))
 }
 
+task generateSources(type: Copy) {
+    inputs.properties("version": version)
+    group = "build"
+    from compileJava.source
+    into "$buildDir/generatedSrc"
+    expand "version": version
+}
+
 compileJava {
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+    source = tasks.generateSources.outputs
+    dependsOn(tasks.generateSources)
 }
 
 processResources {
@@ -189,11 +199,20 @@ processResources {
     }
 }
 
-Properties properties = new Properties()
-properties.load(new FileInputStream("local.properties"))
+task sourceJar(type: Jar) {
+    group = "build"
+    archiveClassifier.set 'sources'
+    from sourceSets.main.allSource
+}
+
+shadowJar {
+    classifier = "deobf"
+    configurations = [project.configurations.shadow]
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
 
 afterEvaluate {
-    task ShadowReobfedJar(type: ShadowJar) { shadow ->
+    task shadowReobfedJar(type: ShadowJar) { shadow ->
         shadow.group = "build"
         shadow.description = 'Create a combined JAR of reobfed and runtime dependencies'
 
@@ -210,13 +229,17 @@ afterEvaluate {
                 libs.addAll files.collect { "${it.name}" }
                 manifest.attributes 'Class-Path': libs.findAll { it }.join(' ')
             }
+            //Take re-Obf Jar as input
+            shadow.from(tasks.reobfJar.getInput())
         }
-        //Take re-Obf Jar as input
-        shadow.from(tasks.reobfJar.outputs)
         shadow.configurations = [project.configurations.shadow]
         shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'module-info.class')
+        shadow.dependsOn(tasks.reobfJar)
+        tasks.reobfJar.finalizedBy(shadow)
     }
-    tasks.reobfJar.finalizedBy("ShadowReobfedJar")
+
+    Properties properties = new Properties()
+    properties.load(new FileInputStream("local.properties"))
 
     curseforge {
         apiKey = properties.getProperty("curse-api")
@@ -228,10 +251,34 @@ afterEvaluate {
             addGameVersion("Java 8")
             addGameVersion("1.12.2")
 
-            mainArtifact ShadowReobfedJar
+            mainArtifact shadowReobfedJar
+            addArtifact shadowJar
+            addArtifact sourceJar
 
             relations {
                 requiredDependency("immersive-engineering")
+            }
+        }
+    }
+
+    publishing {
+        publications {
+            uploadhMod(MavenPublication) {
+                artifactId = project.archivesBaseName
+
+                artifact sourceJar
+                artifact shadowJar
+                artifact shadowReobfedJar
+            }
+        }
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/CappCraft-Team/Immersive-Chemical-Engineering")
+                credentials {
+                    username = properties.getProperty("gpr.user") ?: System.getenv("USERNAME")
+                    password = properties.getProperty("gpr.key") ?: System.getenv("TOKEN")
+                }
             }
         }
     }
