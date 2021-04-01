@@ -1,0 +1,35 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "transform": "forge:default-block",
+    "model": "cube_all"
+  },
+  "variants": {
+    "inventory,type=shell": [
+      {
+        "textures": {
+          "all": "immersiveengineering:blocks/metal_decoration0_radiator"
+        }
+      }
+    ],
+    "inventory,type=tube": [
+      {
+        "textures": {
+          "all": "immersiveengineering:blocks/metal_decoration0_radiator"
+        }
+      }
+    ],
+    "type": {
+      "shell": {
+        "textures": {
+          "all": "immersiveengineering:blocks/metal_decoration0_radiator"
+        }
+      },
+      "tube": {
+        "textures": {
+          "all": "immersiveengineering:blocks/metal_decoration0_radiator"
+        }
+      }
+    }
+  }
+}
