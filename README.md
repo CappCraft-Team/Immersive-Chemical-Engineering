@@ -21,31 +21,31 @@ JEI
 ## Config
 
 ```text
-# Configuration file
+#Configuration file
 heat_exchanger_capacity {
-    # Min: 1
-    # Max: 2147483647
+    #Min: 1
+    #Max: 2147483647
     I:Large=30000
 
-    # Min: 1
-    # Max: 2147483647
+    #Min: 1
+    #Max: 2147483647
     I:Medium=10000
 
-    # Min: 1
-    # Max: 2147483647
+    #Min: 1
+    #Max: 2147483647
     I:Small=5000
 }
 heat_exchanger_tick_multiplier {
-    # Min: 1.0E-7
-    # Max: 1.0E7
+    #Min: 1.0E-7
+    #Max: 1.0E7
     D:Large=0.2
 
-    # Min: 1.0E-7
-    # Max: 1.0E7
+    #Min: 1.0E-7
+    #Max: 1.0E7
     D:Medium=0.4
 
-    # Min: 1.0E-7
-    # Max: 1.0E7
+    #Min: 1.0E-7
+    #Max: 1.0E7
     D:Small=0.8
 }
 ```
