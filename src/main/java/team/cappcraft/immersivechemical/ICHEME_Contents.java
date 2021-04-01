@@ -5,6 +5,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import team.cappcraft.immersivechemical.common.blocks.BlockStructure;
 import team.cappcraft.immersivechemical.common.blocks.multiblocks.*;
 import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRegistry;
 import team.cappcraft.immersivechemical.common.tileentity.TileHeatExchangerLarge;
@@ -15,9 +16,11 @@ import team.cappcraft.immersivechemical.common.tileentity.constant.HeatExchanger
 @Mod.EventBusSubscriber
 public class ICHEME_Contents {
     public static BlockHeatExchanger blockHeatExchanger;
+    public static BlockStructure blockStructure;
 
     public static void preInit() {
         blockHeatExchanger = new BlockHeatExchanger();
+        blockStructure = new BlockStructure();
     }
 
     public static void init() {

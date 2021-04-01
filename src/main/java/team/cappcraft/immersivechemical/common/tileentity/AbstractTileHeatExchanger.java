@@ -114,9 +114,9 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
     public void readCustomNBT(@Nonnull NBTTagCompound nbt, boolean descPacket) {
         super.readCustomNBT(nbt, descPacket);
         final NBTTagList tanks = nbt.getTagList(TAG_TANKS, 10);
-        for (int i = 0; i < tanks.tagList.size(); i++) {
+        for (int i = 0; i < tanks.tagCount(); i++) {
             LockableFluidTank tank = Tanks[i];
-            tank.readFromNBT((NBTTagCompound) tanks.tagList.get(i));
+            tank.readFromNBT(tanks.getCompoundTagAt(i));
         }
         idleTime = nbt.getInteger(TAG_IDLE_TIME);
         if (descPacket) {

@@ -23,7 +23,7 @@ public class HeatExchangerRegistry {
     public final static HeatExchangerRegistry REGISTRY = new HeatExchangerRegistry();
     public final ExecutorService RecipeFinder = Executors.newSingleThreadExecutor();
 
-    private final HashMap<IHeatExchangerProperties, ItemStack> registeredHeatExchanger = new HashMap<>();
+    private final HashMap<IHeatExchangerProperties, ItemStack> registeredHeatExchanger = new LinkedHashMap<>();
     /**
      * Keep the registered entries referenced, just the generated one need to be GC
      */
