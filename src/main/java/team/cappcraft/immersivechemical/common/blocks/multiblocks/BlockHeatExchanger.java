@@ -7,14 +7,12 @@ import blusunrize.immersiveengineering.common.blocks.ItemBlockIEBase;
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
 import team.cappcraft.immersivechemical.common.proxy.CommonProxy;
@@ -93,12 +91,6 @@ public class BlockHeatExchanger extends BlockIEMultiblock<BlockTypes_HeatExchang
     @Override
     public EnumPushReaction getMobilityFlag(@Nonnull IBlockState state) {
         return EnumPushReaction.BLOCK;
-    }
-
-    @Nonnull
-    @Override
-    public BlockFaceShape getBlockFaceShape(@Nonnull IBlockAccess world, @Nonnull IBlockState state, @Nonnull BlockPos pos, @Nonnull EnumFacing side) {
-        return super.getBlockFaceShape(world, state, pos, side);
     }
 
     @Override
