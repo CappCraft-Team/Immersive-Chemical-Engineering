@@ -64,8 +64,8 @@ public class HeatExchangerRegistry {
 
         if (FluidOA != null && FluidOB != null
                 && (
-                (FluidIA.getTemperature() > FluidIB.getTemperature() && FluidOA.getTemperature() < FluidOB.getTemperature())
-                        || (FluidIA.getTemperature() < FluidIB.getTemperature() && FluidOA.getTemperature() > FluidOB.getTemperature())
+                (FluidIA.getTemperature() > FluidIB.getTemperature() && FluidOA.getTemperature() <= FluidOB.getTemperature())
+                        || (FluidIA.getTemperature() < FluidIB.getTemperature() && FluidOA.getTemperature() >= FluidOB.getTemperature())
         ))
             return Optional.empty();
 
