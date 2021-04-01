@@ -1,5 +1,7 @@
 package team.cappcraft.immersivechemical;
 
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -8,7 +10,10 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import org.apache.logging.log4j.Logger;
+import team.cappcraft.immersivechemical.common.blocks.multiblocks.BlockTypes_HeatExchanger;
 import team.cappcraft.immersivechemical.common.proxy.CommonProxy;
+
+import javax.annotation.Nonnull;
 
 
 @Mod(modid = ImmersiveChemicalEngineering.MODID,
@@ -25,6 +30,14 @@ public class ImmersiveChemicalEngineering {
     public static Logger logger;
 
     public static final SimpleNetworkWrapper packetHandler = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
+
+    public static CreativeTabs creativeTab = new CreativeTabs(MODID) {
+        @Nonnull
+        @Override
+        public ItemStack getTabIconItem() {
+            return new ItemStack(ICHEME_Contents.blockHeatExchanger, 1, BlockTypes_HeatExchanger.HEAT_EXCHANGER_SMALL.getMeta());
+        }
+    };
 
     @Mod.Instance
     public static ImmersiveChemicalEngineering instance;

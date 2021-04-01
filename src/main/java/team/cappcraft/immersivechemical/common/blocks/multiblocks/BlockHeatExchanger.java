@@ -33,6 +33,7 @@ public class BlockHeatExchanger extends BlockIEMultiblock<BlockTypes_HeatExchang
         setHardness(3.0F);
         setResistance(15.0F);
         setAllNotNormalBlock();
+        setCreativeTab(ImmersiveChemicalEngineering.creativeTab);
         lightOpacity = 0;
     }
 
