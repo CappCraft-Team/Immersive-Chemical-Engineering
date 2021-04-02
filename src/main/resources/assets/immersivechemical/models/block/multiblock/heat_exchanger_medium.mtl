@@ -2,19 +2,10 @@
 # Material Count: 3
 
 newmtl Cube
-Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
-d 1.000000
 map_Kd immersivechemical:blocks/cube_medium
 
 newmtl LargePipe
-Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
-d 1.000000
 map_Kd immersivechemical:blocks/pipe
 
 newmtl Tube
-Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
-d 1.000000
 map_Kd immersivechemical:blocks/tube
