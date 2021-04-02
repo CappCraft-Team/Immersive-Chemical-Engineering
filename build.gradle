@@ -239,7 +239,8 @@ afterEvaluate {
     }
 
     Properties properties = new Properties()
-    properties.load(new FileInputStream("local.properties"))
+    if (file("local.properties").exists())
+        properties.load(new FileInputStream("local.properties"))
 
     curseforge {
         apiKey = properties.getProperty("curse-api")
