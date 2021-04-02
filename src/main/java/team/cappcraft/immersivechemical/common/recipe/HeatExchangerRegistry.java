@@ -149,7 +149,7 @@ public class HeatExchangerRegistry {
 
         LinkedList<Fluid> fluids = new LinkedList<>();
         while (iter.hasNext()) fluids.add(iter.next());
-        fluids.removeFirst();
+        fluids.removeFirst();//Should not contains input
         return fluids;
     }
 
