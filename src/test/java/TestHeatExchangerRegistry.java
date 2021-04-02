@@ -194,6 +194,11 @@ public class TestHeatExchangerRegistry {
                         fluids.get(0), fluids.get(70),
                         fluids.get(30), fluids.get(40), ConvertDirection.HEAT_UP, ConvertDirection.COOL_DOWN)
                 .isPresent();
+        assert HeatExchangerRegistry.REGISTRY
+                .getHeatExchangerRecipe(
+                        fluids.get(70), fluids.get(10),
+                        fluids.get(40), fluids.get(40), ConvertDirection.COOL_DOWN, ConvertDirection.HEAT_UP)
+                .isPresent();
     }
 
     @Test

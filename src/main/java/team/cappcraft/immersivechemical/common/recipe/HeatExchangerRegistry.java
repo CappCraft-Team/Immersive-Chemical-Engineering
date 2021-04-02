@@ -73,6 +73,9 @@ public class HeatExchangerRegistry {
                 ConvertDirection.COOL_DOWN : ConvertDirection.HEAT_UP;
         ConvertDirection DirectionB = DirectionA.getOpposite();
 
+        if (!(getFluidGraph(DirectionA).containsVertex(FluidIA) && getFluidGraph(DirectionB).containsVertex(FluidIB)))
+            return Optional.empty();
+
         if (FluidOA != null && FluidOB != null) {
             return getHeatExchangerRecipe(FluidIA, FluidIB, FluidOA, FluidOB, DirectionA, DirectionB);
         }
@@ -91,11 +94,11 @@ public class HeatExchangerRegistry {
         }
 
         if (FluidOA == null && FluidOB == null) {
-            final Optional<Fluid> FarthestOA = findFarthest(FluidIA, DirectionA, (FluidIA.getTemperature() + FluidIB.getTemperature()) / 2);
-            if (FarthestOA.isPresent()) {
-                final Optional<Fluid> FarthestOB = findFarthest(FluidIB, DirectionB, FarthestOA.get().getTemperature());
+            final Optional<Fluid> NextOA = findReachable(FluidIA, DirectionA).stream().findFirst();
+            if (NextOA.isPresent()) {
+                final Optional<Fluid> FarthestOB = findFarthest(FluidIB, DirectionB, NextOA.get().getTemperature());
                 if (FarthestOB.isPresent())
-                    return getHeatExchangerRecipe(FluidIA, FluidIB, FarthestOA.get(), FarthestOB.get(), DirectionA, DirectionB);
+                    return getHeatExchangerRecipe(FluidIA, FluidIB, NextOA.get(), FarthestOB.get(), DirectionA, DirectionB);
             }
         }
 
@@ -113,7 +116,7 @@ public class HeatExchangerRegistry {
     /**
      * Find the farthest vertex
      *
-     * @param input     start vertex
+     * @param input     start vertex, must exist in graph
      * @param direction convert direction
      * @param tempLimit the temperature limit of the fluid, depends on direction
      *                  COOL_DOWN -> Greater or equal to limit
@@ -136,11 +139,11 @@ public class HeatExchangerRegistry {
     /**
      * Find reachable fluid from input
      *
-     * @param input     start vertex
+     * @param input     start vertex, must exist in graph
      * @param direction convert direction
      * @return list of reachable fluids
      */
-    public LinkedList<Fluid> findReachable(@Nonnull Fluid input, ConvertDirection direction) {
+    public List<Fluid> findReachable(@Nonnull Fluid input, ConvertDirection direction) {
         final DepthFirstIterator<Fluid, WeakReference<HeatExchangerEntry>> iter
                 = new DepthFirstIterator<>(getFluidGraph(direction), input);
 
@@ -152,8 +155,8 @@ public class HeatExchangerRegistry {
     /**
      * Find correspond entry for input and output, create a generated one if these two is connected
      *
-     * @param input     fluid input
-     * @param output    fluid output
+     * @param input     fluid input, must exist in graph
+     * @param output    fluid output, must exist in graph
      * @param direction convert direction
      * @return empty if input cant connect to output
      */
@@ -164,9 +167,8 @@ public class HeatExchangerRegistry {
             //noinspection unused
             List<HeatExchangerEntry> refEntry = cleanAndRefEntry();//Keep referencing entry
             //Create entry connecting input and output
-            GraphPath<Fluid, WeakReference<HeatExchangerEntry>> path;
-            if (graph.containsVertex(input) && graph.containsVertex(output)
-                    && (path = new DijkstraShortestPath<>(graph).getPath(input, output)) != null) {
+            GraphPath<Fluid, WeakReference<HeatExchangerEntry>> path = new DijkstraShortestPath<>(graph).getPath(input, output);
+            if (path != null) {
                 //Sum up all the heat in the path
                 final int TotalHeat = path.getEdgeList().parallelStream().mapToInt(value -> Objects.requireNonNull(value.get()).HeatValue).sum();
                 final FluidStack FluidStackInput = Objects.requireNonNull(path.getEdgeList().get(0).get()).getInput(direction);
