@@ -127,12 +127,12 @@ public class HeatExchangerRegistry {
         if (direction == ConvertDirection.COOL_DOWN)
             return findReachable(input, direction)
                     .parallelStream()
-                    .filter(fluid -> fluid != input && fluid.getTemperature() >= tempLimit)
+                    .filter(fluid -> fluid.getTemperature() >= tempLimit)
                     .min(Comparator.comparingInt(Fluid::getTemperature));
         else
             return findReachable(input, direction)
                     .parallelStream()
-                    .filter(fluid -> fluid != input && fluid.getTemperature() <= tempLimit)
+                    .filter(fluid -> fluid.getTemperature() <= tempLimit)
                     .max(Comparator.comparingInt(Fluid::getTemperature));
     }
 
