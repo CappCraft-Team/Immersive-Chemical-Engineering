@@ -10,11 +10,11 @@ and **Refresh Gradle** to apply AccessTransformers in your runtime libraries
 # Preview
 
 Added 3 types of Heat Exchangers
-![icon](https://github.com/CappCraft-Team/Immersive-Chemical-Engineering/blob/feature/first_block/Docs/showHeatExchanger.png?raw=true)
+![icon](https://github.com/CappCraft-Team/Immersive-Chemical-Engineering/blob/main/Docs/showHeatExchanger.png?raw=true)
 Gui
-![icon](https://github.com/CappCraft-Team/Immersive-Chemical-Engineering/blob/feature/first_block/Docs/showGUI.png?raw=true)
+![icon](https://github.com/CappCraft-Team/Immersive-Chemical-Engineering/blob/main/Docs/showGUI.png?raw=true)
 JEI
-![icon](https://github.com/CappCraft-Team/Immersive-Chemical-Engineering/blob/feature/first_block/Docs/showJEI.png?raw=true)
+![icon](https://github.com/CappCraft-Team/Immersive-Chemical-Engineering/blob/main/Docs/showJEI.png?raw=true)
 
 # Customization
 
