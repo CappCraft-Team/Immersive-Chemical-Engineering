@@ -94,7 +94,10 @@ public class HeatExchangerRegistry {
         }
 
         if (FluidOA == null && FluidOB == null) {
-            final Optional<Fluid> NextOA = findReachable(FluidIA, DirectionA).stream().findFirst();
+            //Find the closest one to the input
+            final Optional<Fluid> NextOA = DirectionA == ConvertDirection.COOL_DOWN ?
+                    findReachable(FluidIA, DirectionA).parallelStream().max(Comparator.comparingInt(Fluid::getTemperature))
+                    : findReachable(FluidIA, DirectionA).parallelStream().min(Comparator.comparingInt(Fluid::getTemperature));
             if (NextOA.isPresent()) {
                 final Optional<Fluid> FarthestOB = findFarthest(FluidIB, DirectionB, NextOA.get().getTemperature());
                 if (FarthestOB.isPresent())
