@@ -30,6 +30,7 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
     public static final String TAG_PROCESSING = "Processing";
     public static final String TAG_STATE = "State";
     public static final String TAG_IDLE_TIME = "IdleTime";
+    public static final String TAG_CACHED_HEAT = "Cached_Heat";
     public final int CoolDownBase = 20 * 10;
     public final IHeatExchangerProperties Properties;
     /**
@@ -119,6 +120,7 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
             tank.readFromNBT(tanks.getCompoundTagAt(i));
         }
         idleTime = nbt.getInteger(TAG_IDLE_TIME);
+        cachedHeat = nbt.getInteger(TAG_CACHED_HEAT);
         if (descPacket) {
             currentState = nbt.getBoolean(TAG_PROCESSING) ?
                     TileHeatExchangerTickAction.Processing.values()[nbt.getInteger(TAG_STATE)]
@@ -136,6 +138,7 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
         }
         nbt.setTag(TAG_TANKS, tanks);
         nbt.setInteger(TAG_IDLE_TIME, idleTime);
+        nbt.setInteger(TAG_CACHED_HEAT, cachedHeat);
         if (descPacket) {
             nbt.setBoolean(TAG_PROCESSING, currentState instanceof TileHeatExchangerTickAction.Processing);
             nbt.setInteger(TAG_STATE, ((Enum) currentState).ordinal());
