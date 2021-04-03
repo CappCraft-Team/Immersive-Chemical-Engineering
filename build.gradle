@@ -239,7 +239,7 @@ afterEvaluate {
     }
 
     Properties properties = new Properties()
-    if (file("local.properties").exists())
+    if (new File("local.properties").exists())
         properties.load(new FileInputStream("local.properties"))
 
     curseforge {
