@@ -89,7 +89,9 @@ public class LockableFluidTank extends FluidTank implements ILockableSlot {
             onContentsChanged();
 
             if (tile != null) {
-                FluidEvent.fireEvent(new FluidEvent.FluidFillingEvent(fluid, tile.getWorld(), tile.getPos(), this, fluid.amount));
+                final FluidEvent.FluidFillingEvent fluidEvent = new FluidEvent.FluidFillingEvent(fluid, tile.getWorld(), tile.getPos(), this, fluid.amount);
+                onContentChangedConsumer.accept(fluidEvent);
+                FluidEvent.fireEvent(fluidEvent);
             }
             return fluid.amount;
         }
