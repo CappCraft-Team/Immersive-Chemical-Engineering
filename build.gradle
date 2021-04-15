@@ -1,5 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.matthewprenger.cursegradle.CurseArtifact
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.FileFilterUtils
 import org.apache.commons.io.filefilter.TrueFileFilter
@@ -211,6 +212,30 @@ shadowJar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
+Properties properties = new Properties()
+if (new File("local.properties").exists())
+    properties.load(new FileInputStream("local.properties"))
+
+curseforge {
+    apiKey = properties.getProperty("curse-api")
+    project {
+        id = '463438'
+        changelog = 'fix recipe finder; fix LockableTank callback'
+        releaseType = 'beta'
+
+        mainArtifact shadowJar//Will be replaced in afterEvaluate
+        addArtifact shadowJar
+        addArtifact sourceJar
+
+        addGameVersion("Java 8")
+        addGameVersion("1.12.2")
+
+        relations {
+            requiredDependency("immersive-engineering")
+        }
+    }
+}
+
 afterEvaluate {
     task shadowReobfedJar(type: ShadowJar) { shadow ->
         shadow.group = "build"
@@ -238,29 +263,7 @@ afterEvaluate {
         tasks.reobfJar.finalizedBy(shadow)
     }
 
-    Properties properties = new Properties()
-    if (new File("local.properties").exists())
-        properties.load(new FileInputStream("local.properties"))
-
-    curseforge {
-        apiKey = properties.getProperty("curse-api")
-        project {
-            id = '463438'
-            changelog = 'fix recipe finder; fix LockableTank callback'
-            releaseType = 'beta'
-
-            addGameVersion("Java 8")
-            addGameVersion("1.12.2")
-
-            mainArtifact shadowReobfedJar
-            addArtifact shadowJar
-            addArtifact sourceJar
-
-            relations {
-                requiredDependency("immersive-engineering")
-            }
-        }
-    }
+    tasks.curseforge463438.mainArtifact.artifact = shadowReobfedJar
 
     publishing {
         publications {
