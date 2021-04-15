@@ -27,3 +27,4 @@ gradlew.bat
 gradle
 
 /local.properties
+/logs
