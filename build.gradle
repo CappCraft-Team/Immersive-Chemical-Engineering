@@ -24,7 +24,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'idea'
 
 def mcVersion = '1.12.2'
-version = '1.0.0'
+version = '1.0.1'
 group = 'team.cappcraft.icheme'
 archivesBaseName = 'immersive-chemical-engineering'
 
@@ -246,7 +246,7 @@ afterEvaluate {
         apiKey = properties.getProperty("curse-api")
         project {
             id = '463438'
-            changelog = 'Add heat exchanger to minecraft'
+            changelog = 'fix recipe finder; fix LockableTank callback'
             releaseType = 'beta'
 
             addGameVersion("Java 8")
