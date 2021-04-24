@@ -8,6 +8,7 @@ import net.minecraftforge.fluids.FluidTank;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -120,12 +121,16 @@ public class HeatExchangerEntry implements IJEIRecipe {
 
     @Override
     public List<FluidStack> getJEITotalFluidInputs() {
-        return Collections.singletonList(FluidHot);
+        return Direction == ConvertDirection.TWO_WAY ?
+                Arrays.asList(FluidHot, FluidCold)
+                : Collections.singletonList(FluidHot);
     }
 
     @Override
     public List<FluidStack> getJEITotalFluidOutputs() {
-        return Collections.singletonList(FluidCold);
+        return Direction == ConvertDirection.TWO_WAY ?
+                Arrays.asList(FluidHot, FluidCold)
+                : Collections.singletonList(FluidCold);
     }
 }
 
