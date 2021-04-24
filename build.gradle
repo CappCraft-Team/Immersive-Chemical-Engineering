@@ -30,6 +30,8 @@ version = '1.0.1'
 group = 'team.cappcraft.icheme'
 archivesBaseName = 'immersive-chemical-engineering'
 
+sourceCompatibility = targetCompatibility = 1.8
+
 minecraft {
     mappings channel: 'snapshot', version: '20171003-1.12'
 
@@ -178,7 +180,6 @@ task generateSources(type: Copy) {
 }
 
 compileJava {
-    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
     source = tasks.generateSources.outputs
     dependsOn(tasks.generateSources)
 }
