@@ -26,7 +26,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'idea'
 
 def mcVersion = '1.12.2'
-version = '1.1.0'
+version = '1.0.1'
 group = 'team.cappcraft.icheme'
 archivesBaseName = 'immersive-chemical-engineering'
 
@@ -85,7 +85,6 @@ repositories {
             includeGroup "curse.maven"
         }
     }
-    mavenCentral()
 }
 
 dependencies {
@@ -97,11 +96,11 @@ dependencies {
     implementation 'CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.+'
     implementation fg.deobf('blusunrize:ImmersiveEngineering:0.12-92-559')
 
-    implementation 'org.jgrapht:jgrapht-core:1.5.1'
-    shadow 'org.jgrapht:jgrapht-core:1.5.1'
+    implementation 'org.jgrapht:jgrapht-core:1.4.0'
+    shadow 'org.jgrapht:jgrapht-core:1.4.0'
 
     testImplementation(platform('org.junit:junit-bom:5.7.1'))
-    testImplementation('org.junit.jupiter:junit-jupiter:5.8.1')
+    testImplementation('org.junit.jupiter:junit-jupiter')
 
     runtimeOnly('curse.maven:nbtEdit-247580:2448708')
 }
@@ -224,7 +223,7 @@ if (file.exists()) {
         apiKey = properties.getProperty("curse-api")
         project {
             id = '463438'
-            changelog = 'Support Comparator'
+            changelog = 'fix recipe finder; fix LockableTank callback'
             releaseType = 'beta'
 
             mainArtifact shadowJar//Will be replaced in afterEvaluate
