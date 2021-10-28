@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart<AbstractTileHeatExchanger>
-        implements IEBlockInterfaces.IGuiTile, IEBlockInterfaces.IProcessTile, IEBlockInterfaces.IMirrorAble {
+        implements IEBlockInterfaces.IGuiTile, IEBlockInterfaces.IProcessTile, IEBlockInterfaces.IMirrorAble, IEBlockInterfaces.IComparatorOverride {
     public static final String TAG_TANKS = "Tanks";
     public static final String TAG_PROCESSING = "Processing";
     public static final String TAG_STATE = "State";
@@ -63,6 +63,11 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
 
     public AbstractTileHeatExchanger(int[] structureDimensions, IHeatExchangerProperties properties) {
         super(structureDimensions);
+        if (isDummy()) {
+            Properties = null;
+            Tanks = null;
+            return;
+        }
         //region Apply Props
         Properties = properties;
         //endregion
@@ -114,6 +119,7 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
     @Override
     public void readCustomNBT(@Nonnull NBTTagCompound nbt, boolean descPacket) {
         super.readCustomNBT(nbt, descPacket);
+        if (isDummy()) return;
         final NBTTagList tanks = nbt.getTagList(TAG_TANKS, 10);
         for (int i = 0; i < tanks.tagCount(); i++) {
             LockableFluidTank tank = Tanks[i];
@@ -132,6 +138,7 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
     @Override
     public void writeCustomNBT(@Nonnull NBTTagCompound nbt, boolean descPacket) {
         super.writeCustomNBT(nbt, descPacket);
+        if (isDummy()) return;
         final NBTTagList tanks = new NBTTagList();
         for (LockableFluidTank tank : Tanks) {
             tanks.appendTag(tank.writeToNBT(new NBTTagCompound()));
@@ -281,6 +288,7 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
     }
 
     public static class TileHeatExchangerTickAction {
+        @SuppressWarnings("ConstantConditions")
         public enum DecideRecipe implements ITickableStateMachine<AbstractTileHeatExchanger> {
             WAITING_INPUT_SLOT_CHANGE,
             MATCH_COOL_DOWN {
@@ -332,6 +340,7 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
         /**
          * When in processing state, cachedRecipe should not be null
          */
+        @SuppressWarnings("ConstantConditions")
         public enum Processing implements ITickableStateMachine<AbstractTileHeatExchanger> {
             COOL_DOWN {
                 @Override
