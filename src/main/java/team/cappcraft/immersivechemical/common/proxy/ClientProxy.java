@@ -9,18 +9,28 @@ import blusunrize.immersiveengineering.common.blocks.metal.BlockTypes_MetalDecor
 import blusunrize.lib.manual.ManualPages;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.model.obj.OBJLoader;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
+import team.cappcraft.immersivechemical.client.gui.render.TileRenderHeatExchanger;
 import team.cappcraft.immersivechemical.common.blocks.multiblocks.MultiBlockHeatExchangerLarge;
 import team.cappcraft.immersivechemical.common.blocks.multiblocks.MultiBlockHeatExchangerMedium;
 import team.cappcraft.immersivechemical.common.blocks.multiblocks.MultiBlockHeatExchangerSmall;
+import team.cappcraft.immersivechemical.common.tileentity.TileHeatExchangerLarge;
 
 import static team.cappcraft.immersivechemical.ImmersiveChemicalEngineering.MODID;
 
 @Mod.EventBusSubscriber(Side.CLIENT)
 public class ClientProxy extends CommonProxy {
+    @Override
+    public void init(FMLInitializationEvent e) {
+        super.init(e);
+        ClientRegistry.bindTileEntitySpecialRenderer(TileHeatExchangerLarge.class, new TileRenderHeatExchanger());
+    }
+
     @Override
     public void preInit(FMLPreInitializationEvent e) {
         super.preInit(e);
