@@ -98,19 +98,4 @@ public class BlockHeatExchanger extends BlockIEMultiblock<BlockTypes_HeatExchang
     public boolean allowHammerHarvest(@Nonnull IBlockState blockState) {
         return true;
     }
-
-    @Override
-    public boolean isOpaqueCube(@Nonnull IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isFullBlock(@Nonnull IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isFullCube(@Nonnull IBlockState state) {
-        return false;
-    }
 }
