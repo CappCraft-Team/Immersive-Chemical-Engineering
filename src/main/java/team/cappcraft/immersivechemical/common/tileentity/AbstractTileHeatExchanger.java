@@ -63,11 +63,6 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
 
     public AbstractTileHeatExchanger(int[] structureDimensions, IHeatExchangerProperties properties) {
         super(structureDimensions);
-        if (isDummy()) {
-            Properties = null;
-            Tanks = null;
-            return;
-        }
         //region Apply Props
         Properties = properties;
         //endregion
@@ -288,7 +283,6 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
     }
 
     public static class TileHeatExchangerTickAction {
-        @SuppressWarnings("ConstantConditions")
         public enum DecideRecipe implements ITickableStateMachine<AbstractTileHeatExchanger> {
             WAITING_INPUT_SLOT_CHANGE,
             MATCH_COOL_DOWN {
@@ -340,7 +334,6 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
         /**
          * When in processing state, cachedRecipe should not be null
          */
-        @SuppressWarnings("ConstantConditions")
         public enum Processing implements ITickableStateMachine<AbstractTileHeatExchanger> {
             COOL_DOWN {
                 @Override
