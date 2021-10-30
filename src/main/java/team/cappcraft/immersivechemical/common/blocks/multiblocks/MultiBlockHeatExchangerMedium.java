@@ -28,6 +28,7 @@ public class MultiBlockHeatExchangerMedium implements MultiblockHandler.IMultibl
             new IngredientStack(new ItemStack(IEContent.blockSheetmetal, 16, BlockTypes_MetalsAll.IRON.getMeta())),
             new IngredientStack(new ItemStack(IEContent.blockMetalDecoration0, 4, BlockTypes_MetalDecoration0.RADIATOR.getMeta())),
     };
+    static ItemStack renderStack = ItemStack.EMPTY;
 
     static {
         for (int h = 0; h < 2; h++)
@@ -69,9 +70,10 @@ public class MultiBlockHeatExchangerMedium implements MultiblockHandler.IMultibl
             state = state.withProperty(IEProperties.FACING_HORIZONTAL, side);
 
             pos = pos.down();//The Origin need to be at Y=0
+            pos = pos.offset(mirrored ? side.rotateYCCW() : side.rotateY(), 2);//Move 2 block left to make the master in the middle
             for (int h = 0; h < 2; h++)
                 for (int l = 0; l < 2; l++)
-                    for (int w = 0; w < 5; w++) {
+                    for (int w = -2; w <= 2; w++) {
                         final int offsetX = -side.getFrontOffsetZ() * w * (mirrored ? -1 : 1) + side.getFrontOffsetX() * l;
                         final int offsetZ = side.getFrontOffsetX() * w * (mirrored ? -1 : 1) + side.getFrontOffsetZ() * l;
                         final BlockPos blockPos = pos.add(offsetX, h, offsetZ);
@@ -83,7 +85,7 @@ public class MultiBlockHeatExchangerMedium implements MultiblockHandler.IMultibl
                             final AbstractTileHeatExchanger tileHeatExchanger = (AbstractTileHeatExchanger) tileEntity;
                             tileHeatExchanger.formed = true;
                             //See blusunrize.immersiveengineering.common.blocks.TileEntityMultiblockPart.getBlockPosForPos
-                            tileHeatExchanger.pos = h * 10 + l * 5 + w;
+                            tileHeatExchanger.pos = h * 10 + l * 5 + (w + 2);
                             tileHeatExchanger.offset = new int[]{offsetX, h, offsetZ};
                             tileHeatExchanger.mirrored = mirrored;
                             tileHeatExchanger.markDirty();
@@ -136,8 +138,6 @@ public class MultiBlockHeatExchangerMedium implements MultiblockHandler.IMultibl
     public float getManualScale() {
         return 16f;
     }
-
-    static ItemStack renderStack = ItemStack.EMPTY;
 
     @Override
     public boolean canRenderFormedStructure() {
