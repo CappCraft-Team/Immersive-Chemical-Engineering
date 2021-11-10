@@ -1,5 +1,6 @@
 package team.cappcraft.immersivechemical.common.compact.jei;
 
+import com.google.common.collect.Lists;
 import mezz.jei.api.gui.IDrawableStatic;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.ingredients.VanillaTypes;
@@ -24,7 +25,7 @@ public class HeatExchangerRecipeWrapper implements IRecipeWrapper {
     private static final IDrawableStatic HOT_ICON =
             JEIPlugin.guiHelper.createDrawable(HeatExchangerRecipeCategory.resourceLocation, ICON_X, ICON_HOT_Y, ICON_WIDTH, ICON_HEIGHT);
     public final int MinCapacity;
-    private final HeatExchangerEntry Entry;
+    public final HeatExchangerEntry Entry;
 
     public HeatExchangerRecipeWrapper(HeatExchangerEntry Entry) {
         this.Entry = Entry;
@@ -33,8 +34,16 @@ public class HeatExchangerRecipeWrapper implements IRecipeWrapper {
 
     @Override
     public void getIngredients(@Nonnull IIngredients ingredients) {
-        ingredients.setInput(VanillaTypes.FLUID, Entry.FluidHot);
-        ingredients.setOutput(VanillaTypes.FLUID, Entry.FluidCold);
+        if (Entry.Direction == ConvertDirection.HEAT_UP) {
+            ingredients.setInput(VanillaTypes.FLUID, Entry.FluidCold);
+            ingredients.setOutput(VanillaTypes.FLUID, Entry.FluidHot);
+        } else if (Entry.Direction == ConvertDirection.COOL_DOWN) {
+            ingredients.setInput(VanillaTypes.FLUID, Entry.FluidHot);
+            ingredients.setOutput(VanillaTypes.FLUID, Entry.FluidCold);
+        } else {
+            ingredients.setInputs(VanillaTypes.FLUID, Lists.newArrayList(Entry.FluidHot, Entry.FluidCold));
+            ingredients.setOutputs(VanillaTypes.FLUID, Lists.newArrayList(Entry.FluidCold, Entry.FluidHot));
+        }
     }
 
     @Override

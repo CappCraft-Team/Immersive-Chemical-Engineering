@@ -1,16 +1,17 @@
 package team.cappcraft.immersivechemical.common.compact.jei;
 
 import blusunrize.immersiveengineering.common.util.compat.jei.IERecipeCategory;
+import com.google.common.collect.Lists;
 import mezz.jei.api.IGuiHelper;
 import mezz.jei.api.gui.IGuiFluidStackGroup;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.ingredients.IIngredients;
-import mezz.jei.api.ingredients.VanillaTypes;
 import mezz.jei.api.recipe.IRecipeWrapper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
 import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
+import team.cappcraft.immersivechemical.common.recipe.ConvertDirection;
 import team.cappcraft.immersivechemical.common.recipe.HeatExchangerEntry;
 import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRegistry;
 
@@ -40,14 +41,20 @@ public class HeatExchangerRecipeCategory extends IERecipeCategory<HeatExchangerE
 
         int i = 0;
 
-        List<FluidStack> input = ingredients.getInputs(VanillaTypes.FLUID).get(0);
-        fluidStacks.init(i, true, x, y, 16, 16, recipeWrapper.MinCapacity, true, null);
-        fluidStacks.set(i++, input);
+        List<FluidStack> left = Lists.newArrayList(recipeWrapper.Entry.FluidHot);
+        fluidStacks.init(i,
+                recipeWrapper.Entry.Direction == ConvertDirection.COOL_DOWN
+                        || recipeWrapper.Entry.Direction == ConvertDirection.TWO_WAY,
+                x, y, 16, 16, recipeWrapper.MinCapacity, true, null);
+        fluidStacks.set(i++, left);
 
         x += 53;
-        List<FluidStack> output = ingredients.getOutputs(VanillaTypes.FLUID).get(0);
-        fluidStacks.init(i, false, x, y, 16, 16, recipeWrapper.MinCapacity, true, null);
-        fluidStacks.set(i, output);
+        List<FluidStack> right = Lists.newArrayList(recipeWrapper.Entry.FluidCold);
+        fluidStacks.init(i,
+                recipeWrapper.Entry.Direction == ConvertDirection.HEAT_UP
+                        || recipeWrapper.Entry.Direction == ConvertDirection.TWO_WAY,
+                x, y, 16, 16, recipeWrapper.MinCapacity, true, null);
+        fluidStacks.set(i, right);
     }
 
     @Nonnull
