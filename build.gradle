@@ -209,6 +209,14 @@ task sourceJar(type: Jar) {
     from sourceSets.main.allSource
 }
 
+shadowJar {
+    classifier = "deobf"
+    relocate 'org.jgrapht', 'team.cappcraft.jgrapht'
+    relocate 'org.jheap', 'team.cappcraft.jheap'
+    configurations = [project.configurations.shadow]
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 Properties properties = new Properties()
 def file = new File("${projectDir}/local.properties")
 if (file.exists()) {
