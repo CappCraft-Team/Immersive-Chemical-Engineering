@@ -69,7 +69,7 @@ public class MultiBlockHeatExchangerLarge implements MultiblockHandler.IMultiblo
             state = state.withProperty(IEProperties.FACING_HORIZONTAL, side);
 
             pos = pos.down();//The Origin need to be at Y=0
-            pos = pos.offset(side, 3);//Forward 3 block to make the origin in the middle
+            pos = pos.offset(side, 3);//Forward 3 block to make the master in the middle
             for (int h = 0; h < 3; h++)
                 for (int l = -3; l <= 3; l++)
                     for (int w = -1; w <= 1; w++) {

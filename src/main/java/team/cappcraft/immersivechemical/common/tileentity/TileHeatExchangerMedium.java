@@ -5,6 +5,7 @@ import blusunrize.immersiveengineering.common.blocks.BlockTypes_MetalsAll;
 import blusunrize.immersiveengineering.common.blocks.metal.BlockTypes_MetalDecoration0;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fluids.FluidEvent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import team.cappcraft.immersivechemical.common.tileentity.constant.HeatExchangerSizeVariants;
@@ -20,8 +21,49 @@ public class TileHeatExchangerMedium extends AbstractTileHeatExchanger {
     protected static final int FluidAccessPointInputB = 6;
     protected static final int FluidAccessPointOutputB = 11;
 
+    /**
+     * Redstone Comparator Access Point
+     */
+    protected static final int ComparatorAccessPointInputA = 5;
+    protected static final int ComparatorAccessPointOutputA = 6;
+    protected static final int ComparatorAccessPointInputB = 0;
+    protected static final int ComparatorAccessPointOutputB = 1;
+
     public TileHeatExchangerMedium() {
         super(new int[]{2, 2, 5}, HeatExchangerSizeVariants.MEDIUM);
+    }
+
+    @Override
+    protected void onInputSlotChanged(FluidEvent event) {
+        super.onInputSlotChanged(event);
+        markBlockForUpdate(getBlockPosForPos(ComparatorAccessPointInputA), null);
+        markBlockForUpdate(getBlockPosForPos(ComparatorAccessPointInputB), null);
+    }
+
+    @Override
+    protected void onOutputSlotChanged(FluidEvent event) {
+        super.onOutputSlotChanged(event);
+        markBlockForUpdate(getBlockPosForPos(ComparatorAccessPointOutputA), null);
+        markBlockForUpdate(getBlockPosForPos(ComparatorAccessPointOutputB), null);
+    }
+
+    @Override
+    protected void clearFluidSlot(int slot) {
+        super.clearFluidSlot(slot);
+        switch (slot) {
+            case 0:
+                markBlockForUpdate(getBlockPosForPos(ComparatorAccessPointInputA), null);
+                break;
+            case 1:
+                markBlockForUpdate(getBlockPosForPos(ComparatorAccessPointOutputA), null);
+                break;
+            case 2:
+                markBlockForUpdate(getBlockPosForPos(ComparatorAccessPointInputB), null);
+                break;
+            case 3:
+                markBlockForUpdate(getBlockPosForPos(ComparatorAccessPointOutputB), null);
+                break;
+        }
     }
 
     @Nonnull
@@ -102,5 +144,23 @@ public class TileHeatExchangerMedium extends AbstractTileHeatExchanger {
             else
                 return new float[]{Z_1, Y_1, X_1, Z_2, Y_2, X_2};
         }
+    }
+
+    @Override
+    public int getComparatorInputOverride() {
+        final AbstractTileHeatExchanger master = master();
+        if (master == null) return 0;
+        final LockableFluidTank[] Tanks = master.Tanks;
+        switch (pos) {
+            case ComparatorAccessPointInputA:
+                return 15 * Tanks[0].getFluidAmount() / Tanks[0].getCapacity();
+            case ComparatorAccessPointOutputA:
+                return 15 * Tanks[1].getFluidAmount() / Tanks[1].getCapacity();
+            case ComparatorAccessPointInputB:
+                return 15 * Tanks[2].getFluidAmount() / Tanks[2].getCapacity();
+            case ComparatorAccessPointOutputB:
+                return 15 * Tanks[3].getFluidAmount() / Tanks[3].getCapacity();
+        }
+        return 0;
     }
 }

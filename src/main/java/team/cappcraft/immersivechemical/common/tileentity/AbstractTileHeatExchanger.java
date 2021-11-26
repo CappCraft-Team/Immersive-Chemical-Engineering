@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart<AbstractTileHeatExchanger>
-        implements IEBlockInterfaces.IGuiTile, IEBlockInterfaces.IProcessTile, IEBlockInterfaces.IMirrorAble {
+        implements IEBlockInterfaces.IGuiTile, IEBlockInterfaces.IProcessTile, IEBlockInterfaces.IMirrorAble, IEBlockInterfaces.IComparatorOverride {
     public static final String TAG_TANKS = "Tanks";
     public static final String TAG_PROCESSING = "Processing";
     public static final String TAG_STATE = "State";
@@ -42,18 +42,18 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
      */
     public final LockableFluidTank[] Tanks;
     /**
-     * When restore, we need to refresh the recipe by current input
+     * When restored, we need to refresh the recipe by current input
      */
     @Nonnull
     public ITickableStateMachine<AbstractTileHeatExchanger> currentState = TileHeatExchangerTickAction.DecideRecipe.IS_INPUT_READY_FOR_MATCH;
     /**
-     * Use to decide cool down time
-     * increase when not exchange heat, otherwise decrease
+     * Use for decide cool down,
+     * increase when not exchanging heat, otherwise decrease
      */
     public int idleTime = 0;
     /**
-     * Wont save to NBT, rely on the InputSlot
-     * available recipes may changing
+     * Won't save to NBT, rely on the InputSlot,
+     * as available recipes may change
      */
     protected HeatExchangerRecipe cachedRecipe;
     protected int coolDown;
@@ -114,6 +114,7 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
     @Override
     public void readCustomNBT(@Nonnull NBTTagCompound nbt, boolean descPacket) {
         super.readCustomNBT(nbt, descPacket);
+        if (isDummy()) return;
         final NBTTagList tanks = nbt.getTagList(TAG_TANKS, 10);
         for (int i = 0; i < tanks.tagCount(); i++) {
             LockableFluidTank tank = Tanks[i];
@@ -132,6 +133,7 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
     @Override
     public void writeCustomNBT(@Nonnull NBTTagCompound nbt, boolean descPacket) {
         super.writeCustomNBT(nbt, descPacket);
+        if (isDummy()) return;
         final NBTTagList tanks = new NBTTagList();
         for (LockableFluidTank tank : Tanks) {
             tanks.appendTag(tank.writeToNBT(new NBTTagCompound()));
@@ -237,7 +239,7 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
 
     /**
      * Clear the fluid in the specified slot and unlock it
-     * Wont action if in WAITING_FOR_RECIPE_MATCH state
+     * Won't action if in WAITING_FOR_RECIPE_MATCH state
      */
     protected void clearFluidSlot(int slot) {
         if (currentState == TileHeatExchangerTickAction.DecideRecipe.WAITING_FOR_RECIPE_MATCH) return;
@@ -248,7 +250,7 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
     }
 
     /**
-     * Wont action if in WAITING_FOR_RECIPE_MATCH state
+     * Won't action if in WAITING_FOR_RECIPE_MATCH state
      */
     protected void setFluidFilter(int slot, FluidStack fluidStack) {
         if (currentState == TileHeatExchangerTickAction.DecideRecipe.WAITING_FOR_RECIPE_MATCH) return;
@@ -323,7 +325,7 @@ public abstract class AbstractTileHeatExchanger extends TileEntityMultiblockPart
                 }
             },
             /**
-             * When in this state, means a async task is running
+             * When in this state, means an async task is running
              * we should not change this state nor change the slot
              */
             WAITING_FOR_RECIPE_MATCH

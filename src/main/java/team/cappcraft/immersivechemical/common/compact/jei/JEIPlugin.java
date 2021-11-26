@@ -9,7 +9,7 @@ import mezz.jei.api.recipe.IRecipeCategory;
 import mezz.jei.api.recipe.IRecipeCategoryRegistration;
 import mezz.jei.api.recipe.IRecipeWrapper;
 import team.cappcraft.immersivechemical.client.gui.GuiHeatExchanger;
-import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRecipe;
+import team.cappcraft.immersivechemical.common.recipe.HeatExchangerEntry;
 import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRegistry;
 
 import javax.annotation.Nonnull;
@@ -32,7 +32,7 @@ public class JEIPlugin implements IModPlugin {
         jeiHelpers = registry.getJeiHelpers();
         guiHelper = jeiHelpers.getGuiHelper();
 
-        categories.put(HeatExchangerRecipe.class, new HeatExchangerRecipeCategory(guiHelper));
+        categories.put(HeatExchangerEntry.class, new HeatExchangerRecipeCategory(guiHelper));
         registry.addRecipeCategories(categories.values().toArray(new IRecipeCategory[0]));
     }
 
