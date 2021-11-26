@@ -26,7 +26,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'idea'
 
 def mcVersion = '1.12.2'
-version = '1.1.5'
+version = '1.1.6'
 group = 'team.cappcraft.icheme'
 archivesBaseName = 'immersive-chemical-engineering'
 
@@ -209,12 +209,6 @@ task sourceJar(type: Jar) {
     from sourceSets.main.allSource
 }
 
-shadowJar {
-    classifier = "deobf"
-    configurations = [project.configurations.shadow]
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
-
 Properties properties = new Properties()
 def file = new File("${projectDir}/local.properties")
 if (file.exists()) {
@@ -261,6 +255,8 @@ if (file.exists()) {
                 //Take re-Obf Jar as input
                 shadow.from(tasks.reobfJar.getInput())
             }
+            shadow.relocate('org.jgrapht', 'team.cappcraft.jgrapht')
+            shadow.relocate('org.jheap', 'team.cappcraft.jheap')
             shadow.configurations = [project.configurations.shadow]
             shadow.exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'module-info.class')
             shadow.dependsOn(tasks.reobfJar)
