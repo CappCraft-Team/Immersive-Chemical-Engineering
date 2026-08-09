@@ -1,0 +1,10 @@
+# Materials for the centered MEDIUM inventory model.
+
+newmtl Cube
+map_Kd immersivechemical:block/cube_medium
+
+newmtl LargePipe
+map_Kd immersivechemical:block/pipe
+
+newmtl Tube
+map_Kd immersivechemical:block/tube

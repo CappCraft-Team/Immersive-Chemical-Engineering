@@ -1,0 +1,45 @@
+{
+    "parent": "minecraft:block/block",
+    "automatic_culling": false,
+    "flip_v": true,
+    "loader": "forge:obj",
+    "model": "immersivechemical:models/block/multiblock/heat_exchanger_medium_item.obj",
+    "render_type": "minecraft:cutout",
+    "textures": {
+        "particle": "immersivechemical:block/cube_medium"
+    },
+    "display": {
+        "thirdperson_righthand": {
+            "rotation": [20, -45, 0],
+            "scale": [0.2, 0.2, 0.2]
+        },
+        "thirdperson_lefthand": {
+            "rotation": [20, -45, 0],
+            "scale": [0.2, 0.2, 0.2]
+        },
+        "firstperson_righthand": {
+            "rotation": [20, -45, 0],
+            "scale": [0.2, 0.2, 0.2]
+        },
+        "firstperson_lefthand": {
+            "rotation": [20, -45, 0],
+            "scale": [0.2, 0.2, 0.2]
+        },
+        "gui": {
+            "rotation": [20, -45, 0],
+            "scale": [0.2, 0.2, 0.2]
+        },
+        "head": {
+            "rotation": [20, -45, 0],
+            "scale": [0.2, 0.2, 0.2]
+        },
+        "ground": {
+            "rotation": [20, -45, 0],
+            "scale": [0.2, 0.2, 0.2]
+        },
+        "fixed": {
+            "rotation": [20, -45, 0],
+            "scale": [0.2, 0.2, 0.2]
+        }
+    }
+}

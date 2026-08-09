@@ -1,18 +1,14 @@
 package team.cappcraft.immersivechemical.common.recipe;
 
-import blusunrize.immersiveengineering.api.crafting.IJEIRecipe;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.Fluid;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.capability.templates.FluidTank;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.Objects;
 
-public class HeatExchangerEntry implements IJEIRecipe {
+public class HeatExchangerEntry {
     @Nonnull
     public final FluidStack FluidHot;
     @Nonnull
@@ -44,15 +40,37 @@ public class HeatExchangerEntry implements IJEIRecipe {
      * @param direction set if this entry can just convert from one to another
      */
     public HeatExchangerEntry(@Nonnull FluidStack fluidA, @Nonnull FluidStack fluidB, int heatValue, ConvertDirection direction) {
-        if (fluidA.getFluid().getTemperature() > fluidB.getFluid().getTemperature()) {
-            this.FluidHot = fluidA;
-            this.FluidCold = fluidB;
+        Objects.requireNonNull(fluidA, "fluidA");
+        Objects.requireNonNull(fluidB, "fluidB");
+        this.Direction = Objects.requireNonNull(direction, "direction");
+
+        if (fluidA.isEmpty() || fluidB.isEmpty()) {
+            throw new IllegalArgumentException("Heat exchanger fluids must be non-empty");
+        }
+        if (fluidA.getAmount() <= 0 || fluidB.getAmount() <= 0) {
+            throw new IllegalArgumentException("Heat exchanger fluid amounts must be positive");
+        }
+        if (heatValue <= 0) {
+            throw new IllegalArgumentException("Heat value must be positive");
+        }
+        if (fluidA.getFluid() == fluidB.getFluid()) {
+            throw new IllegalArgumentException("A heat exchanger conversion must use two different fluids");
+        }
+
+        int temperatureA = fluidA.getFluid().getFluidType().getTemperature();
+        int temperatureB = fluidB.getFluid().getFluidType().getTemperature();
+        if (temperatureA == temperatureB) {
+            throw new IllegalArgumentException("Heat exchanger fluids must have different temperatures");
+        }
+
+        if (temperatureA > temperatureB) {
+            this.FluidHot = fluidA.copy();
+            this.FluidCold = fluidB.copy();
         } else {
-            this.FluidHot = fluidB;
-            this.FluidCold = fluidA;
+            this.FluidHot = fluidB.copy();
+            this.FluidCold = fluidA.copy();
         }
         this.HeatValue = heatValue;
-        this.Direction = direction;
     }
 
     @Override
@@ -70,7 +88,7 @@ public class HeatExchangerEntry implements IJEIRecipe {
     }
 
     public boolean isInputMatches(@Nullable FluidStack fluidStack, ConvertDirection direction) {
-        return fluidStack != null && isInputMatches(fluidStack.getFluid(), direction);
+        return fluidStack != null && !fluidStack.isEmpty() && isInputMatches(fluidStack.getFluid(), direction);
     }
 
     public boolean isInputMatches(@Nonnull Fluid fluid, ConvertDirection direction) {
@@ -82,7 +100,7 @@ public class HeatExchangerEntry implements IJEIRecipe {
     }
 
     public boolean isOutputMatches(@Nullable FluidStack fluidStack, ConvertDirection direction) {
-        return fluidStack != null && isOutputMatches(fluidStack.getFluid(), direction);
+        return fluidStack != null && !fluidStack.isEmpty() && isOutputMatches(fluidStack.getFluid(), direction);
     }
 
     public boolean isOutputMatches(@Nonnull Fluid fluid, ConvertDirection direction) {
@@ -92,9 +110,9 @@ public class HeatExchangerEntry implements IJEIRecipe {
     public FluidStack getInput(ConvertDirection direction) {
         switch (direction) {
             case COOL_DOWN:
-                return FluidHot;
+                return FluidHot.copy();
             case HEAT_UP:
-                return FluidCold;
+                return FluidCold.copy();
         }
         throw new IllegalArgumentException("Invalid direction:" + direction);
     }
@@ -102,35 +120,10 @@ public class HeatExchangerEntry implements IJEIRecipe {
     public FluidStack getOutput(ConvertDirection direction) {
         switch (direction) {
             case COOL_DOWN:
-                return FluidCold;
+                return FluidCold.copy();
             case HEAT_UP:
-                return FluidHot;
+                return FluidHot.copy();
         }
         throw new IllegalArgumentException("Invalid direction:" + direction);
     }
-
-    @Override
-    public List<ItemStack> getJEITotalItemInputs() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public List<ItemStack> getJEITotalItemOutputs() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public List<FluidStack> getJEITotalFluidInputs() {
-        return Direction == ConvertDirection.TWO_WAY ?
-                Arrays.asList(FluidHot, FluidCold)
-                : Collections.singletonList(FluidHot);
-    }
-
-    @Override
-    public List<FluidStack> getJEITotalFluidOutputs() {
-        return Direction == ConvertDirection.TWO_WAY ?
-                Arrays.asList(FluidHot, FluidCold)
-                : Collections.singletonList(FluidCold);
-    }
 }
-

@@ -1,0 +1,14 @@
+{
+  "small": {
+    "type": "immersiveengineering:multiblock",
+    "name": "immersivechemical:heat_exchanger_small"
+  },
+  "medium": {
+    "type": "immersiveengineering:multiblock",
+    "name": "immersivechemical:heat_exchanger_medium"
+  },
+  "large": {
+    "type": "immersiveengineering:multiblock",
+    "name": "immersivechemical:heat_exchanger_large"
+  }
+}

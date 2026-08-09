@@ -1,56 +1,117 @@
 package team.cappcraft.immersivechemical.common.compact.jei;
 
-import blusunrize.immersiveengineering.common.util.compat.jei.IERecipeCategory;
-import mezz.jei.api.IGuiHelper;
-import mezz.jei.api.IJeiHelpers;
 import mezz.jei.api.IModPlugin;
-import mezz.jei.api.IModRegistry;
-import mezz.jei.api.recipe.IRecipeCategory;
-import mezz.jei.api.recipe.IRecipeCategoryRegistration;
-import mezz.jei.api.recipe.IRecipeWrapper;
-import team.cappcraft.immersivechemical.client.gui.GuiHeatExchanger;
+import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.registration.IGuiHandlerRegistration;
+import mezz.jei.api.registration.IRecipeCategoryRegistration;
+import mezz.jei.api.registration.IRecipeCatalystRegistration;
+import mezz.jei.api.registration.IRecipeRegistration;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import team.cappcraft.immersivechemical.ICHEME_Contents;
+import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
+import team.cappcraft.immersivechemical.client.gui.HeatExchangerLargeScreen;
+import team.cappcraft.immersivechemical.client.gui.HeatExchangerMediumScreen;
+import team.cappcraft.immersivechemical.client.gui.HeatExchangerSmallScreen;
+import team.cappcraft.immersivechemical.common.recipe.ConvertDirection;
+import team.cappcraft.immersivechemical.common.recipe.HeatExchangerDataRecipe;
 import team.cappcraft.immersivechemical.common.recipe.HeatExchangerEntry;
-import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRegistry;
+import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRecipeRegistration;
 
-import javax.annotation.Nonnull;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Stream;
 
-@SuppressWarnings("FieldCanBeLocal")
-@mezz.jei.api.JEIPlugin
+@JeiPlugin
 public class JEIPlugin implements IModPlugin {
-    public static final String HEAT_EXCHANGER_RECIPE_CATE_ID = "ichme.heatExchanger";
-    public static IModRegistry modRegistry;
-    public static IJeiHelpers jeiHelpers;
-    public static IGuiHelper guiHelper;
 
-    @SuppressWarnings("rawtypes")
-    Map<Class, IERecipeCategory> categories = new LinkedHashMap<>();
+    private static final ResourceLocation PLUGIN_ID = new ResourceLocation(
+            ImmersiveChemicalEngineering.MODID, "jei_plugin");
 
     @Override
-    public void registerCategories(@Nonnull IRecipeCategoryRegistration registry) {
-        jeiHelpers = registry.getJeiHelpers();
-        guiHelper = jeiHelpers.getGuiHelper();
-
-        categories.put(HeatExchangerEntry.class, new HeatExchangerRecipeCategory(guiHelper));
-        registry.addRecipeCategories(categories.values().toArray(new IRecipeCategory[0]));
+    public ResourceLocation getPluginUid() {
+        return PLUGIN_ID;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void register(@Nonnull IModRegistry registry) {
-        modRegistry = registry;
+    public void registerCategories(IRecipeCategoryRegistration registration) {
+        registration.addRecipeCategories(
+                new HeatExchangerRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
+    }
 
-        for (IERecipeCategory<Object, IRecipeWrapper> cat : categories.values()) {
-            cat.addCatalysts(registry);
-            modRegistry.handleRecipes(cat.getRecipeClass(), cat, cat.getRecipeCategoryUid());
+    @Override
+    public void registerRecipes(IRecipeRegistration registration) {
+        var connection = Minecraft.getInstance().getConnection();
+        if (connection == null) {
+            return;
         }
 
-        modRegistry.addRecipes(HeatExchangerRegistry.REGISTRY.getRegisteredEntries(), HEAT_EXCHANGER_RECIPE_CATE_ID);
+        List<HeatExchangerEntry> entries = connection.getRecipeManager()
+                .getAllRecipesFor(HeatExchangerRecipeRegistration.HEAT_EXCHANGER_TYPE.get())
+                .stream()
+                .sorted(Comparator.comparing(recipe -> recipe.getId().toString()))
+                .map(HeatExchangerDataRecipe::getEntry)
+                .flatMap(JEIPlugin::directionalDisplays)
+                .toList();
 
-        modRegistry.addRecipeClickArea(GuiHeatExchanger.class,
-                GuiHeatExchanger.STATE_X, GuiHeatExchanger.STATE_Y,
-                16, 16,
-                HEAT_EXCHANGER_RECIPE_CATE_ID);
+        if (!entries.isEmpty()) {
+            registration.addRecipes(IChemERecipeTypes.HEAT_EXCHANGER, entries);
+        }
+    }
+
+    @Override
+    public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
+        registration.addRecipeCatalyst(
+                new ItemStack(ICHEME_Contents.HEAT_EXCHANGER_SMALL.blockItem().get()),
+                IChemERecipeTypes.HEAT_EXCHANGER
+        );
+        registration.addRecipeCatalyst(
+                new ItemStack(ICHEME_Contents.HEAT_EXCHANGER_MEDIUM.blockItem().get()),
+                IChemERecipeTypes.HEAT_EXCHANGER
+        );
+        registration.addRecipeCatalyst(
+                new ItemStack(ICHEME_Contents.HEAT_EXCHANGER_LARGE.blockItem().get()),
+                IChemERecipeTypes.HEAT_EXCHANGER
+        );
+    }
+
+    @Override
+    public void registerGuiHandlers(IGuiHandlerRegistration registration) {
+        registration.addRecipeClickArea(
+                HeatExchangerSmallScreen.class,
+                81, 55, 16, 15,
+                IChemERecipeTypes.HEAT_EXCHANGER
+        );
+        registration.addRecipeClickArea(
+                HeatExchangerMediumScreen.class,
+                81, 55, 16, 15,
+                IChemERecipeTypes.HEAT_EXCHANGER
+        );
+        registration.addRecipeClickArea(
+                HeatExchangerLargeScreen.class,
+                81, 55, 16, 15,
+                IChemERecipeTypes.HEAT_EXCHANGER
+        );
+    }
+
+    private static Stream<HeatExchangerEntry> directionalDisplays(HeatExchangerEntry entry) {
+        if (entry.Direction != ConvertDirection.TWO_WAY) {
+            return Stream.of(entry);
+        }
+        return Stream.of(
+                new HeatExchangerEntry(
+                        entry.FluidHot,
+                        entry.FluidCold,
+                        entry.HeatValue,
+                        ConvertDirection.COOL_DOWN
+                ),
+                new HeatExchangerEntry(
+                        entry.FluidHot,
+                        entry.FluidCold,
+                        entry.HeatValue,
+                        ConvertDirection.HEAT_UP
+                )
+        );
     }
 }

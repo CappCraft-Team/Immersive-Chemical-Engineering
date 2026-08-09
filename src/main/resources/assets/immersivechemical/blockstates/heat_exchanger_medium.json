@@ -1,0 +1,42 @@
+{
+    "variants": {
+        "facing=north,mirrored=false": {
+            "model": "immersivechemical:block/heat_exchanger_medium",
+            "uvlock": true
+        },
+        "facing=east,mirrored=false": {
+            "model": "immersivechemical:block/heat_exchanger_medium",
+            "y": 90,
+            "uvlock": true
+        },
+        "facing=south,mirrored=false": {
+            "model": "immersivechemical:block/heat_exchanger_medium",
+            "y": 180,
+            "uvlock": true
+        },
+        "facing=west,mirrored=false": {
+            "model": "immersivechemical:block/heat_exchanger_medium",
+            "y": 270,
+            "uvlock": true
+        },
+        "facing=north,mirrored=true": {
+            "model": "immersivechemical:block/heat_exchanger_medium_mirrored",
+            "uvlock": true
+        },
+        "facing=east,mirrored=true": {
+            "model": "immersivechemical:block/heat_exchanger_medium_mirrored",
+            "y": 90,
+            "uvlock": true
+        },
+        "facing=south,mirrored=true": {
+            "model": "immersivechemical:block/heat_exchanger_medium_mirrored",
+            "y": 180,
+            "uvlock": true
+        },
+        "facing=west,mirrored=true": {
+            "model": "immersivechemical:block/heat_exchanger_medium_mirrored",
+            "y": 270,
+            "uvlock": true
+        }
+    }
+}

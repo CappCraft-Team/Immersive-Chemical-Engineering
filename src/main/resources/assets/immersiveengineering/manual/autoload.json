@@ -1,0 +1,9 @@
+{
+  "autoload_priority": 0.5,
+  "immersivechemical:heat_exchange": {
+    "category_weight": 55,
+    "entry_list": [
+      "immersivechemical:heat_exchangers"
+    ]
+  }
+}

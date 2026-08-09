@@ -1,0 +1,149 @@
+{
+    "parent": "minecraft:block/block",
+    "automatic_culling": false,
+    "flip_v": true,
+    "loader": "forge:obj",
+    "model": "immersivechemical:models/block/multiblock/heat_exchanger_large_item.obj",
+    "render_type": "minecraft:cutout",
+    "textures": {
+        "particle": "immersivechemical:block/cube_large"
+    },
+    "display": {
+        "thirdperson_righthand": {
+            "rotation": [
+                20,
+                -45,
+                0
+            ],
+            "translation": [
+                0,
+                -0.2,
+                0
+            ],
+            "scale": [
+                0.15,
+                0.15,
+                0.15
+            ]
+        },
+        "thirdperson_lefthand": {
+            "rotation": [
+                20,
+                -45,
+                0
+            ],
+            "translation": [
+                0,
+                -0.2,
+                0
+            ],
+            "scale": [
+                0.15,
+                0.15,
+                0.15
+            ]
+        },
+        "firstperson_righthand": {
+            "rotation": [
+                20,
+                -45,
+                0
+            ],
+            "translation": [
+                0,
+                -0.2,
+                0
+            ],
+            "scale": [
+                0.15,
+                0.15,
+                0.15
+            ]
+        },
+        "firstperson_lefthand": {
+            "rotation": [
+                20,
+                -45,
+                0
+            ],
+            "translation": [
+                0,
+                -0.2,
+                0
+            ],
+            "scale": [
+                0.15,
+                0.15,
+                0.15
+            ]
+        },
+        "gui": {
+            "rotation": [
+                20,
+                -45,
+                0
+            ],
+            "translation": [
+                0,
+                -0.2,
+                0
+            ],
+            "scale": [
+                0.15,
+                0.15,
+                0.15
+            ]
+        },
+        "head": {
+            "rotation": [
+                20,
+                -45,
+                0
+            ],
+            "translation": [
+                0,
+                -0.2,
+                0
+            ],
+            "scale": [
+                0.15,
+                0.15,
+                0.15
+            ]
+        },
+        "ground": {
+            "rotation": [
+                20,
+                -45,
+                0
+            ],
+            "translation": [
+                0,
+                -0.2,
+                0
+            ],
+            "scale": [
+                0.15,
+                0.15,
+                0.15
+            ]
+        },
+        "fixed": {
+            "rotation": [
+                20,
+                -45,
+                0
+            ],
+            "translation": [
+                0,
+                -0.2,
+                0
+            ],
+            "scale": [
+                0.15,
+                0.15,
+                0.15
+            ]
+        }
+    }
+}

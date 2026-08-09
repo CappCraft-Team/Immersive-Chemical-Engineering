@@ -1,176 +1,176 @@
 package team.cappcraft.immersivechemical.common.tileentity;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidEvent;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
+import net.minecraftforge.fluids.capability.templates.FluidTank;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 import java.util.function.Consumer;
 
-public class LockableFluidTank extends FluidTank implements ILockableSlot {
+/**
+ * A modern Forge fluid tank with independent content and fluid-type locks.
+ */
+public class LockableFluidTank extends FluidTank {
     public static final String TAG_LOCKED = "Locked";
     public static final String TAG_LOCKED_TYPE = "LockedType";
-    private final Consumer<FluidEvent> onContentChangedConsumer;
-    private boolean locked = false;
-    private boolean lockedType = false;
+    public static final String TAG_LOCKED_FLUID = "LockedFluid";
 
-    public LockableFluidTank(int capacity, Consumer<FluidEvent> onContentChanged) {
-        super(capacity);
-        onContentChangedConsumer = onContentChanged;
+    private final Consumer<FluidStack> onContentChangedConsumer;
+    private boolean locked;
+    private boolean lockedType;
+    private FluidStack lockedFluid = FluidStack.EMPTY;
+
+    public LockableFluidTank(int capacity, Consumer<FluidStack> onContentChanged) {
+        super(requirePositiveCapacity(capacity));
+        this.onContentChangedConsumer = Objects.requireNonNull(onContentChanged, "onContentChanged");
     }
 
-    public LockableFluidTank(@Nullable FluidStack fluidStack, int capacity, Consumer<FluidEvent> onContentChanged) {
-        super(fluidStack, capacity);
-        onContentChangedConsumer = onContentChanged;
+    public LockableFluidTank(
+            @Nullable FluidStack fluidStack, int capacity, Consumer<FluidStack> onContentChanged
+    ) {
+        this(capacity, onContentChanged);
+        setFluid(fluidStack);
     }
 
-    public LockableFluidTank(Fluid fluid, int amount, int capacity, Consumer<FluidEvent> onContentChanged) {
-        super(fluid, amount, capacity);
-        onContentChangedConsumer = onContentChanged;
-    }
-
-    /**
-     * @return the volume the tank left
-     */
-    public int getSpareVolume() {
-        if (fluid != null) {
-            return capacity - fluid.amount;
+    public LockableFluidTank(
+            @Nullable Fluid fluid, int amount, int capacity, Consumer<FluidStack> onContentChanged
+    ) {
+        this(capacity, onContentChanged);
+        if (fluid != null && amount > 0) {
+            setFluid(new FluidStack(fluid, amount));
         }
-        return capacity;
     }
 
     @Override
-    public boolean canDrain() {
-        return !isLocked() && super.canDrain();
+    public boolean isFluidValid(FluidStack stack) {
+        if (locked || stack == null || stack.isEmpty()) {
+            return false;
+        }
+        if (lockedType && (lockedFluid.isEmpty() || !lockedFluid.isFluidEqual(stack))) {
+            return false;
+        }
+        return super.isFluidValid(stack);
     }
 
     @Override
-    public boolean canFill() {
-        return !isLocked() && super.canFill();
-    }
-
-    @Override
-    public FluidTank readFromNBT(NBTTagCompound nbt) {
+    public FluidTank readFromNBT(CompoundTag nbt) {
+        Objects.requireNonNull(nbt, "nbt");
         locked = nbt.getBoolean(TAG_LOCKED);
         lockedType = nbt.getBoolean(TAG_LOCKED_TYPE);
-        return super.readFromNBT(nbt);
+        lockedFluid = nbt.contains(TAG_LOCKED_FLUID, Tag.TAG_COMPOUND)
+                ? FluidStack.loadFluidStackFromNBT(nbt.getCompound(TAG_LOCKED_FLUID))
+                : FluidStack.EMPTY;
+
+        super.readFromNBT(nbt);
+        if (lockedType && lockedFluid.isEmpty() && !fluid.isEmpty()) {
+            lockedFluid = copyType(fluid);
+        }
+        if (!lockedType) {
+            lockedFluid = FluidStack.EMPTY;
+        }
+        return this;
     }
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-        nbt.setBoolean(TAG_LOCKED, locked);
-        nbt.setBoolean(TAG_LOCKED_TYPE, lockedType);
-        return super.writeToNBT(nbt);
-    }
-
-    @Override
-    public int fillInternal(FluidStack resource, boolean doFill) {
-        if (resource == null || resource.amount <= 0 || (fluid == null && isLockedType())) {
-            return 0;
-        }
-
-        if (!doFill) {
-            if (fluid == null) {
-                return Math.min(capacity, resource.amount);
-            }
-
-            if (!fluid.isFluidEqual(resource)) {
-                return 0;
-            }
-
-            return Math.min(capacity - fluid.amount, resource.amount);
-        }
-
-        if (fluid == null) {
-            fluid = new FluidStack(resource, Math.min(capacity, resource.amount));
-
-            onContentsChanged();
-
-            if (tile != null) {
-                final FluidEvent.FluidFillingEvent fluidEvent = new FluidEvent.FluidFillingEvent(fluid, tile.getWorld(), tile.getPos(), this, fluid.amount);
-                onContentChangedConsumer.accept(fluidEvent);
-                FluidEvent.fireEvent(fluidEvent);
-            }
-            return fluid.amount;
-        }
-
-        if (!fluid.isFluidEqual(resource)) {
-            return 0;
-        }
-        int filled = capacity - fluid.amount;
-
-        if (resource.amount < filled) {
-            fluid.amount += resource.amount;
-            filled = resource.amount;
+    public CompoundTag writeToNBT(CompoundTag nbt) {
+        Objects.requireNonNull(nbt, "nbt");
+        super.writeToNBT(nbt);
+        nbt.putBoolean(TAG_LOCKED, locked);
+        nbt.putBoolean(TAG_LOCKED_TYPE, lockedType);
+        if (lockedType && !lockedFluid.isEmpty()) {
+            nbt.put(TAG_LOCKED_FLUID, lockedFluid.writeToNBT(new CompoundTag()));
         } else {
-            fluid.amount = capacity;
+            nbt.remove(TAG_LOCKED_FLUID);
         }
-
-        onContentsChanged();
-
-        if (tile != null) {
-            final FluidEvent.FluidFillingEvent fluidEvent = new FluidEvent.FluidFillingEvent(fluid, tile.getWorld(), tile.getPos(), this, filled);
-            onContentChangedConsumer.accept(fluidEvent);
-            FluidEvent.fireEvent(fluidEvent);
-        }
-        return filled;
-    }
-
-    @Nullable
-    @Override
-    public FluidStack drainInternal(int maxDrain, boolean doDrain) {
-        if (fluid == null || maxDrain <= 0) {
-            return null;
-        }
-
-        int drained = maxDrain;
-        if (fluid.amount < drained) {
-            drained = fluid.amount;
-        }
-
-        FluidStack stack = new FluidStack(fluid, drained);
-        if (doDrain) {
-            fluid.amount -= drained;
-            if (fluid.amount <= 0 && !isLockedType()) {
-                fluid = null;
-            }
-
-            onContentsChanged();
-
-            if (tile != null) {
-                final FluidEvent.FluidDrainingEvent fluidEvent = new FluidEvent.FluidDrainingEvent(fluid, tile.getWorld(), tile.getPos(), this, drained);
-                onContentChangedConsumer.accept(fluidEvent);
-                FluidEvent.fireEvent(fluidEvent);
-            }
-        }
-        return stack;
+        return nbt;
     }
 
     @Override
+    public int fill(FluidStack resource, FluidAction action) {
+        Objects.requireNonNull(action, "action");
+        if (locked || resource == null || resource.isEmpty()) {
+            return 0;
+        }
+        return super.fill(resource, action);
+    }
+
+    @Override
+    public FluidStack drain(FluidStack resource, FluidAction action) {
+        Objects.requireNonNull(action, "action");
+        if (locked || resource == null || resource.isEmpty()) {
+            return FluidStack.EMPTY;
+        }
+        FluidStack drained = super.drain(resource, action);
+        return drained == null ? FluidStack.EMPTY : drained;
+    }
+
+    @Override
+    public FluidStack drain(int maxDrain, FluidAction action) {
+        Objects.requireNonNull(action, "action");
+        if (locked || maxDrain <= 0 || fluid.isEmpty()) {
+            return FluidStack.EMPTY;
+        }
+        FluidStack drained = super.drain(maxDrain, action);
+        return drained == null ? FluidStack.EMPTY : drained;
+    }
+
+    @Override
+    public void setFluid(@Nullable FluidStack stack) {
+        if (stack == null || stack.isEmpty()) {
+            super.setFluid(FluidStack.EMPTY);
+            return;
+        }
+
+        int amount = Math.min(capacity, stack.getAmount());
+        super.setFluid(new FluidStack(stack, amount));
+        if (lockedType) {
+            lockedFluid = copyType(stack);
+        }
+    }
+
+    @Override
+    protected void onContentsChanged() {
+        super.onContentsChanged();
+        onContentChangedConsumer.accept(fluid.isEmpty() ? FluidStack.EMPTY : fluid.copy());
+    }
+
     public boolean isLocked() {
         return locked;
     }
 
-    @Override
     public void setLocked(boolean locked) {
-        this.locked = locked;
-        if (!locked && fluid != null && fluid.amount <= 0)
-            fluid = null;
-        if (tile != null) tile.markDirty();
+        if (this.locked != locked) {
+            this.locked = locked;
+            onContentsChanged();
+        }
     }
 
-    @Override
     public boolean isLockedType() {
         return lockedType;
     }
 
-    @Override
     public void setLockedType(boolean locked) {
+        if (lockedType == locked) {
+            return;
+        }
+
         lockedType = locked;
-        if (!locked && fluid != null && fluid.amount <= 0)
-            fluid = null;
-        if (tile != null) tile.markDirty();
+        lockedFluid = locked && !fluid.isEmpty() ? copyType(fluid) : FluidStack.EMPTY;
+        onContentsChanged();
+    }
+
+    private static FluidStack copyType(FluidStack stack) {
+        return new FluidStack(stack, 1);
+    }
+
+    private static int requirePositiveCapacity(int capacity) {
+        if (capacity <= 0) {
+            throw new IllegalArgumentException("Tank capacity must be positive");
+        }
+        return capacity;
     }
 }

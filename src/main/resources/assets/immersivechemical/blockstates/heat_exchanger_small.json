@@ -1,0 +1,22 @@
+{
+    "variants": {
+        "facing=north": {
+            "model": "immersivechemical:block/heat_exchanger_small"
+        },
+        "facing=east": {
+            "model": "immersivechemical:block/heat_exchanger_small",
+            "y": 90,
+            "uvlock": true
+        },
+        "facing=south": {
+            "model": "immersivechemical:block/heat_exchanger_small",
+            "y": 180,
+            "uvlock": true
+        },
+        "facing=west": {
+            "model": "immersivechemical:block/heat_exchanger_small",
+            "y": 270,
+            "uvlock": true
+        }
+    }
+}

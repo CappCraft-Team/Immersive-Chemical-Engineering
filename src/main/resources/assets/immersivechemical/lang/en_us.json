@@ -1,0 +1,20 @@
+{
+    "manual.immersivechemical.heat_exchange": "Heat Exchange",
+    "block.immersivechemical.heat_exchanger_small": "Small Heat Exchanger",
+    "block.immersivechemical.heat_exchanger_medium": "Medium Heat Exchanger",
+    "block.immersivechemical.heat_exchanger_large": "Large Heat Exchanger",
+    "category.immersivechemical.heat_exchanger": "Heat Exchanger",
+    "container.immersivechemical.heat_exchanger_small": "Small Heat Exchanger",
+    "container.immersivechemical.heat_exchanger_medium": "Medium Heat Exchanger",
+    "container.immersivechemical.heat_exchanger_large": "Large Heat Exchanger",
+    "gui.immersivechemical.heat_exchanger_small.processing": "Exchanging",
+    "gui.immersivechemical.heat_exchanger_small.idle": "Idle",
+    "gui.immersivechemical.heat_exchanger_small.clear_side": "Clear both tanks and filters on this side",
+    "gui.immersivechemical.heat_exchanger_small.clear_all": "Clear all tanks and filters",
+    "gui.immersivechemical.heat_exchanger_small.lock_filter": "Lock filter to current fluid",
+    "gui.immersivechemical.heat_exchanger_small.unlock_filter": "Unlock fluid filter",
+    "gui.immersivechemical.heat_exchanger_small.empty": "Empty",
+    "gui.immersivechemical.heat_exchanger_small.amount": "%s / %s mB",
+    "gui.immersivechemical.heat_exchanger_small.filter_locked": "Filter locked",
+    "gui.immersivechemical.heat_exchanger_small.filter_open": "Filter open"
+}

@@ -1,65 +1,47 @@
 package team.cappcraft.immersivechemical;
 
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.ItemStack;
+import blusunrize.immersiveengineering.api.multiblocks.MultiblockHandler;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import team.cappcraft.immersivechemical.common.blocks.multiblocks.BlockTypes_HeatExchanger;
-import team.cappcraft.immersivechemical.common.proxy.CommonProxy;
+import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRecipeRegistration;
 
-import javax.annotation.Nonnull;
-
-
-@Mod(modid = ImmersiveChemicalEngineering.MODID,
-        name = ImmersiveChemicalEngineering.NAME,
-        version = ImmersiveChemicalEngineering.VERSION,
-        dependencies = "required-after:immersiveengineering",
-        acceptedMinecraftVersions = "[1.12.2]")
+@Mod(ImmersiveChemicalEngineering.MODID)
 public class ImmersiveChemicalEngineering {
-    //insert an 'immersive' to get around IE's registry
+
     public static final String MODID = "immersivechemical";
     public static final String NAME = "Immersive Chemical Engineering";
-    public static final String VERSION = "${version}";
+    public static final Logger LOGGER = LogManager.getLogger(NAME);
 
-    public static Logger logger;
+    public ImmersiveChemicalEngineering() {
+        var modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-    public static final SimpleNetworkWrapper packetHandler = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
+        ICHEME_Contents.BLOCKS.register(modEventBus);
+        ICHEME_Contents.ITEMS.register(modEventBus);
+        ICHEME_Contents.BLOCK_ENTITIES.register(modEventBus);
+        ICHEME_Contents.MENUS.register(modEventBus);
+        HeatExchangerRecipeRegistration.register(modEventBus);
 
-    public static CreativeTabs creativeTab = new CreativeTabs(MODID) {
-        @Nonnull
-        @Override
-        public ItemStack getTabIconItem() {
-            return new ItemStack(ICHEME_Contents.blockHeatExchanger, 1, BlockTypes_HeatExchanger.HEAT_EXCHANGER_SMALL.getMeta());
-        }
-    };
+        MinecraftForge.EVENT_BUS.addListener(
+                HeatExchangerRecipeRegistration::onAddReloadListeners);
 
-    @Mod.Instance
-    public static ImmersiveChemicalEngineering instance;
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.CONFIG_SPEC);
+        modEventBus.addListener(this::commonSetup);
 
-    @SidedProxy(clientSide = "team.cappcraft.immersivechemical.common.proxy.ClientProxy",
-            serverSide = "team.cappcraft.immersivechemical.common.proxy.ServerProxy")
-    public static CommonProxy proxy;
-
-
-    @Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
-        logger = event.getModLog();
-        proxy.preInit(event);
+        LOGGER.info("Immersive Chemical Engineering initializing...");
     }
 
-    @Mod.EventHandler
-    public void init(FMLInitializationEvent event) {
-        proxy.init(event);
-    }
-
-    @Mod.EventHandler
-    public void postInit(FMLPostInitializationEvent event) {
-        proxy.postInit(event);
+    private void commonSetup(FMLCommonSetupEvent event) {
+        event.enqueueWork(() -> {
+            MultiblockHandler.registerMultiblock(ICHEME_Contents.HEAT_EXCHANGER_SMALL_TEMPLATE);
+            MultiblockHandler.registerMultiblock(ICHEME_Contents.HEAT_EXCHANGER_MEDIUM_TEMPLATE);
+            MultiblockHandler.registerMultiblock(ICHEME_Contents.HEAT_EXCHANGER_LARGE_TEMPLATE);
+            LOGGER.info("Immersive Chemical Engineering multiblocks registered.");
+        });
     }
 }

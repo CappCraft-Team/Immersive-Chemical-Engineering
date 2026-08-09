@@ -1,0 +1,7 @@
+# Materials for the centered inventory model.
+
+newmtl cube
+map_Kd immersivechemical:block/cube_small
+
+newmtl pipe
+map_Kd immersivechemical:block/pipe_small

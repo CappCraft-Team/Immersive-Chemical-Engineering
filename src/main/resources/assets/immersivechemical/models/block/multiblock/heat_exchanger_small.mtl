@@ -1,8 +1,7 @@
-# Blender MTL File: 'heat_exchanger_small.blend'
-# Material Count: 2
+# Materials ported from the 1.12.2 SMALL heat exchanger model.
 
 newmtl cube
-map_Kd immersivechemical:blocks/cube_small
+map_Kd immersivechemical:block/cube_small
 
 newmtl pipe
-map_Kd immersivechemical:blocks/pipe_small
+map_Kd immersivechemical:block/pipe_small

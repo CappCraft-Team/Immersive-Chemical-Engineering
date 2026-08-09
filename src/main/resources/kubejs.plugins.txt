@@ -1,0 +1,1 @@
+team.cappcraft.immersivechemical.common.compact.kubejs.IChemEKubeJSPlugin

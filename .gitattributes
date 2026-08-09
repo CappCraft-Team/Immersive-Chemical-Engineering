@@ -1,0 +1,23 @@
+* text=auto
+
+*.java text eol=lf
+*.js text eol=lf
+*.gradle text eol=lf
+*.properties text eol=lf
+*.json text eol=lf
+*.mcmeta text eol=lf
+*.md text eol=lf
+*.mtl text eol=lf
+*.obj text eol=lf
+*.toml text eol=lf
+*.txt text eol=lf
+gradlew text eol=lf
+gradlew.bat text eol=crlf
+.gitattributes text eol=lf
+.gitignore text eol=lf
+LICENSE text eol=lf
+
+*.blend binary
+*.jar binary
+*.png binary
+*.psd binary

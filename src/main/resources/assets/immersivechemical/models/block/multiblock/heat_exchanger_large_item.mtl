@@ -1,0 +1,10 @@
+# Materials for the centered LARGE inventory model.
+
+newmtl Cube
+map_Kd immersivechemical:block/cube_large
+
+newmtl LargePipe
+map_Kd immersivechemical:block/pipe
+
+newmtl Tube
+map_Kd immersivechemical:block/tube

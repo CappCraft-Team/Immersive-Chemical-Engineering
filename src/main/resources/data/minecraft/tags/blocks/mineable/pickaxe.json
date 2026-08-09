@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "immersivechemical:heat_exchanger_small",
+    "immersivechemical:heat_exchanger_medium",
+    "immersivechemical:heat_exchanger_large"
+  ]
+}

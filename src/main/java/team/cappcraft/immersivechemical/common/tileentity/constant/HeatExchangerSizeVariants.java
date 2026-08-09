@@ -1,31 +1,31 @@
 package team.cappcraft.immersivechemical.common.tileentity.constant;
 
 import team.cappcraft.immersivechemical.Config;
-import team.cappcraft.immersivechemical.common.tileentity.IHeatExchangerProperties;
 
-public enum HeatExchangerSizeVariants implements IHeatExchangerProperties {
-    SMALL(Config.HeatExchangerCapacity.Small,
-            Config.HeatExchangerTickMultiplier.Small),
-    MEDIUM(Config.HeatExchangerCapacity.Medium,
-            Config.HeatExchangerTickMultiplier.Medium),
-    LARGE(Config.HeatExchangerCapacity.Large,
-            Config.HeatExchangerTickMultiplier.Large);
+/**
+ * Heat exchanger size variants. Values are read live from Config,
+ * so they update when the config is reloaded.
+ */
+public enum HeatExchangerSizeVariants {
+    SMALL,
+    MEDIUM,
+    LARGE;
 
-    private final Integer Capacity;
-    private final Float TickMultiplier;
-
-    HeatExchangerSizeVariants(Integer capacity, Float tickMultiplier) {
-        Capacity = capacity;
-        TickMultiplier = tickMultiplier;
-    }
-
-    @Override
     public int getCapacity() {
-        return Capacity;
+        switch (this) {
+            case SMALL: return Config.getSmallCapacity();
+            case MEDIUM: return Config.getMediumCapacity();
+            case LARGE: return Config.getLargeCapacity();
+        }
+        throw new IllegalStateException("Unknown size: " + this);
     }
 
-    @Override
     public float getTickMultiplier() {
-        return TickMultiplier;
+        switch (this) {
+            case SMALL: return (float) Config.getSmallTickMultiplier();
+            case MEDIUM: return (float) Config.getMediumTickMultiplier();
+            case LARGE: return (float) Config.getLargeTickMultiplier();
+        }
+        throw new IllegalStateException("Unknown size: " + this);
     }
 }

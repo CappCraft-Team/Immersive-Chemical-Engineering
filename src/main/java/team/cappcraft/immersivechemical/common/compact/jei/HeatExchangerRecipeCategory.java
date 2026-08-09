@@ -1,83 +1,78 @@
 package team.cappcraft.immersivechemical.common.compact.jei;
 
-import blusunrize.immersiveengineering.common.util.compat.jei.IERecipeCategory;
-import com.google.common.collect.Lists;
-import mezz.jei.api.IGuiHelper;
-import mezz.jei.api.gui.IGuiFluidStackGroup;
-import mezz.jei.api.gui.IRecipeLayout;
-import mezz.jei.api.ingredients.IIngredients;
-import mezz.jei.api.recipe.IRecipeWrapper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fluids.FluidStack;
+import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
+import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.recipe.IFocusGroup;
+import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.category.IRecipeCategory;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import team.cappcraft.immersivechemical.ICHEME_Contents;
 import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
 import team.cappcraft.immersivechemical.common.recipe.ConvertDirection;
 import team.cappcraft.immersivechemical.common.recipe.HeatExchangerEntry;
-import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRegistry;
 
-import javax.annotation.Nonnull;
-import java.util.List;
+public class HeatExchangerRecipeCategory implements IRecipeCategory<HeatExchangerEntry> {
 
-public class HeatExchangerRecipeCategory extends IERecipeCategory<HeatExchangerEntry, HeatExchangerRecipeWrapper> {
-    public static final ResourceLocation resourceLocation =
-            new ResourceLocation(ImmersiveChemicalEngineering.MODID, "textures/gui/heatexchanger_category.png");
+    public static final ResourceLocation TEXTURE = new ResourceLocation(
+            ImmersiveChemicalEngineering.MODID, "textures/gui/heatexchanger_common.png");
+
+    private final IDrawable background;
+    private final IDrawable icon;
 
     public HeatExchangerRecipeCategory(IGuiHelper guiHelper) {
-        super("heatExchanger",
-                "category.heat_exchanger.name",
-                guiHelper.createDrawable(
-                        resourceLocation,
-                        0, 0,
-                        135, 100),
-                HeatExchangerEntry.class,
-                HeatExchangerRegistry.REGISTRY.getRegisteredHeatExchanger().values().toArray(new ItemStack[0]));
+        // Reuse the top tank panel from the machine GUI so JEI and the menu share a visual language.
+        this.background = guiHelper.createDrawable(TEXTURE, 15, 20, 145, 45);
+        this.icon = guiHelper.createDrawableItemStack(
+                new ItemStack(ICHEME_Contents.HEAT_EXCHANGER_SMALL.blockItem().get()));
     }
 
     @Override
-    public void setRecipe(@Nonnull IRecipeLayout recipeLayout, @Nonnull HeatExchangerRecipeWrapper recipeWrapper, @Nonnull IIngredients ingredients) {
-        final IGuiFluidStackGroup fluidStacks = recipeLayout.getFluidStacks();
-        int x = 33;
-        int y = 24;
-
-        int i = 0;
-
-        List<FluidStack> left = Lists.newArrayList(recipeWrapper.Entry.FluidHot);
-        fluidStacks.init(i,
-                recipeWrapper.Entry.Direction == ConvertDirection.COOL_DOWN
-                        || recipeWrapper.Entry.Direction == ConvertDirection.TWO_WAY,
-                x, y, 16, 16, recipeWrapper.MinCapacity, true, null);
-        fluidStacks.set(i++, left);
-
-        x += 53;
-        List<FluidStack> right = Lists.newArrayList(recipeWrapper.Entry.FluidCold);
-        fluidStacks.init(i,
-                recipeWrapper.Entry.Direction == ConvertDirection.HEAT_UP
-                        || recipeWrapper.Entry.Direction == ConvertDirection.TWO_WAY,
-                x, y, 16, 16, recipeWrapper.MinCapacity, true, null);
-        fluidStacks.set(i, right);
+    public RecipeType<HeatExchangerEntry> getRecipeType() {
+        return IChemERecipeTypes.HEAT_EXCHANGER;
     }
 
-    @Nonnull
     @Override
-    public IRecipeWrapper getRecipeWrapper(@Nonnull HeatExchangerEntry entry) {
-        return new HeatExchangerRecipeWrapper(entry);
+    public Component getTitle() {
+        return Component.translatable("category.immersivechemical.heat_exchanger");
     }
 
-    @Nonnull
     @Override
-    public String getUid() {
-        return "ichme." + uniqueName;
+    public IDrawable getBackground() {
+        return background;
     }
 
-    @Nonnull
     @Override
-    public String getRecipeCategoryUid() {
-        return "ichme." + uniqueName;
+    public IDrawable getIcon() {
+        return icon;
     }
 
-    @Nonnull
     @Override
-    public String getModName() {
-        return ImmersiveChemicalEngineering.NAME;
+    public void setRecipe(IRecipeLayoutBuilder builder, HeatExchangerEntry recipe, IFocusGroup focuses) {
+        // Fluid input
+        IRecipeSlotBuilder inputSlot = builder.addSlot(RecipeIngredientRole.INPUT, 20, 14);
+        IRecipeSlotBuilder outputSlot = builder.addSlot(RecipeIngredientRole.OUTPUT, 110, 14);
+
+        if (recipe.Direction == ConvertDirection.HEAT_UP) {
+            inputSlot
+                    .setFluidRenderer(recipe.FluidCold.getAmount(), false, 16, 16)
+                    .addFluidStack(recipe.FluidCold.getFluid(), recipe.FluidCold.getAmount());
+            outputSlot
+                    .setFluidRenderer(recipe.FluidHot.getAmount(), false, 16, 16)
+                    .addFluidStack(recipe.FluidHot.getFluid(), recipe.FluidHot.getAmount());
+        } else if (recipe.Direction == ConvertDirection.COOL_DOWN) {
+            inputSlot
+                    .setFluidRenderer(recipe.FluidHot.getAmount(), false, 16, 16)
+                    .addFluidStack(recipe.FluidHot.getFluid(), recipe.FluidHot.getAmount());
+            outputSlot
+                    .setFluidRenderer(recipe.FluidCold.getAmount(), false, 16, 16)
+                    .addFluidStack(recipe.FluidCold.getFluid(), recipe.FluidCold.getAmount());
+        } else {
+            throw new IllegalArgumentException("JEI recipes must have a concrete direction");
+        }
     }
 }
