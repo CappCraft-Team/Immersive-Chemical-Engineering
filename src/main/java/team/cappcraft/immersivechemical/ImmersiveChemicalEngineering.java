@@ -5,6 +5,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.apache.logging.log4j.LogManager;
@@ -18,8 +19,9 @@ public class ImmersiveChemicalEngineering {
     public static final String NAME = "Immersive Chemical Engineering";
     public static final Logger LOGGER = LogManager.getLogger(NAME);
 
-    public ImmersiveChemicalEngineering(
-            IEventBus modEventBus, ModLoadingContext modLoadingContext) {
+    @SuppressWarnings("removal")
+    public ImmersiveChemicalEngineering(FMLJavaModLoadingContext context) {
+        IEventBus modEventBus = context.getModEventBus();
         ICHEME_Contents.BLOCKS.register(modEventBus);
         ICHEME_Contents.ITEMS.register(modEventBus);
         ICHEME_Contents.BLOCK_ENTITIES.register(modEventBus);
@@ -28,7 +30,7 @@ public class ImmersiveChemicalEngineering {
 
         MinecraftForge.EVENT_BUS.addListener(HeatExchangerRecipeRegistration::onAddReloadListeners);
 
-        modLoadingContext.registerConfig(ModConfig.Type.COMMON, Config.CONFIG_SPEC);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.CONFIG_SPEC);
         modEventBus.addListener(this::commonSetup);
 
         LOGGER.info("Immersive Chemical Engineering initializing...");
