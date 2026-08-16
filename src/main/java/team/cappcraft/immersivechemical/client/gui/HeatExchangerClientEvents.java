@@ -7,9 +7,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import team.cappcraft.immersivechemical.ICHEME_Contents;
 import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
-import team.cappcraft.immersivechemical.common.menu.HeatExchangerLargeMenu;
-import team.cappcraft.immersivechemical.common.menu.HeatExchangerMediumMenu;
-import team.cappcraft.immersivechemical.common.menu.HeatExchangerSmallMenu;
+import team.cappcraft.immersivechemical.common.menu.HeatExchangerMenu;
 
 
 @Mod.EventBusSubscriber(
@@ -26,15 +24,15 @@ public final class HeatExchangerClientEvents {
         event.enqueueWork(() -> {
             MenuScreens.register(
                     ICHEME_Contents.HEAT_EXCHANGER_SMALL_MENU.get(),
-                    HeatExchangerScreen<HeatExchangerSmallMenu>::new
+                    HeatExchangerScreen::new
             );
             MenuScreens.register(
                     ICHEME_Contents.HEAT_EXCHANGER_MEDIUM_MENU.get(),
-                    HeatExchangerScreen<HeatExchangerMediumMenu>::new
+                    HeatExchangerScreen::new
             );
             MenuScreens.register(
                     ICHEME_Contents.HEAT_EXCHANGER_LARGE_MENU.get(),
-                    HeatExchangerScreen<HeatExchangerLargeMenu>::new
+                    HeatExchangerScreen::new
             );
         });
     }

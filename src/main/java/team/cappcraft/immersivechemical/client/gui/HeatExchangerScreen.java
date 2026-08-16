@@ -11,15 +11,14 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.ModList;
 import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
-import team.cappcraft.immersivechemical.common.menu.AbstractHeatExchangerMenu;
+import team.cappcraft.immersivechemical.common.menu.HeatExchangerMenu;
 import team.cappcraft.immersivechemical.common.network.HeatExchangerMenuAction;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class HeatExchangerScreen<M extends AbstractHeatExchangerMenu<?>>
-        extends AbstractContainerScreen<M> {
+public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMenu> {
     private static final ResourceLocation BACKGROUND = new ResourceLocation(
             ImmersiveChemicalEngineering.MODID,
             "textures/gui/heatexchanger.png"
@@ -48,11 +47,11 @@ public class HeatExchangerScreen<M extends AbstractHeatExchangerMenu<?>>
     private static final int[] SIDE_RESET_X = {35, 125};
 
     private final Button[] sideResetButtons = new Button[2];
-    private final Button[] filterButtons = new Button[AbstractHeatExchangerMenu.TANK_COUNT];
+    private final Button[] filterButtons = new Button[HeatExchangerMenu.TANK_COUNT];
     private Button resetAllButton;
 
     public HeatExchangerScreen(
-            M menu,
+            HeatExchangerMenu menu,
             Inventory inventory,
             Component title
     ) {
@@ -87,7 +86,7 @@ public class HeatExchangerScreen<M extends AbstractHeatExchangerMenu<?>>
                 ignored -> sendAction(HeatExchangerMenuAction.CLEAR_ALL, 0)
         ));
 
-        for (int tankIndex = 0; tankIndex < AbstractHeatExchangerMenu.TANK_COUNT; ++tankIndex) {
+        for (int tankIndex = 0; tankIndex < HeatExchangerMenu.TANK_COUNT; ++tankIndex) {
             int index = tankIndex;
             filterButtons[index] = addRenderableWidget(Button.builder(
                     Component.literal("F"),
@@ -115,7 +114,7 @@ public class HeatExchangerScreen<M extends AbstractHeatExchangerMenu<?>>
 
     private void updateButtons() {
         boolean canClearAny = false;
-        for (int tankIndex = 0; tankIndex < AbstractHeatExchangerMenu.TANK_COUNT; ++tankIndex) {
+        for (int tankIndex = 0; tankIndex < HeatExchangerMenu.TANK_COUNT; ++tankIndex) {
             FluidStack fluid = menu.getTankFluid(tankIndex);
             boolean typeLocked = menu.isTankTypeLocked(tankIndex);
             filterButtons[tankIndex].active = typeLocked || !fluid.isEmpty();
@@ -205,7 +204,7 @@ public class HeatExchangerScreen<M extends AbstractHeatExchangerMenu<?>>
                 TEXTURE_SIZE
         );
 
-        for (int tankIndex = 0; tankIndex < AbstractHeatExchangerMenu.TANK_COUNT; ++tankIndex) {
+        for (int tankIndex = 0; tankIndex < HeatExchangerMenu.TANK_COUNT; ++tankIndex) {
             FluidStack fluid = menu.getTankFluid(tankIndex);
             if (!fluid.isEmpty()) {
                 GuiHelper.drawRepeatedFluidSpriteGui(
@@ -221,7 +220,7 @@ public class HeatExchangerScreen<M extends AbstractHeatExchangerMenu<?>>
         }
         graphics.flush();
 
-        for (int tankIndex = 0; tankIndex < AbstractHeatExchangerMenu.TANK_COUNT; ++tankIndex) {
+        for (int tankIndex = 0; tankIndex < HeatExchangerMenu.TANK_COUNT; ++tankIndex) {
             if (menu.isTankTypeLocked(tankIndex)) {
                 graphics.renderOutline(
                         leftPos + TANK_X[tankIndex] - 1,
@@ -250,7 +249,7 @@ public class HeatExchangerScreen<M extends AbstractHeatExchangerMenu<?>>
     @Override
     protected void renderTooltip(GuiGraphics graphics, int mouseX, int mouseY) {
         super.renderTooltip(graphics, mouseX, mouseY);
-        for (int tankIndex = 0; tankIndex < AbstractHeatExchangerMenu.TANK_COUNT; ++tankIndex) {
+        for (int tankIndex = 0; tankIndex < HeatExchangerMenu.TANK_COUNT; ++tankIndex) {
             if (isHovering(
                     TANK_X[tankIndex],
                     TANK_Y[tankIndex],

@@ -22,7 +22,7 @@ import java.util.Objects;
 
 
 
-public abstract class HeatExchangerState implements IMultiblockState {
+public class HeatExchangerState implements IMultiblockState {
 
     public static final int INPUT_A = 0;
     public static final int OUTPUT_A = 1;

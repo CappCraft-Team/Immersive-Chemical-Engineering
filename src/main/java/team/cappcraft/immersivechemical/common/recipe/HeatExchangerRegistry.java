@@ -8,7 +8,6 @@ import javax.annotation.Nonnull;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -31,19 +30,6 @@ public class HeatExchangerRegistry {
     private final DirectedConversionGraph<Fluid, HeatExchangerEntry> heatUpFluidGraph =
             new DirectedConversionGraph<>();
 
-    public synchronized void registerFluid(HeatExchangerEntry entry) {
-        Objects.requireNonNull(entry, "entry");
-        HeatExchangerEntry snapshot = copyEntry(entry);
-        insertEntryAsEdge(snapshot, 1, false);
-        registeredEntries.add(snapshot);
-    }
-
-    
-
-
-
-
-
     public synchronized void replaceRegisteredEntries(Collection<HeatExchangerEntry> entries) {
         Objects.requireNonNull(entries, "entries");
         List<HeatExchangerEntry> snapshot = new ArrayList<>(entries.size());
@@ -59,12 +45,6 @@ public class HeatExchangerRegistry {
             insertEntryAsEdge(entry, 1, false);
             registeredEntries.add(entry);
         }
-    }
-
-    public synchronized Set<HeatExchangerEntry> getRegisteredEntries() {
-        Set<HeatExchangerEntry> copy = new LinkedHashSet<>();
-        registeredEntries.forEach(entry -> copy.add(copyEntry(entry)));
-        return Collections.unmodifiableSet(copy);
     }
 
     public synchronized Optional<HeatExchangerRecipe> findRecipe(
@@ -351,15 +331,6 @@ public class HeatExchangerRegistry {
         }
     }
 
-    
-
-
-
-    public synchronized List<HeatExchangerEntry> cleanAndRefEntry() {
-        List<HeatExchangerEntry> copy = new ArrayList<>(generatedEntries.size());
-        generatedEntries.forEach(entry -> copy.add(copyEntry(entry)));
-        return copy;
-    }
 
     private Optional<Fluid> findClosestReachable(Fluid input, ConvertDirection direction) {
         Comparator<Fluid> temperatureComparator = Comparator.comparingInt(HeatExchangerRegistry::temperature);

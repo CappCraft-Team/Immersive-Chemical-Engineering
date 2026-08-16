@@ -1,11 +1,8 @@
 package team.cappcraft.immersivechemical.common.recipe;
 
-import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.templates.FluidTank;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class HeatExchangerEntry {
@@ -17,20 +14,6 @@ public class HeatExchangerEntry {
     public final ConvertDirection Direction;
 
     
-
-
-
-
-
-
-
-
-    public HeatExchangerEntry(@Nonnull FluidStack fluidA, @Nonnull FluidStack fluidB, int heatValue) {
-        this(fluidA, fluidB, heatValue, ConvertDirection.TWO_WAY);
-    }
-
-    
-
 
 
 
@@ -81,30 +64,6 @@ public class HeatExchangerEntry {
                 ", HeatValue=" + HeatValue +
                 ", Direction=" + Direction +
                 '}';
-    }
-
-    public boolean isInputMatches(@Nonnull FluidTank fluidTank, ConvertDirection direction) {
-        return isInputMatches(fluidTank.getFluid(), direction);
-    }
-
-    public boolean isInputMatches(@Nullable FluidStack fluidStack, ConvertDirection direction) {
-        return fluidStack != null && !fluidStack.isEmpty() && isInputMatches(fluidStack.getFluid(), direction);
-    }
-
-    public boolean isInputMatches(@Nonnull Fluid fluid, ConvertDirection direction) {
-        return fluid == getInput(direction).getFluid();
-    }
-
-    public boolean isOutputMatches(@Nonnull FluidTank fluidTank, ConvertDirection direction) {
-        return isOutputMatches(fluidTank.getFluid(), direction);
-    }
-
-    public boolean isOutputMatches(@Nullable FluidStack fluidStack, ConvertDirection direction) {
-        return fluidStack != null && !fluidStack.isEmpty() && isOutputMatches(fluidStack.getFluid(), direction);
-    }
-
-    public boolean isOutputMatches(@Nonnull Fluid fluid, ConvertDirection direction) {
-        return fluid == getOutput(direction).getFluid();
     }
 
     public FluidStack getInput(ConvertDirection direction) {

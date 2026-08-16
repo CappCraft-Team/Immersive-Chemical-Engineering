@@ -4,6 +4,7 @@ import blusunrize.immersiveengineering.api.multiblocks.blocks.env.IMultiblockCon
 import blusunrize.immersiveengineering.common.gui.IEContainerMenu;
 import blusunrize.immersiveengineering.common.gui.sync.GenericContainerData;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -13,15 +14,15 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
+import team.cappcraft.immersivechemical.ICHEME_Contents;
 import team.cappcraft.immersivechemical.common.blocks.multiblocks.HeatExchangerState;
 import team.cappcraft.immersivechemical.common.network.HeatExchangerMenuAction;
+import team.cappcraft.immersivechemical.common.tileentity.constant.HeatExchangerSizeVariants;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-
-public abstract class AbstractHeatExchangerMenu<S extends HeatExchangerState>
-        extends IEContainerMenu {
+public final class HeatExchangerMenu extends IEContainerMenu {
     public static final int TANK_COUNT = HeatExchangerMenuAction.TANK_COUNT;
     private static final int PLAYER_INVENTORY_START = 0;
     private static final int PLAYER_INVENTORY_END = 27;
@@ -35,9 +36,9 @@ public abstract class AbstractHeatExchangerMenu<S extends HeatExchangerState>
     private final BlockPos interactionPos;
 
     @Nullable
-    private final S serverState;
+    private final HeatExchangerState serverState;
     @Nullable
-    private final IMultiblockContext<S> serverContext;
+    private final IMultiblockContext<HeatExchangerState> serverContext;
     @Nullable
     private final Level serverLevel;
     @Nullable
@@ -48,30 +49,63 @@ public abstract class AbstractHeatExchangerMenu<S extends HeatExchangerState>
     private int syncedDuration = 1;
     private boolean syncedProcessing;
 
-    protected AbstractHeatExchangerMenu(
-            MenuContext menuContext,
+    public HeatExchangerMenu(
+            HeatExchangerSizeVariants size,
+            int containerId,
             Inventory inventory,
-            @Nullable S state,
-            @Nullable IMultiblockContext<S> context,
+            HeatExchangerState state,
+            IMultiblockContext<HeatExchangerState> context,
             BlockPos masterPos,
-            BlockPos interactionPos,
-            @Nullable Block expectedFormedBlock
+            BlockPos interactionPos
     ) {
-        super(menuContext);
+        super(multiblockCtx(
+                ICHEME_Contents.menuType(size),
+                containerId,
+                new MultiblockMenuContext<>(context, masterPos)
+        ));
         this.serverState = state;
         this.serverContext = context;
-        this.serverLevel = context == null ? null : context.getLevel().getRawLevel();
+        this.serverLevel = context.getLevel().getRawLevel();
         this.masterPos = masterPos.immutable();
         this.interactionPos = interactionPos.immutable();
-        this.expectedFormedBlock = expectedFormedBlock;
+        this.expectedFormedBlock = ICHEME_Contents.registration(size).block().get();
 
         for (int tankIndex = 0; tankIndex < TANK_COUNT; ++tankIndex) {
-            syncedTanks[tankIndex] = state == null
-                    ? new FluidTank(syncedCapacity)
-                    : state.Tanks[tankIndex];
+            syncedTanks[tankIndex] = state.Tanks[tankIndex];
         }
         registerSyncedData();
         addPlayerInventory(inventory);
+    }
+
+    private HeatExchangerMenu(
+            HeatExchangerSizeVariants size,
+            int containerId,
+            Inventory inventory,
+            BlockPos masterPos
+    ) {
+        super(clientCtx(ICHEME_Contents.menuType(size), containerId));
+        this.serverState = null;
+        this.serverContext = null;
+        this.serverLevel = null;
+        this.masterPos = masterPos.immutable();
+        this.interactionPos = masterPos.immutable();
+        this.expectedFormedBlock = null;
+
+        for (int tankIndex = 0; tankIndex < TANK_COUNT; ++tankIndex) {
+            syncedTanks[tankIndex] = new FluidTank(syncedCapacity);
+        }
+        registerSyncedData();
+        addPlayerInventory(inventory);
+    }
+
+    public static HeatExchangerMenu fromNetwork(
+            HeatExchangerSizeVariants size,
+            int containerId,
+            Inventory inventory,
+            FriendlyByteBuf extraData
+    ) {
+        BlockPos masterPos = extraData.readBlockPos();
+        return new HeatExchangerMenu(size, containerId, inventory, masterPos);
     }
 
     private void registerSyncedData() {

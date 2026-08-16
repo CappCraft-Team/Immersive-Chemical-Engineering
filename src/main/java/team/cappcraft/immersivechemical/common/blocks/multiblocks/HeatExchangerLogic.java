@@ -10,9 +10,11 @@ import blusunrize.immersiveengineering.api.multiblocks.blocks.util.ShapeType;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.util.StoredCapability;
 import blusunrize.immersiveengineering.api.utils.CapabilityReference;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -24,7 +26,9 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
+import net.minecraftforge.network.NetworkHooks;
 import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
+import team.cappcraft.immersivechemical.common.menu.HeatExchangerMenu;
 import team.cappcraft.immersivechemical.common.recipe.ConvertDirection;
 import team.cappcraft.immersivechemical.common.recipe.HeatExchangerEntry;
 import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRecipe;
@@ -36,13 +40,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
-
-public abstract class AbstractHeatExchangerLogic<S extends HeatExchangerState> implements
-        IMultiblockLogic<S>,
-        IServerTickableComponent<S> {
+public final class HeatExchangerLogic implements
+        IMultiblockLogic<HeatExchangerState>,
+        IServerTickableComponent<HeatExchangerState> {
 
     private static final int RETRY_DELAY_TICKS = 20;
-    static final int AUTOMATIC_OUTPUT_RATE = 1000;
+    private static final int AUTOMATIC_OUTPUT_RATE = 1000;
 
     private final HeatExchangerSizeVariants size;
     private final BlockPos masterPosition;
@@ -52,27 +55,19 @@ public abstract class AbstractHeatExchangerLogic<S extends HeatExchangerState> i
     private final CapabilityPosition outputB;
     private final boolean exposeUnsidedPorts;
 
-    protected AbstractHeatExchangerLogic(
-            HeatExchangerSizeVariants size,
-            BlockPos masterPosition,
-            CapabilityPosition inputA,
-            CapabilityPosition outputA,
-            CapabilityPosition inputB,
-            CapabilityPosition outputB,
-            boolean exposeUnsidedPorts
-    ) {
+    public HeatExchangerLogic(HeatExchangerSizeVariants size) {
         this.size = size;
-        this.masterPosition = masterPosition.immutable();
-        this.inputA = inputA;
-        this.outputA = outputA;
-        this.inputB = inputB;
-        this.outputB = outputB;
-        this.exposeUnsidedPorts = exposeUnsidedPorts;
+        this.masterPosition = size.getMasterPos().immutable();
+        this.inputA = size.getInputA();
+        this.outputA = size.getOutputA();
+        this.inputB = size.getInputB();
+        this.outputB = size.getOutputB();
+        this.exposeUnsidedPorts = size.isExposeUnsidedPorts();
     }
 
     @Override
-    public final S createInitialState(IInitialMultiblockContext<S> context) {
-        return createState(
+    public HeatExchangerState createInitialState(IInitialMultiblockContext<HeatExchangerState> context) {
+        return new HeatExchangerState(
                 size.getCapacity(),
                 context,
                 context.getCapabilityAt(
@@ -85,17 +80,6 @@ public abstract class AbstractHeatExchangerLogic<S extends HeatExchangerState> i
                 )
         );
     }
-
-    protected abstract S createState(
-            int tankCapacity,
-            IInitialMultiblockContext<S> context,
-            CapabilityReference<IFluidHandler> automaticOutputA,
-            CapabilityReference<IFluidHandler> automaticOutputB
-    );
-
-    
-
-
 
     static MultiblockFace getAdjacentTargetFace(CapabilityPosition outputPort) {
         var outwardFace = Objects.requireNonNull(outputPort.side(), "Output port face");
@@ -112,7 +96,7 @@ public abstract class AbstractHeatExchangerLogic<S extends HeatExchangerState> i
 
     @Override
     public InteractionResult click(
-            IMultiblockContext<S> context,
+            IMultiblockContext<HeatExchangerState> context,
             BlockPos posInMultiblock,
             Player player,
             InteractionHand hand,
@@ -139,16 +123,31 @@ public abstract class AbstractHeatExchangerLogic<S extends HeatExchangerState> i
         return InteractionResult.CONSUME;
     }
 
-    protected abstract void openMenu(
-            IMultiblockContext<S> context,
+    private void openMenu(
+            IMultiblockContext<HeatExchangerState> context,
             ServerPlayer player,
             BlockPos masterPos,
             BlockPos interactionPos
-    );
+    ) {
+        HeatExchangerState state = context.getState();
+        SimpleMenuProvider provider = new SimpleMenuProvider(
+                (containerId, inventory, ignoredPlayer) -> new HeatExchangerMenu(
+                        size,
+                        containerId,
+                        inventory,
+                        state,
+                        context,
+                        masterPos,
+                        interactionPos
+                ),
+                Component.translatable(size.getContainerKey())
+        );
+        NetworkHooks.openScreen(player, provider, masterPos);
+    }
 
     @Override
-    public void tickServer(IMultiblockContext<S> context) {
-        S state = context.getState();
+    public void tickServer(IMultiblockContext<HeatExchangerState> context) {
+        HeatExchangerState state = context.getState();
         pushOutputFluids(state);
 
         if (state.cooldown > 0) {
@@ -205,10 +204,6 @@ public abstract class AbstractHeatExchangerLogic<S extends HeatExchangerState> i
         }
     }
 
-    
-
-
-
     static int pushOutputFluid(IFluidHandler target, LockableFluidTank source) {
         if (target == null || source.getFluid().isEmpty() || source.isLocked()) {
             return 0;
@@ -216,11 +211,7 @@ public abstract class AbstractHeatExchangerLogic<S extends HeatExchangerState> i
         return FluidUtil.tryFluidTransfer(target, source, AUTOMATIC_OUTPUT_RATE, true).getAmount();
     }
 
-    
-
-
-
-    private int exchangeAtomically(S state, HeatExchangerRecipe recipe) {
+    private int exchangeAtomically(HeatExchangerState state, HeatExchangerRecipe recipe) {
         int heatGcd = greatestCommonDivisor(recipe.ExchangeA.HeatValue, recipe.ExchangeB.HeatValue);
         int repetitionsA = recipe.ExchangeB.HeatValue / heatGcd;
         int repetitionsB = recipe.ExchangeA.HeatValue / heatGcd;
@@ -393,9 +384,9 @@ public abstract class AbstractHeatExchangerLogic<S extends HeatExchangerState> i
                 && actual.isFluidEqual(expected);
     }
 
-    private static <S extends HeatExchangerState> void setProcessing(
-            IMultiblockContext<S> context,
-            S state,
+    private static void setProcessing(
+            IMultiblockContext<HeatExchangerState> context,
+            HeatExchangerState state,
             boolean processing
     ) {
         if (state.processing != processing) {
@@ -406,7 +397,7 @@ public abstract class AbstractHeatExchangerLogic<S extends HeatExchangerState> i
 
     @Override
     public <T> LazyOptional<T> getCapability(
-            IMultiblockContext<S> context,
+            IMultiblockContext<HeatExchangerState> context,
             CapabilityPosition position,
             Capability<T> capability
     ) {
@@ -422,7 +413,7 @@ public abstract class AbstractHeatExchangerLogic<S extends HeatExchangerState> i
     }
 
     private StoredCapability<IFluidHandler> selectFluidCapability(
-            S state,
+            HeatExchangerState state,
             CapabilityPosition position
     ) {
         if (inputA.equals(position)) {

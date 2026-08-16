@@ -2,7 +2,6 @@ package team.cappcraft.immersivechemical.common.tileentity;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
@@ -27,22 +26,6 @@ public class LockableFluidTank extends FluidTank {
     public LockableFluidTank(int capacity, Consumer<FluidStack> onContentChanged) {
         super(requirePositiveCapacity(capacity));
         this.onContentChangedConsumer = Objects.requireNonNull(onContentChanged, "onContentChanged");
-    }
-
-    public LockableFluidTank(
-            @Nullable FluidStack fluidStack, int capacity, Consumer<FluidStack> onContentChanged
-    ) {
-        this(capacity, onContentChanged);
-        setFluid(fluidStack);
-    }
-
-    public LockableFluidTank(
-            @Nullable Fluid fluid, int amount, int capacity, Consumer<FluidStack> onContentChanged
-    ) {
-        this(capacity, onContentChanged);
-        if (fluid != null && amount > 0) {
-            setFluid(new FluidStack(fluid, amount));
-        }
     }
 
     @Override
