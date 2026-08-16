@@ -13,13 +13,20 @@ public class LockableFluidTank extends FluidTank {
     public static final String TAG_LOCKED_FLUID = "LockedFluid";
 
     private final Consumer<FluidStack> onContentChangedConsumer;
+    private final boolean autoLock;
     private boolean locked;
     private boolean lockedType;
     private FluidStack lockedFluid = FluidStack.EMPTY;
 
     public LockableFluidTank(int capacity, Consumer<FluidStack> onContentChanged) {
+        this(capacity, onContentChanged, false);
+    }
+
+    public LockableFluidTank(
+            int capacity, Consumer<FluidStack> onContentChanged, boolean autoLock) {
         super(capacity);
         this.onContentChangedConsumer = onContentChanged;
+        this.autoLock = autoLock;
     }
 
     @Override
@@ -70,7 +77,12 @@ public class LockableFluidTank extends FluidTank {
         if (locked) {
             return 0;
         }
-        return super.fill(resource, action);
+        boolean emptyBefore = fluid.isEmpty();
+        int filled = super.fill(resource, action);
+        if (autoLock && filled > 0 && action == FluidAction.EXECUTE && emptyBefore) {
+            setLockedType(true);
+        }
+        return filled;
     }
 
     @Override

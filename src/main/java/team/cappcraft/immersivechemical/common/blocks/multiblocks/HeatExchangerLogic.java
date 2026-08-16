@@ -9,7 +9,6 @@ import blusunrize.immersiveengineering.api.multiblocks.blocks.util.MultiblockFac
 import blusunrize.immersiveengineering.api.multiblocks.blocks.util.RelativeBlockFace;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.util.ShapeType;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.util.StoredCapability;
-import java.util.Optional;
 import java.util.function.Function;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -29,7 +28,6 @@ import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import net.minecraftforge.network.NetworkHooks;
-import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
 import team.cappcraft.immersivechemical.common.menu.HeatExchangerMenu;
 import team.cappcraft.immersivechemical.common.recipe.ConvertDirection;
 import team.cappcraft.immersivechemical.common.recipe.HeatExchangerEntry;
@@ -145,36 +143,76 @@ public final class HeatExchangerLogic
             return;
         }
 
-        Optional<HeatExchangerRecipe> foundRecipe =
-                HeatExchangerRegistry.REGISTRY.findRecipe(
-                        state.Tanks[HeatExchangerState.INPUT_A],
-                        state.Tanks[HeatExchangerState.INPUT_B],
-                        state.Tanks[HeatExchangerState.OUTPUT_A],
-                        state.Tanks[HeatExchangerState.OUTPUT_B]);
-        if (foundRecipe.isEmpty()) {
-            state.cooldown = RETRY_DELAY_TICKS;
-            state.tickSinceLastExchange = 0;
-            setProcessing(context, state, false);
-            context.markMasterDirty();
-            return;
+        if (state.recipeDirty) {
+            state.recipeDirty = false;
+            state.cachedRecipe =
+                    HeatExchangerRegistry.REGISTRY
+                            .findRecipe(
+                                    state.Tanks[HeatExchangerState.INPUT_A],
+                                    state.Tanks[HeatExchangerState.INPUT_B],
+                                    state.Tanks[HeatExchangerState.OUTPUT_A],
+                                    state.Tanks[HeatExchangerState.OUTPUT_B])
+                            .orElse(null);
         }
 
-        if (++state.tickSinceLastExchange < state.tickRequired) {
-            setProcessing(context, state, true);
-            context.markMasterDirty();
-            return;
-        }
-
-        state.tickSinceLastExchange = 0;
-        int transferredHeat = exchangeAtomically(state, foundRecipe.get());
-        if (transferredHeat <= 0) {
+        HeatExchangerRecipe recipe = state.cachedRecipe;
+        if (recipe == null) {
             state.cooldown = RETRY_DELAY_TICKS;
             setProcessing(context, state, false);
             context.markMasterDirty();
             return;
         }
+        int rate = size.getHeatTransferRate();
 
-        state.tickRequired = (int) Math.ceil(transferredHeat * size.getTickMultiplier());
+        boolean sideAAbsorbs = recipe.DirectionA == ConvertDirection.HEAT_UP;
+        HeatExchangerEntry absorbingEntry = sideAAbsorbs ? recipe.ExchangeA : recipe.ExchangeB;
+        HeatExchangerEntry releasingEntry = sideAAbsorbs ? recipe.ExchangeB : recipe.ExchangeA;
+        ConvertDirection absorbingDirection = sideAAbsorbs ? recipe.DirectionA : recipe.DirectionB;
+        ConvertDirection releasingDirection = sideAAbsorbs ? recipe.DirectionB : recipe.DirectionA;
+        int absorbingInput = sideAAbsorbs ? HeatExchangerState.INPUT_A : HeatExchangerState.INPUT_B;
+        int absorbingOutput =
+                sideAAbsorbs ? HeatExchangerState.OUTPUT_A : HeatExchangerState.OUTPUT_B;
+        int releasingInput = sideAAbsorbs ? HeatExchangerState.INPUT_B : HeatExchangerState.INPUT_A;
+        int releasingOutput =
+                sideAAbsorbs ? HeatExchangerState.OUTPUT_B : HeatExchangerState.OUTPUT_A;
+
+        boolean processed = false;
+        long heatCost = Math.min(rate, absorbingEntry.HeatValue);
+        if (state.heatBuffer >= heatCost) {
+            int heatMoved =
+                    exchangeSide(
+                            state.Tanks[absorbingInput],
+                            state.Tanks[absorbingOutput],
+                            absorbingEntry,
+                            absorbingDirection,
+                            rate);
+            if (heatMoved > 0) {
+                state.heatBuffer -= heatMoved;
+                processed = true;
+            }
+        }
+
+        if (!processed) {
+            int heatMoved =
+                    exchangeSide(
+                            state.Tanks[releasingInput],
+                            state.Tanks[releasingOutput],
+                            releasingEntry,
+                            releasingDirection,
+                            rate);
+            if (heatMoved > 0) {
+                state.heatBuffer += heatMoved;
+                processed = true;
+            }
+        }
+
+        if (!processed) {
+            state.cooldown = RETRY_DELAY_TICKS;
+            setProcessing(context, state, false);
+            context.markMasterDirty();
+            return;
+        }
+
         setProcessing(context, state, true);
         context.markDirtyAndSync();
     }
@@ -198,175 +236,45 @@ public final class HeatExchangerLogic
         return FluidUtil.tryFluidTransfer(target, source, AUTOMATIC_OUTPUT_RATE, true).getAmount();
     }
 
-    private int exchangeAtomically(HeatExchangerState state, HeatExchangerRecipe recipe) {
-        int heatGcd = greatestCommonDivisor(recipe.ExchangeA.HeatValue, recipe.ExchangeB.HeatValue);
-        int repetitionsA = recipe.ExchangeB.HeatValue / heatGcd;
-        int repetitionsB = recipe.ExchangeA.HeatValue / heatGcd;
-
-        ExchangeBatch batchA = createBatch(recipe.ExchangeA, recipe.DirectionA, repetitionsA);
-        ExchangeBatch batchB = createBatch(recipe.ExchangeB, recipe.DirectionB, repetitionsB);
-        if (batchA == null || batchB == null || batchA.heat() != batchB.heat()) {
+    private static int exchangeSide(
+            LockableFluidTank input,
+            LockableFluidTank output,
+            HeatExchangerEntry entry,
+            ConvertDirection direction,
+            int maxHeat) {
+        int heatValue = entry.HeatValue;
+        int heatToMove = Math.min(maxHeat, heatValue);
+        if (heatToMove <= 0) {
             return 0;
         }
 
-        LockableFluidTank inputTankA = state.Tanks[HeatExchangerState.INPUT_A];
-        LockableFluidTank outputTankA = state.Tanks[HeatExchangerState.OUTPUT_A];
-        LockableFluidTank inputTankB = state.Tanks[HeatExchangerState.INPUT_B];
-        LockableFluidTank outputTankB = state.Tanks[HeatExchangerState.OUTPUT_B];
-        if (!canExchange(batchA, inputTankA, outputTankA)
-                || !canExchange(batchB, inputTankB, outputTankB)) {
+        FluidStack fullInput = entry.getInput(direction);
+        FluidStack fullOutput = entry.getOutput(direction);
+        long inputAmount = (long) fullInput.getAmount() * heatToMove / heatValue;
+        long outputAmount = (long) fullOutput.getAmount() * heatToMove / heatValue;
+        if (inputAmount <= 0 || outputAmount <= 0) {
             return 0;
         }
 
-        FluidStack drainedA = inputTankA.drain(batchA.input(), FluidAction.EXECUTE);
-        if (!sameFluidAndAmount(drainedA, batchA.input())) {
-            rollbackInputs(inputTankA, drainedA, inputTankB, FluidStack.EMPTY);
-            logTransactionFailure("first input drain");
+        FluidStack inputStack = new FluidStack(fullInput, (int) inputAmount);
+        FluidStack outputStack = new FluidStack(fullOutput, (int) outputAmount);
+        if (input.drain(inputStack, FluidAction.SIMULATE).getAmount() != inputAmount
+                || output.fill(outputStack, FluidAction.SIMULATE) != outputAmount) {
             return 0;
         }
 
-        FluidStack drainedB = inputTankB.drain(batchB.input(), FluidAction.EXECUTE);
-        if (!sameFluidAndAmount(drainedB, batchB.input())) {
-            rollbackInputs(inputTankA, drainedA, inputTankB, drainedB);
-            logTransactionFailure("second input drain");
+        FluidStack drained = input.drain(inputStack, FluidAction.EXECUTE);
+        if (drained.getAmount() != inputAmount) {
+            input.fill(drained, FluidAction.EXECUTE);
             return 0;
         }
-
-        int filledA = outputTankA.fill(batchA.output(), FluidAction.EXECUTE);
-        if (filledA != batchA.output().getAmount()) {
-            rollbackTransaction(
-                    inputTankA,
-                    drainedA,
-                    outputTankA,
-                    batchA.output(),
-                    filledA,
-                    inputTankB,
-                    drainedB,
-                    outputTankB,
-                    batchB.output(),
-                    0);
-            logTransactionFailure("first output fill");
+        int filled = output.fill(outputStack, FluidAction.EXECUTE);
+        if (filled != outputAmount) {
+            output.drain(new FluidStack(outputStack, filled), FluidAction.EXECUTE);
+            input.fill(drained, FluidAction.EXECUTE);
             return 0;
         }
-
-        int filledB = outputTankB.fill(batchB.output(), FluidAction.EXECUTE);
-        if (filledB != batchB.output().getAmount()) {
-            rollbackTransaction(
-                    inputTankA,
-                    drainedA,
-                    outputTankA,
-                    batchA.output(),
-                    filledA,
-                    inputTankB,
-                    drainedB,
-                    outputTankB,
-                    batchB.output(),
-                    filledB);
-            logTransactionFailure("second output fill");
-            return 0;
-        }
-        return batchA.heat();
-    }
-
-    private static ExchangeBatch createBatch(
-            HeatExchangerEntry entry, ConvertDirection direction, int repetitions) {
-        FluidStack input = scale(entry.getInput(direction), repetitions);
-        FluidStack output = scale(entry.getOutput(direction), repetitions);
-        long heat = (long) entry.HeatValue * repetitions;
-        if (input.isEmpty() || output.isEmpty() || heat > Integer.MAX_VALUE) {
-            return null;
-        }
-        return new ExchangeBatch(input, output, (int) heat);
-    }
-
-    private static FluidStack scale(FluidStack stack, int repetitions) {
-        long amount = (long) stack.getAmount() * repetitions;
-        if (stack.isEmpty() || amount > Integer.MAX_VALUE) {
-            return FluidStack.EMPTY;
-        }
-        return new FluidStack(stack, (int) amount);
-    }
-
-    private static boolean canExchange(
-            ExchangeBatch batch, LockableFluidTank input, LockableFluidTank output) {
-        FluidStack simulatedDrain = input.drain(batch.input(), FluidAction.SIMULATE);
-        return sameFluidAndAmount(simulatedDrain, batch.input())
-                && output.fill(batch.output(), FluidAction.SIMULATE) == batch.output().getAmount();
-    }
-
-    private static void rollbackTransaction(
-            LockableFluidTank inputA,
-            FluidStack drainedA,
-            LockableFluidTank outputA,
-            FluidStack producedA,
-            int filledA,
-            LockableFluidTank inputB,
-            FluidStack drainedB,
-            LockableFluidTank outputB,
-            FluidStack producedB,
-            int filledB) {
-        rollbackOutput(outputB, producedB, filledB);
-        rollbackOutput(outputA, producedA, filledA);
-        rollbackInputs(inputA, drainedA, inputB, drainedB);
-    }
-
-    private static void rollbackOutput(LockableFluidTank output, FluidStack produced, int filled) {
-        if (filled <= 0) {
-            return;
-        }
-        FluidStack removed = output.drain(new FluidStack(produced, filled), FluidAction.EXECUTE);
-        if (removed.getAmount() != filled) {
-            ImmersiveChemicalEngineering.LOGGER.error(
-                    "Heat exchanger rollback removed {}/{} mB from an output tank",
-                    removed.getAmount(),
-                    filled);
-        }
-    }
-
-    private static void rollbackInputs(
-            LockableFluidTank inputA,
-            FluidStack drainedA,
-            LockableFluidTank inputB,
-            FluidStack drainedB) {
-        restoreInput(inputB, drainedB);
-        restoreInput(inputA, drainedA);
-    }
-
-    private static void restoreInput(LockableFluidTank input, FluidStack drained) {
-        if (drained.isEmpty()) {
-            return;
-        }
-        int restored = input.fill(drained, FluidAction.EXECUTE);
-        if (restored != drained.getAmount()) {
-            ImmersiveChemicalEngineering.LOGGER.error(
-                    "Heat exchanger rollback restored {}/{} mB to an input tank",
-                    restored,
-                    drained.getAmount());
-        }
-    }
-
-    private void logTransactionFailure(String stage) {
-        ImmersiveChemicalEngineering.LOGGER.error(
-                "{} heat exchanger changed during atomic exchange at {}; rolled back",
-                size.name().toLowerCase(),
-                stage);
-    }
-
-    private static int greatestCommonDivisor(int a, int b) {
-        while (b != 0) {
-            int remainder = a % b;
-            a = b;
-            b = remainder;
-        }
-        return a;
-    }
-
-    private record ExchangeBatch(FluidStack input, FluidStack output, int heat) {}
-
-    private static boolean sameFluidAndAmount(FluidStack actual, FluidStack expected) {
-        return !actual.isEmpty()
-                && actual.getAmount() == expected.getAmount()
-                && actual.isFluidEqual(expected);
+        return heatToMove;
     }
 
     private static void setProcessing(

@@ -40,8 +40,6 @@ public final class HeatExchangerMenu extends IEContainerMenu {
     @Nullable private final Block expectedFormedBlock;
 
     private int syncedCapacity = 1;
-    private int syncedProgress;
-    private int syncedDuration = 1;
     private boolean syncedProcessing;
 
     public HeatExchangerMenu(
@@ -130,20 +128,6 @@ public final class HeatExchangerMenu extends IEContainerMenu {
         }
 
         addGenericData(
-                GenericContainerData.int32(
-                        () ->
-                                serverState == null
-                                        ? syncedProgress
-                                        : serverState.getExchangeProgress(),
-                        value -> syncedProgress = value));
-        addGenericData(
-                GenericContainerData.int32(
-                        () ->
-                                serverState == null
-                                        ? syncedDuration
-                                        : serverState.getExchangeDuration(),
-                        value -> syncedDuration = value));
-        addGenericData(
                 GenericContainerData.bool(
                         () -> serverState == null ? syncedProcessing : serverState.isProcessing(),
                         value -> syncedProcessing = value));
@@ -173,14 +157,6 @@ public final class HeatExchangerMenu extends IEContainerMenu {
         return serverState == null
                 ? syncedTypeLocks[tankIndex]
                 : serverState.isTankTypeLocked(tankIndex);
-    }
-
-    public int getExchangeProgress() {
-        return serverState == null ? syncedProgress : serverState.getExchangeProgress();
-    }
-
-    public int getExchangeDuration() {
-        return serverState == null ? syncedDuration : serverState.getExchangeDuration();
     }
 
     public boolean isProcessing() {

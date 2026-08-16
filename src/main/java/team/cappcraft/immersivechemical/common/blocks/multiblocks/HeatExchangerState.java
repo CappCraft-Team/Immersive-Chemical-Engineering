@@ -10,6 +10,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRecipe;
 import team.cappcraft.immersivechemical.common.tileentity.LockableFluidTank;
 
 public class HeatExchangerState implements IMultiblockState {
@@ -22,8 +23,7 @@ public class HeatExchangerState implements IMultiblockState {
 
     private static final String TAG_TANKS = "Tanks";
     private static final String TAG_COOLDOWN = "Cooldown";
-    private static final String TAG_TICK_SINCE_EXCHANGE = "TickSinceExchange";
-    private static final String TAG_TICK_REQUIRED = "TickRequired";
+    private static final String TAG_HEAT_BUFFER = "HeatBuffer";
     private static final String TAG_PROCESSING = "Processing";
 
     public final LockableFluidTank[] Tanks;
@@ -37,9 +37,10 @@ public class HeatExchangerState implements IMultiblockState {
     final CapabilityReference<IFluidHandler> automaticOutputB;
 
     int cooldown;
-    int tickSinceLastExchange;
-    int tickRequired = 1;
+    long heatBuffer;
     boolean processing;
+    @Nullable HeatExchangerRecipe cachedRecipe;
+    boolean recipeDirty = true;
 
     protected HeatExchangerState(
             int tankCapacity,
@@ -50,10 +51,10 @@ public class HeatExchangerState implements IMultiblockState {
         Runnable sync = context.getSyncRunnable();
         this.Tanks =
                 new LockableFluidTank[] {
-                    createTank(tankCapacity, markDirty, sync),
-                    createTank(tankCapacity, markDirty, sync),
-                    createTank(tankCapacity, markDirty, sync),
-                    createTank(tankCapacity, markDirty, sync)
+                    createTank(tankCapacity, true, markDirty, sync),
+                    createTank(tankCapacity, true, markDirty, sync),
+                    createTank(tankCapacity, true, markDirty, sync),
+                    createTank(tankCapacity, true, markDirty, sync)
                 };
 
         this.inputACapability = new StoredCapability<>(new PortFluidHandler(Tanks[INPUT_A], null));
@@ -70,13 +71,16 @@ public class HeatExchangerState implements IMultiblockState {
         this.automaticOutputB = automaticOutputB;
     }
 
-    private static LockableFluidTank createTank(int capacity, Runnable markDirty, Runnable sync) {
+    private LockableFluidTank createTank(
+            int capacity, boolean autoLock, Runnable markDirty, Runnable sync) {
         return new LockableFluidTank(
                 capacity,
                 ignored -> {
+                    recipeDirty = true;
                     markDirty.run();
                     sync.run();
-                });
+                },
+                autoLock);
     }
 
     @Override
@@ -106,8 +110,7 @@ public class HeatExchangerState implements IMultiblockState {
         }
         nbt.put(TAG_TANKS, tanks);
         nbt.putInt(TAG_COOLDOWN, cooldown);
-        nbt.putInt(TAG_TICK_SINCE_EXCHANGE, tickSinceLastExchange);
-        nbt.putInt(TAG_TICK_REQUIRED, tickRequired);
+        nbt.putLong(TAG_HEAT_BUFFER, heatBuffer);
         nbt.putBoolean(TAG_PROCESSING, processing);
     }
 
@@ -117,8 +120,7 @@ public class HeatExchangerState implements IMultiblockState {
             Tanks[i].readFromNBT(tanks.getCompound(i));
         }
         cooldown = nbt.getInt(TAG_COOLDOWN);
-        tickSinceLastExchange = nbt.getInt(TAG_TICK_SINCE_EXCHANGE);
-        tickRequired = nbt.getInt(TAG_TICK_REQUIRED);
+        heatBuffer = nbt.getLong(TAG_HEAT_BUFFER);
         processing = nbt.getBoolean(TAG_PROCESSING);
     }
 
@@ -135,12 +137,8 @@ public class HeatExchangerState implements IMultiblockState {
         return Tanks[tankIndex].isLockedType();
     }
 
-    public int getExchangeProgress() {
-        return tickSinceLastExchange;
-    }
-
-    public int getExchangeDuration() {
-        return tickRequired;
+    public long getHeatBuffer() {
+        return heatBuffer;
     }
 
     public boolean isProcessing() {
@@ -192,7 +190,7 @@ public class HeatExchangerState implements IMultiblockState {
 
     private void resetAfterManualTankChange() {
         cooldown = 0;
-        tickSinceLastExchange = 0;
+        heatBuffer = 0;
         processing = false;
     }
 

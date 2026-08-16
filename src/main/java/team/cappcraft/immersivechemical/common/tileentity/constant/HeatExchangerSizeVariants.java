@@ -166,6 +166,14 @@ public enum HeatExchangerSizeVariants {
         return manualScale;
     }
 
+    public int getHeatTransferRate() {
+        return switch (this) {
+            case SMALL -> Config.getSmallHeatTransferRate();
+            case MEDIUM -> Config.getMediumHeatTransferRate();
+            case LARGE -> Config.getLargeHeatTransferRate();
+        };
+    }
+
     public BlockPos getComparatorInputA() {
         return comparatorInputA;
     }
@@ -191,14 +199,6 @@ public enum HeatExchangerSizeVariants {
             case SMALL -> Config.getSmallCapacity();
             case MEDIUM -> Config.getMediumCapacity();
             case LARGE -> Config.getLargeCapacity();
-        };
-    }
-
-    public float getTickMultiplier() {
-        return switch (this) {
-            case SMALL -> (float) Config.getSmallTickMultiplier();
-            case MEDIUM -> (float) Config.getMediumTickMultiplier();
-            case LARGE -> (float) Config.getLargeTickMultiplier();
         };
     }
 }

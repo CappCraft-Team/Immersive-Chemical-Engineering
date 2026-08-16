@@ -1,7 +1,6 @@
 package team.cappcraft.immersivechemical;
 
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.DoubleValue;
 import net.minecraftforge.common.ForgeConfigSpec.IntValue;
 
 public class Config {
@@ -12,9 +11,9 @@ public class Config {
     private static final IntValue MEDIUM_CAPACITY;
     private static final IntValue LARGE_CAPACITY;
 
-    private static final DoubleValue SMALL_TICK_MULTIPLIER;
-    private static final DoubleValue MEDIUM_TICK_MULTIPLIER;
-    private static final DoubleValue LARGE_TICK_MULTIPLIER;
+    private static final IntValue SMALL_HEAT_TRANSFER_RATE;
+    private static final IntValue MEDIUM_HEAT_TRANSFER_RATE;
+    private static final IntValue LARGE_HEAT_TRANSFER_RATE;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -33,17 +32,17 @@ public class Config {
                         .defineInRange("large", 30000, 1, Integer.MAX_VALUE);
         builder.pop();
 
-        builder.comment("Tick multiplier for each heat exchanger size. Lower = faster.")
-                .push("tick_multiplier");
-        SMALL_TICK_MULTIPLIER =
-                builder.comment("Tick multiplier for Small Heat Exchanger")
-                        .defineInRange("small", 0.8, 1e-7, 1e7);
-        MEDIUM_TICK_MULTIPLIER =
-                builder.comment("Tick multiplier for Medium Heat Exchanger")
-                        .defineInRange("medium", 0.4, 1e-7, 1e7);
-        LARGE_TICK_MULTIPLIER =
-                builder.comment("Tick multiplier for Large Heat Exchanger")
-                        .defineInRange("large", 0.2, 1e-7, 1e7);
+        builder.comment("Heat transfer rate for each heat exchanger size (heat per tick)")
+                .push("heat_transfer_rate");
+        SMALL_HEAT_TRANSFER_RATE =
+                builder.comment("Heat transfer rate for Small Heat Exchanger")
+                        .defineInRange("small", 100, 1, Integer.MAX_VALUE);
+        MEDIUM_HEAT_TRANSFER_RATE =
+                builder.comment("Heat transfer rate for Medium Heat Exchanger")
+                        .defineInRange("medium", 200, 1, Integer.MAX_VALUE);
+        LARGE_HEAT_TRANSFER_RATE =
+                builder.comment("Heat transfer rate for Large Heat Exchanger")
+                        .defineInRange("large", 400, 1, Integer.MAX_VALUE);
         builder.pop();
 
         builder.pop();
@@ -63,15 +62,15 @@ public class Config {
         return LARGE_CAPACITY.get();
     }
 
-    public static double getSmallTickMultiplier() {
-        return SMALL_TICK_MULTIPLIER.get();
+    public static int getSmallHeatTransferRate() {
+        return SMALL_HEAT_TRANSFER_RATE.get();
     }
 
-    public static double getMediumTickMultiplier() {
-        return MEDIUM_TICK_MULTIPLIER.get();
+    public static int getMediumHeatTransferRate() {
+        return MEDIUM_HEAT_TRANSFER_RATE.get();
     }
 
-    public static double getLargeTickMultiplier() {
-        return LARGE_TICK_MULTIPLIER.get();
+    public static int getLargeHeatTransferRate() {
+        return LARGE_HEAT_TRANSFER_RATE.get();
     }
 }

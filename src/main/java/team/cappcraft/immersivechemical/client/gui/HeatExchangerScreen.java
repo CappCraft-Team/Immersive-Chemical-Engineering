@@ -140,6 +140,11 @@ public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMe
         boolean canClearAny = false;
         for (int tankIndex = 0; tankIndex < HeatExchangerMenu.TANK_COUNT; ++tankIndex) {
             FluidStack fluid = menu.getTankFluid(tankIndex);
+            canClearAny |= menu.isTankTypeLocked(tankIndex) || !fluid.isEmpty();
+        }
+
+        for (int tankIndex = 0; tankIndex < HeatExchangerMenu.TANK_COUNT; ++tankIndex) {
+            FluidStack fluid = menu.getTankFluid(tankIndex);
             boolean typeLocked = menu.isTankTypeLocked(tankIndex);
             filterButtons[tankIndex].active = typeLocked || !fluid.isEmpty();
             filterButtons[tankIndex].setMessage(Component.literal(typeLocked ? "U" : "F"));
