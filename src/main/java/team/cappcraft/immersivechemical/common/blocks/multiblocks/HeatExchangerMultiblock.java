@@ -10,8 +10,11 @@ import blusunrize.immersiveengineering.api.multiblocks.blocks.registry.Multibloc
 import blusunrize.immersiveengineering.api.multiblocks.blocks.registry.MultiblockBlockEntityMaster;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.registry.MultiblockPartBlock;
 import blusunrize.immersiveengineering.common.register.IEBlocks;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -21,6 +24,7 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -28,7 +32,6 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
-import team.cappcraft.immersivechemical.client.manual.HeatExchangerManualData;
 import team.cappcraft.immersivechemical.common.tileentity.constant.HeatExchangerSizeVariants;
 
 import javax.annotation.Nonnull;
@@ -238,8 +241,31 @@ public final class HeatExchangerMultiblock extends TemplateMultiblock {
                 }
             }
         }
-        int blockCount = size.getX() * size.getY() * size.getZ();
-        consumer.accept(HeatExchangerManualData.of(blockCount - radiatorCount, radiatorCount));
+        int sheetmetalCount = size.getX() * size.getY() * size.getZ() - radiatorCount;
+        consumer.accept(new ClientMultiblocks.MultiblockManualData() {
+            @Override
+            public NonNullList<ItemStack> getTotalMaterials() {
+                NonNullList<ItemStack> materials = NonNullList.create();
+                materials.add(new ItemStack(
+                        IEBlocks.Metals.SHEETMETAL.get(EnumMetals.IRON),
+                        sheetmetalCount
+                ));
+                materials.add(new ItemStack(
+                        IEBlocks.MetalDecoration.RADIATOR.get(),
+                        radiatorCount
+                ));
+                return materials;
+            }
+
+            @Override
+            public boolean canRenderFormedStructure() {
+                return false;
+            }
+
+            @Override
+            public void renderFormedStructure(PoseStack poseStack, MultiBufferSource buffers) {
+            }
+        });
     }
 
     @Override

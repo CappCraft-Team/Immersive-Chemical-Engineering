@@ -6,6 +6,7 @@ import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
+import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -23,6 +24,9 @@ import java.util.stream.Stream;
 
 @JeiPlugin
 public class JEIPlugin implements IModPlugin {
+
+    public static final RecipeType<HeatExchangerEntry> HEAT_EXCHANGER_RECIPE_TYPE =
+            RecipeType.create(ImmersiveChemicalEngineering.MODID, "heat_exchanger", HeatExchangerEntry.class);
 
     private static final ResourceLocation PLUGIN_ID = new ResourceLocation(
             ImmersiveChemicalEngineering.MODID, "jei_plugin");
@@ -54,7 +58,7 @@ public class JEIPlugin implements IModPlugin {
                 .toList();
 
         if (!entries.isEmpty()) {
-            registration.addRecipes(IChemERecipeTypes.HEAT_EXCHANGER, entries);
+            registration.addRecipes(JEIPlugin.HEAT_EXCHANGER_RECIPE_TYPE, entries);
         }
     }
 
@@ -62,15 +66,15 @@ public class JEIPlugin implements IModPlugin {
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
         registration.addRecipeCatalyst(
                 new ItemStack(ICHEME_Contents.HEAT_EXCHANGER_SMALL.blockItem().get()),
-                IChemERecipeTypes.HEAT_EXCHANGER
+                JEIPlugin.HEAT_EXCHANGER_RECIPE_TYPE
         );
         registration.addRecipeCatalyst(
                 new ItemStack(ICHEME_Contents.HEAT_EXCHANGER_MEDIUM.blockItem().get()),
-                IChemERecipeTypes.HEAT_EXCHANGER
+                JEIPlugin.HEAT_EXCHANGER_RECIPE_TYPE
         );
         registration.addRecipeCatalyst(
                 new ItemStack(ICHEME_Contents.HEAT_EXCHANGER_LARGE.blockItem().get()),
-                IChemERecipeTypes.HEAT_EXCHANGER
+                JEIPlugin.HEAT_EXCHANGER_RECIPE_TYPE
         );
     }
 
@@ -79,7 +83,7 @@ public class JEIPlugin implements IModPlugin {
         registration.addRecipeClickArea(
                 HeatExchangerScreen.class,
                 81, 55, 16, 15,
-                IChemERecipeTypes.HEAT_EXCHANGER
+                JEIPlugin.HEAT_EXCHANGER_RECIPE_TYPE
         );
     }
 

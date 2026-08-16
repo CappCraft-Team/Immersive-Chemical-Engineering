@@ -33,7 +33,7 @@ public class HeatExchangerRecipeCategory implements IRecipeCategory<HeatExchange
 
     @Override
     public RecipeType<HeatExchangerEntry> getRecipeType() {
-        return IChemERecipeTypes.HEAT_EXCHANGER;
+        return JEIPlugin.HEAT_EXCHANGER_RECIPE_TYPE;
     }
 
     @Override

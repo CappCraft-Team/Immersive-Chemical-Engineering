@@ -30,15 +30,4 @@ public class HeatExchangerRecipe {
         }
         return direction;
     }
-
-    @Override
-    public String toString() {
-        return "HeatExchangerRecipe{" +
-                "ExchangeA=" + ExchangeA +
-                ", ExchangeB=" + ExchangeB +
-                ", DirectionA=" + DirectionA +
-                ", DirectionB=" + DirectionB +
-                '}';
-    }
-
 }

@@ -4,20 +4,31 @@ import blusunrize.immersiveengineering.client.utils.GuiHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import team.cappcraft.immersivechemical.ICHEME_Contents;
 import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
 import team.cappcraft.immersivechemical.common.menu.HeatExchangerMenu;
 import team.cappcraft.immersivechemical.common.network.HeatExchangerMenuAction;
+import team.cappcraft.immersivechemical.common.tileentity.constant.HeatExchangerSizeVariants;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Mod.EventBusSubscriber(
+        modid = ImmersiveChemicalEngineering.MODID,
+        value = Dist.CLIENT,
+        bus = Mod.EventBusSubscriber.Bus.MOD
+)
 public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMenu> {
     private static final ResourceLocation BACKGROUND = new ResourceLocation(
             ImmersiveChemicalEngineering.MODID,
@@ -60,6 +71,18 @@ public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMe
         imageHeight = GUI_HEIGHT;
         inventoryLabelY = 115;
         titleLabelY = 6;
+    }
+
+    @SubscribeEvent
+    public static void onClientSetup(FMLClientSetupEvent event) {
+        event.enqueueWork(() -> {
+            for (HeatExchangerSizeVariants variant : HeatExchangerSizeVariants.values()) {
+                MenuScreens.register(
+                        ICHEME_Contents.menuType(variant),
+                        HeatExchangerScreen::new
+                );
+            }
+        });
     }
 
     @Override
@@ -313,8 +336,6 @@ public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMe
             return;
         }
 
-        
-        
         if (!ModList.get().isLoaded("jei")
                 && isHovering(STATUS_X, STATUS_Y, TANK_SIZE, 15, mouseX, mouseY)) {
             Component status = Component.translatable(menu.isProcessing()
@@ -347,7 +368,6 @@ public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMe
         return tooltip;
     }
 
-    
     private static final class AtlasButton extends Button {
         private AtlasButton(
                 int x,

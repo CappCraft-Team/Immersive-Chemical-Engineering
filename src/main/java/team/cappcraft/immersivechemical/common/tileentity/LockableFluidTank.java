@@ -10,9 +10,6 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-
-
-
 public class LockableFluidTank extends FluidTank {
     public static final String TAG_LOCKED = "Locked";
     public static final String TAG_LOCKED_TYPE = "LockedType";

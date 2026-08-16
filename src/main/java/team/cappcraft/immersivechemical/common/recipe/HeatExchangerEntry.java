@@ -20,8 +20,6 @@ public class HeatExchangerEntry {
 
 
 
-
-
     public HeatExchangerEntry(@Nonnull FluidStack fluidA, @Nonnull FluidStack fluidB, int heatValue, ConvertDirection direction) {
         Objects.requireNonNull(fluidA, "fluidA");
         Objects.requireNonNull(fluidB, "fluidB");
@@ -54,16 +52,6 @@ public class HeatExchangerEntry {
             this.FluidCold = fluidA.copy();
         }
         this.HeatValue = heatValue;
-    }
-
-    @Override
-    public String toString() {
-        return "HeatExchangerRecipeEntry{" +
-                "FluidHot=" + FluidHot +
-                ", FluidCold=" + FluidCold +
-                ", HeatValue=" + HeatValue +
-                ", Direction=" + Direction +
-                '}';
     }
 
     public FluidStack getInput(ConvertDirection direction) {
