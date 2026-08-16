@@ -1,11 +1,5 @@
-import groovy.json.JsonOutput
-import groovy.json.JsonSlurper
-
 plugins {
     id 'net.minecraftforge.gradle' version '6.0.54'
-    id 'org.parchmentmc.librarian.forgegradle' version '1.2.0.7-dev-SNAPSHOT'
-    id 'eclipse'
-    id 'idea'
 }
 
 group = 'team.cappcraft.icheme'
@@ -19,10 +13,6 @@ java {
         languageVersion = JavaLanguageVersion.of(17)
     }
 }
-
-// ----------------------------------------------------------------------------
-// RESOURCE EXPANSION & REPLACEMENTS
-// ----------------------------------------------------------------------------
 
 def versionReplacements = [
     version        : project.version,
@@ -38,57 +28,20 @@ def versionReplacements = [
 ]
 
 tasks.withType(ProcessResources).configureEach {
-    duplicatesStrategy = DuplicatesStrategy.FAIL
     inputs.properties versionReplacements
-
     filesMatching('META-INF/mods.toml') {
         expand versionReplacements
     }
-    exclude '.cache'
-
-    doLast {
-        def slurper = new JsonSlurper()
-        fileTree(dir: outputs.files.asPath, include: ['**/*.json', '**/*.mcmeta']).each { File f ->
-            try {
-                def parsed = slurper.parse(f)
-                f.text = JsonOutput.prettyPrint(JsonOutput.toJson(parsed))
-            } catch (Exception e) {
-                logger.warn("Skipping invalid JSON file ${f.name}: ${e.message}")
-            }
-        }
-    }
 }
-
-tasks.withType(Jar).configureEach {
-    zip64 = true
-    from(rootProject.file('LICENSE')) {
-        into 'META-INF'
-        rename { 'LICENSE_immersivechemical' }
-    }
-}
-
-// ----------------------------------------------------------------------------
-// FORGE RUNS & DEPENDENCIES
-// ----------------------------------------------------------------------------
 
 minecraft {
-    mappings channel: 'parchment', version: "1.19.3-2023.06.25-1.20.1"
+    mappings channel: 'official', version: version_minecraft
 
     runs {
         client {
             workingDirectory project.file('run')
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            property 'forge.logging.console.level', 'debug'
-            ideaModule "${project.name}.main"
-            mods {
-                immersivechemical { source sourceSets.main }
-            }
-        }
-        server {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            property 'forge.logging.console.level', 'debug'
-            arg '-nogui'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             mods {
                 immersivechemical { source sourceSets.main }
             }
@@ -109,28 +62,15 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${version_minecraft}-${version_forge}"
+
     implementation fg.deobf("curse.maven:immersive-engineering-231951:6206989")
+
     compileOnly fg.deobf("mezz.jei:jei-1.20.1-forge-api:${version_jei}")
     compileOnly fg.deobf("mezz.jei:jei-1.20.1-common-api:${version_jei}")
-    runtimeOnly fg.deobf("mezz.jei:jei-1.20.1-forge:${version_jei}")
     compileOnly fg.deobf("dev.latvian.mods:kubejs-forge:${version_kubejs}")
-    if (providers.gradleProperty('enableKubeJsRun').map(String::toBoolean).getOrElse(false)) {
-        runtimeOnly fg.deobf("dev.latvian.mods:kubejs-forge:${version_kubejs}")
-        runtimeOnly fg.deobf("dev.latvian.mods:rhino-forge:${version_rhino}")
-        runtimeOnly fg.deobf("dev.architectury:architectury-forge:${version_architectury}")
-    }
-}
 
-// ----------------------------------------------------------------------------
-// EXTRA TASKS
-// ----------------------------------------------------------------------------
-
-tasks.register('sourcesJar', Jar) {
-    dependsOn tasks.classes
-    archiveClassifier.set('sources')
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives tasks.named('sourcesJar')
+    runtimeOnly fg.deobf("mezz.jei:jei-1.20.1-forge:${version_jei}")
+    runtimeOnly fg.deobf("dev.latvian.mods:kubejs-forge:${version_kubejs}")
+    runtimeOnly fg.deobf("dev.latvian.mods:rhino-forge:${version_rhino}")
+    runtimeOnly fg.deobf("dev.architectury:architectury-forge:${version_architectury}")
 }
