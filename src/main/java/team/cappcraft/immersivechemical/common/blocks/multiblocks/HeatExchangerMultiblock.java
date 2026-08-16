@@ -224,6 +224,8 @@ public final class HeatExchangerMultiblock extends TemplateMultiblock {
             }
         }
         int sheetmetalCount = size.getX() * size.getY() * size.getZ() - radiatorCount;
+        final int radiators = radiatorCount;
+        final int sheetmetals = sheetmetalCount;
         consumer.accept(
                 new ClientMultiblocks.MultiblockManualData() {
                     @Override
@@ -232,10 +234,9 @@ public final class HeatExchangerMultiblock extends TemplateMultiblock {
                         materials.add(
                                 new ItemStack(
                                         IEBlocks.Metals.SHEETMETAL.get(EnumMetals.IRON),
-                                        sheetmetalCount));
+                                        sheetmetals));
                         materials.add(
-                                new ItemStack(
-                                        IEBlocks.MetalDecoration.RADIATOR.get(), radiatorCount));
+                                new ItemStack(IEBlocks.MetalDecoration.RADIATOR.get(), radiators));
                         return materials;
                     }
 

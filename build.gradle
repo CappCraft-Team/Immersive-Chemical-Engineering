@@ -28,6 +28,10 @@ def versionReplacements = [
     mod_id         : mod_id
 ]
 
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += '-Xlint:deprecation'
+}
+
 tasks.withType(ProcessResources).configureEach {
     inputs.properties versionReplacements
     filesMatching('META-INF/mods.toml') {

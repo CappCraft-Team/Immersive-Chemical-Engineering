@@ -100,7 +100,7 @@ public enum HeatExchangerSizeVariants {
             BlockPos comparatorInputB,
             BlockPos comparatorOutputB,
             Predicate<BlockPos> radiatorPredicate) {
-        this.id = new ResourceLocation(ImmersiveChemicalEngineering.MODID, id);
+        this.id = ResourceLocation.fromNamespaceAndPath(ImmersiveChemicalEngineering.MODID, id);
         this.masterPos = masterPos;
         this.triggerPos = triggerPos;
         this.size = size;

@@ -16,7 +16,8 @@ import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
 
 public final class HeatExchangerRecipeRegistration {
     public static final ResourceLocation ID =
-            new ResourceLocation(ImmersiveChemicalEngineering.MODID, "heat_exchanger");
+            ResourceLocation.fromNamespaceAndPath(
+                    ImmersiveChemicalEngineering.MODID, "heat_exchanger");
 
     public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES =
             DeferredRegister.create(

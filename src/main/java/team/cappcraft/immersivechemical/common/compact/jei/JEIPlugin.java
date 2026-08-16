@@ -29,7 +29,7 @@ public class JEIPlugin implements IModPlugin {
                     ImmersiveChemicalEngineering.MODID, "heat_exchanger", HeatExchangerEntry.class);
 
     private static final ResourceLocation PLUGIN_ID =
-            new ResourceLocation(ImmersiveChemicalEngineering.MODID, "jei_plugin");
+            ResourceLocation.fromNamespaceAndPath(ImmersiveChemicalEngineering.MODID, "jei_plugin");
 
     @Override
     public ResourceLocation getPluginUid() {

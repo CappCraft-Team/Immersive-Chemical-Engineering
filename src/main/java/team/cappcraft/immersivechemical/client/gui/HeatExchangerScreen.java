@@ -29,7 +29,7 @@ import team.cappcraft.immersivechemical.common.tileentity.constant.HeatExchanger
         bus = Mod.EventBusSubscriber.Bus.MOD)
 public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMenu> {
     private static final ResourceLocation BACKGROUND =
-            new ResourceLocation(
+            ResourceLocation.fromNamespaceAndPath(
                     ImmersiveChemicalEngineering.MODID, "textures/gui/heatexchanger.png");
 
     private static final int GUI_WIDTH = 175;

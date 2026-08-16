@@ -24,7 +24,10 @@ import team.cappcraft.immersivechemical.common.blocks.multiblocks.HeatExchangerS
 import team.cappcraft.immersivechemical.common.menu.HeatExchangerMenu;
 import team.cappcraft.immersivechemical.common.tileentity.constant.HeatExchangerSizeVariants;
 
+/** 本模组所有注册内容的集中入口：方块、物品、方块实体、菜单类型与多方块结构。 */
 public final class ICHEME_Contents {
+
+    // ======== 各类注册表 ========
 
     public static final DeferredRegister<Block> BLOCKS =
             DeferredRegister.create(Registries.BLOCK, ImmersiveChemicalEngineering.MODID);
@@ -36,12 +39,17 @@ public final class ICHEME_Contents {
     public static final DeferredRegister<MenuType<?>> MENUS =
             DeferredRegister.create(Registries.MENU, ImmersiveChemicalEngineering.MODID);
 
+    // ======== 热交换器：逻辑 / 结构模板 / 多方块注册 ========
+
+    // 每种尺寸由三部分组成：
+    //   LOGIC      —— 逻辑实现（按尺寸参数化，三个尺寸共用一个类）
+    //   TEMPLATE   —— 结构模板，构造时需要懒引用 Registration（两者循环依赖）
+    //   REGISTRATION —— 由 registerHeatExchanger 组装成的最终多方块注册对象
     public static final HeatExchangerLogic HEAT_EXCHANGER_SMALL_LOGIC =
             new HeatExchangerLogic(HeatExchangerSizeVariants.SMALL);
     public static final HeatExchangerMultiblock HEAT_EXCHANGER_SMALL_TEMPLATE =
             new HeatExchangerMultiblock(
-                    HeatExchangerSizeVariants.SMALL,
-                    ICHEME_Contents::getHeatExchangerSmallRegistration);
+                    HeatExchangerSizeVariants.SMALL, () -> ICHEME_Contents.HEAT_EXCHANGER_SMALL);
     public static final MultiblockRegistration<HeatExchangerState> HEAT_EXCHANGER_SMALL =
             registerHeatExchanger(
                     HeatExchangerSizeVariants.SMALL,
@@ -52,8 +60,7 @@ public final class ICHEME_Contents {
             new HeatExchangerLogic(HeatExchangerSizeVariants.MEDIUM);
     public static final HeatExchangerMultiblock HEAT_EXCHANGER_MEDIUM_TEMPLATE =
             new HeatExchangerMultiblock(
-                    HeatExchangerSizeVariants.MEDIUM,
-                    ICHEME_Contents::getHeatExchangerMediumRegistration);
+                    HeatExchangerSizeVariants.MEDIUM, () -> ICHEME_Contents.HEAT_EXCHANGER_MEDIUM);
     public static final MultiblockRegistration<HeatExchangerState> HEAT_EXCHANGER_MEDIUM =
             registerHeatExchanger(
                     HeatExchangerSizeVariants.MEDIUM,
@@ -64,13 +71,14 @@ public final class ICHEME_Contents {
             new HeatExchangerLogic(HeatExchangerSizeVariants.LARGE);
     public static final HeatExchangerMultiblock HEAT_EXCHANGER_LARGE_TEMPLATE =
             new HeatExchangerMultiblock(
-                    HeatExchangerSizeVariants.LARGE,
-                    ICHEME_Contents::getHeatExchangerLargeRegistration);
+                    HeatExchangerSizeVariants.LARGE, () -> ICHEME_Contents.HEAT_EXCHANGER_LARGE);
     public static final MultiblockRegistration<HeatExchangerState> HEAT_EXCHANGER_LARGE =
             registerHeatExchanger(
                     HeatExchangerSizeVariants.LARGE,
                     HEAT_EXCHANGER_LARGE_LOGIC,
                     () -> HEAT_EXCHANGER_LARGE_TEMPLATE);
+
+    // ======== 热交换器：容器菜单类型（每种尺寸一个） ========
 
     public static final RegistryObject<MenuType<HeatExchangerMenu>> HEAT_EXCHANGER_SMALL_MENU =
             MENUS.register(
@@ -108,6 +116,9 @@ public final class ICHEME_Contents {
                                                     inventory,
                                                     extraData)));
 
+    // ======== 对外查询入口 ========
+
+    /** 按尺寸查询对应菜单类型，供 GUI 打开时使用。 */
     public static MenuType<HeatExchangerMenu> menuType(HeatExchangerSizeVariants variant) {
         return switch (variant) {
             case SMALL -> HEAT_EXCHANGER_SMALL_MENU.get();
@@ -116,6 +127,7 @@ public final class ICHEME_Contents {
         };
     }
 
+    /** 按尺寸查询对应多方块注册对象。 */
     public static MultiblockRegistration<HeatExchangerState> registration(
             HeatExchangerSizeVariants variant) {
         return switch (variant) {
@@ -125,18 +137,9 @@ public final class ICHEME_Contents {
         };
     }
 
-    private static MultiblockRegistration<HeatExchangerState> getHeatExchangerSmallRegistration() {
-        return HEAT_EXCHANGER_SMALL;
-    }
+    // ======== 私有构造辅助 ========
 
-    private static MultiblockRegistration<HeatExchangerState> getHeatExchangerMediumRegistration() {
-        return HEAT_EXCHANGER_MEDIUM;
-    }
-
-    private static MultiblockRegistration<HeatExchangerState> getHeatExchangerLargeRegistration() {
-        return HEAT_EXCHANGER_LARGE;
-    }
-
+    /** 组装一个热交换器多方块注册：登记 4 个红石比较器输出位，并按是否可镜像选择方块注册方式。 */
     private static MultiblockRegistration<HeatExchangerState> registerHeatExchanger(
             HeatExchangerSizeVariants variant,
             HeatExchangerLogic logic,
@@ -185,6 +188,7 @@ public final class ICHEME_Contents {
         return builder.structure(template).build();
     }
 
+    /** 多方块成形后构成的实体方块属性：金属质感、需正确工具挖掘、无碰撞阻挡。 */
     private static BlockBehaviour.Properties formedBlockProperties() {
         return BlockBehaviour.Properties.of()
                 .mapColor(MapColor.METAL)

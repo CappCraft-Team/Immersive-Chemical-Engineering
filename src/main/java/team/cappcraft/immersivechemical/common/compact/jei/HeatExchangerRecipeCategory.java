@@ -19,7 +19,7 @@ import team.cappcraft.immersivechemical.common.recipe.HeatExchangerEntry;
 public class HeatExchangerRecipeCategory implements IRecipeCategory<HeatExchangerEntry> {
 
     public static final ResourceLocation TEXTURE =
-            new ResourceLocation(
+            ResourceLocation.fromNamespaceAndPath(
                     ImmersiveChemicalEngineering.MODID, "textures/gui/heatexchanger.png");
 
     private final IDrawable background;

@@ -5,13 +5,13 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 import io.netty.handler.codec.DecoderException;
 import java.util.Objects;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public final class HeatExchangerRecipeSerializer
         implements RecipeSerializer<HeatExchangerDataRecipe> {
@@ -116,13 +116,10 @@ public final class HeatExchangerRecipeSerializer
     }
 
     private static Fluid getRegisteredFluid(ResourceLocation id, String field) {
-        Fluid fluid =
-                BuiltInRegistries.FLUID
-                        .getOptional(id)
-                        .orElseThrow(
-                                () ->
-                                        new IllegalArgumentException(
-                                                "Unknown fluid ID in '" + field + "': " + id));
+        Fluid fluid = ForgeRegistries.FLUIDS.getValue(id);
+        if (fluid == null) {
+            throw new IllegalArgumentException("Unknown fluid ID in '" + field + "': " + id);
+        }
         if (fluid == Fluids.EMPTY) {
             throw new IllegalArgumentException("'" + field + "' may not use minecraft:empty");
         }
@@ -133,8 +130,8 @@ public final class HeatExchangerRecipeSerializer
         if (fluid == null || fluid == Fluids.EMPTY) {
             throw new IllegalArgumentException("Cannot serialize an empty fluid");
         }
-        ResourceLocation id = BuiltInRegistries.FLUID.getKey(fluid);
-        if (id == null || BuiltInRegistries.FLUID.getOptional(id).orElse(null) != fluid) {
+        ResourceLocation id = ForgeRegistries.FLUIDS.getKey(fluid);
+        if (id == null || ForgeRegistries.FLUIDS.getValue(id) != fluid) {
             throw new IllegalArgumentException("Cannot serialize an unregistered fluid");
         }
         return id;
