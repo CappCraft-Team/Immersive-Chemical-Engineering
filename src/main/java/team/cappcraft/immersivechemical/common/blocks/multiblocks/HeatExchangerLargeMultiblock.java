@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-/** Code-backed 3x3x7 legacy large heat-exchanger formation template. */
+
 public final class HeatExchangerLargeMultiblock extends TemplateMultiblock {
 
     static final BlockPos MASTER_FROM_ORIGIN = new BlockPos(1, 0, 3);
@@ -88,7 +88,7 @@ public final class HeatExchangerLargeMultiblock extends TemplateMultiblock {
                 && position.getZ() <= 5);
     }
 
-    /** Supplies the real template data IE synchronizes to clients during login. */
+    
     @Nonnull
     @Override
     public TemplateData getTemplate(@Nonnull Level level) {
@@ -164,7 +164,7 @@ public final class HeatExchangerLargeMultiblock extends TemplateMultiblock {
         return false;
     }
 
-    /** Preserve legacy top/bottom hammer clicks by using the player's horizontal direction. */
+    
     @Override
     public boolean createStructure(
             Level level,

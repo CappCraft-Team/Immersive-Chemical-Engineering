@@ -7,7 +7,7 @@ import net.minecraft.world.entity.player.Inventory;
 import team.cappcraft.immersivechemical.ICHEME_Contents;
 import team.cappcraft.immersivechemical.common.blocks.multiblocks.HeatExchangerMediumState;
 
-/** Network/menu registration wrapper for the medium machine. */
+
 public final class HeatExchangerMediumMenu
         extends AbstractHeatExchangerMenu<HeatExchangerMediumState> {
 

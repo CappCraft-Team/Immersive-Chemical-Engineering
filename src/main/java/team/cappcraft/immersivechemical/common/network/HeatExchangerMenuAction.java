@@ -2,12 +2,12 @@ package team.cappcraft.immersivechemical.common.network;
 
 import java.util.Optional;
 
-/**
- * Compact, validated action IDs carried by Minecraft's container-button packet.
- *
- * <p>Lock and unlock are separate idempotent commands rather than a toggle, so a delayed or
- * duplicated packet cannot invert a newer server state.</p>
- */
+
+
+
+
+
+
 public enum HeatExchangerMenuAction {
     CLEAR_TANK(true),
     LOCK_FILTER(true),

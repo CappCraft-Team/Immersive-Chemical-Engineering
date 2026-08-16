@@ -2,10 +2,10 @@ package team.cappcraft.immersivechemical.common.tileentity.constant;
 
 import team.cappcraft.immersivechemical.Config;
 
-/**
- * Heat exchanger size variants. Values are read live from Config,
- * so they update when the config is reloaded.
- */
+
+
+
+
 public enum HeatExchangerSizeVariants {
     SMALL,
     MEDIUM,

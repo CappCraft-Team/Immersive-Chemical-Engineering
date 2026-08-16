@@ -16,9 +16,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- * Registry and deterministic path finder for heat exchanger fluid conversions.
- */
+
+
+
 public class HeatExchangerRegistry {
     public static final HeatExchangerRegistry REGISTRY = new HeatExchangerRegistry();
 
@@ -38,12 +38,12 @@ public class HeatExchangerRegistry {
         registeredEntries.add(snapshot);
     }
 
-    /**
-     * Atomically replaces all datapack-provided conversions.
-     *
-     * <p>Every entry is validated and copied before the live graphs are cleared,
-     * so a malformed reload cannot leave a partially rebuilt registry.</p>
-     */
+    
+
+
+
+
+
     public synchronized void replaceRegisteredEntries(Collection<HeatExchangerEntry> entries) {
         Objects.requireNonNull(entries, "entries");
         List<HeatExchangerEntry> snapshot = new ArrayList<>(entries.size());
@@ -132,10 +132,10 @@ public class HeatExchangerRegistry {
         return Optional.of(new HeatExchangerRecipe(entryA.get(), entryB.get(), directionA, directionB));
     }
 
-    /**
-     * Finds the reachable fluid farthest from the input without crossing the
-     * temperature available from the other side of the exchanger.
-     */
+    
+
+
+
     public synchronized Optional<Fluid> findFarthest(
             @Nonnull Fluid input, ConvertDirection direction, int tempLimit
     ) {
@@ -156,17 +156,17 @@ public class HeatExchangerRegistry {
         throw new IllegalArgumentException("A concrete conversion direction is required");
     }
 
-    /**
-     * Returns all fluids reachable from {@code input} in deterministic depth-first order.
-     */
+    
+
+
     public synchronized List<Fluid> findReachable(@Nonnull Fluid input, ConvertDirection direction) {
         Objects.requireNonNull(input, "input");
         return getFluidGraph(direction).reachableDepthFirst(input);
     }
 
-    /**
-     * Finds a direct entry or creates a cached aggregate entry for the cheapest path.
-     */
+    
+
+
     public synchronized Optional<HeatExchangerEntry> findOrGenerateEntry(
             @Nonnull Fluid input, @Nonnull Fluid output, ConvertDirection direction
     ) {
@@ -224,19 +224,19 @@ public class HeatExchangerRegistry {
         return Optional.of(generatedEntry);
     }
 
-    /**
-     * Composes a path of integer fluid conversions into the smallest whole-number transaction.
-     *
-     * <p>For every adjacent pair, the repetitions are scaled until the first conversion's
-     * intermediate output exactly equals the second conversion's intermediate input. Relative
-     * repetition counts are kept as reduced fractions, then integerized with the least common
-     * multiple of their denominators. This preserves both fluid and heat across unequal recipe
-     * ratios without accumulating rounding error.</p>
-     *
-     * <p>The runtime recipe representation uses signed 32-bit amounts and heat. A path whose
-     * minimal exact transaction cannot fit that representation is rejected instead of wrapping
-     * or caching a lossy shortcut.</p>
-     */
+    
+
+
+
+
+
+
+
+
+
+
+
+
     static Optional<ComposedConversion> composeConversionAmounts(List<ConversionStep> steps) {
         Objects.requireNonNull(steps, "steps");
         if (steps.isEmpty()) {
@@ -326,9 +326,9 @@ public class HeatExchangerRegistry {
     private record Fraction(BigInteger numerator, BigInteger denominator) {
     }
 
-    /**
-     * Inserts an entry into the graph(s) allowed by its declared direction.
-     */
+    
+
+
     public synchronized void insertEntryAsEdge(HeatExchangerEntry entry, int weight, boolean generated) {
         Objects.requireNonNull(entry, "entry");
         if (weight <= 0) {
@@ -351,10 +351,10 @@ public class HeatExchangerRegistry {
         }
     }
 
-    /**
-     * Retained as a compatibility accessor. Generated entries are now held strongly,
-     * so there are no weak references to clean.
-     */
+    
+
+
+
     public synchronized List<HeatExchangerEntry> cleanAndRefEntry() {
         List<HeatExchangerEntry> copy = new ArrayList<>(generatedEntries.size());
         generatedEntries.forEach(entry -> copy.add(copyEntry(entry)));

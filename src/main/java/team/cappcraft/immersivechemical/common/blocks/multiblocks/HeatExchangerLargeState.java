@@ -4,7 +4,7 @@ import blusunrize.immersiveengineering.api.multiblocks.blocks.env.IInitialMultib
 import blusunrize.immersiveengineering.api.utils.CapabilityReference;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
-/** State marker for the large heat-exchanger registration. */
+
 public final class HeatExchangerLargeState extends HeatExchangerState {
     public HeatExchangerLargeState(
             int tankCapacity,

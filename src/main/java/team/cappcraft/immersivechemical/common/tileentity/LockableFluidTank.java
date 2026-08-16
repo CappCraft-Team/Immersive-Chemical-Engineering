@@ -11,9 +11,9 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-/**
- * A modern Forge fluid tank with independent content and fluid-type locks.
- */
+
+
+
 public class LockableFluidTank extends FluidTank {
     public static final String TAG_LOCKED = "Locked";
     public static final String TAG_LOCKED_TYPE = "LockedType";

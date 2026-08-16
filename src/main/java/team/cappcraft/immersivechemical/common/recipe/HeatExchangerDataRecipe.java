@@ -11,11 +11,11 @@ import net.minecraft.world.level.Level;
 
 import java.util.Objects;
 
-/**
- * Datapack representation of one heat-exchanger fluid conversion.
- *
- * <p>This is a data-only recipe and is never matched by a vanilla container.</p>
- */
+
+
+
+
+
 public final class HeatExchangerDataRecipe implements Recipe<Container> {
     private final ResourceLocation id;
     private final HeatExchangerEntry entry;

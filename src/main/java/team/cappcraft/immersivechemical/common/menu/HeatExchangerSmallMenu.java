@@ -7,7 +7,7 @@ import net.minecraft.world.entity.player.Inventory;
 import team.cappcraft.immersivechemical.ICHEME_Contents;
 import team.cappcraft.immersivechemical.common.blocks.multiblocks.HeatExchangerSmallState;
 
-/** Menu registration wrapper retaining the small machine's existing network type. */
+
 public final class HeatExchangerSmallMenu
         extends AbstractHeatExchangerMenu<HeatExchangerSmallState> {
 

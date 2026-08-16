@@ -14,14 +14,14 @@ import team.cappcraft.immersivechemical.common.tileentity.LockableFluidTank;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
-/**
- * Persistent, synchronized state shared by every heat-exchanger size.
- *
- * <p>The physical port positions and processing speed belong to each size's logic, while the
- * four-tank storage and transaction progress are intentionally identical. Keeping them here
- * prevents the medium and large ports from drifting away from the already-tested small machine
- * semantics.</p>
- */
+
+
+
+
+
+
+
+
 public abstract class HeatExchangerState implements IMultiblockState {
 
     public static final int INPUT_A = 0;
@@ -160,7 +160,7 @@ public abstract class HeatExchangerState implements IMultiblockState {
         return processing;
     }
 
-    /** Returns the legacy 0-15 comparator level for one tank. */
+    
     public int getComparatorOutput(int tankIndex) {
         if (!isTankIndex(tankIndex)) {
             return 0;
@@ -169,7 +169,7 @@ public abstract class HeatExchangerState implements IMultiblockState {
         return (int)(15L * tank.getFluidAmount() / Math.max(1, tank.getCapacity()));
     }
 
-    /** Clears one tank and both locks, returning false for invalid packet-facing indices. */
+    
     public boolean clearTank(int tankIndex) {
         if (!isTankIndex(tankIndex)) {
             return false;
@@ -196,7 +196,7 @@ public abstract class HeatExchangerState implements IMultiblockState {
         return changed;
     }
 
-    /** Clears the input and output tanks for side A ({@code 0}) or side B ({@code 1}). */
+    
     public boolean clearTankSide(int sideIndex) {
         if (sideIndex < 0 || sideIndex > 1) {
             return false;
@@ -205,10 +205,10 @@ public abstract class HeatExchangerState implements IMultiblockState {
         return clearTank(firstTank) | clearTank(firstTank + 1);
     }
 
-    /**
-     * Changes the fluid-type filter without allowing an empty tank to invent a filter type.
-     * Repeating the same request is harmless, which makes this safe for network retries.
-     */
+    
+
+
+
     public boolean setTankTypeLocked(int tankIndex, boolean locked) {
         if (!isTankIndex(tankIndex)) {
             return false;

@@ -14,22 +14,22 @@ import net.minecraftforge.fluids.FluidStack;
 
 import java.util.Objects;
 
-/**
- * JSON/network serializer for {@link HeatExchangerDataRecipe}.
- *
- * <p>Datapack shape:</p>
- * <pre>{@code
- * {
- *   "type": "immersivechemical:heat_exchanger",
- *   "fluid_a": "example:hot_fluid",
- *   "amount_a": 1000,
- *   "fluid_b": "example:cold_fluid",
- *   "amount_b": 1000,
- *   "heat": 500,
- *   "direction": "two_way"
- * }
- * }</pre>
- */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 public final class HeatExchangerRecipeSerializer implements RecipeSerializer<HeatExchangerDataRecipe> {
     static final String FLUID_A = "fluid_a";
     static final String AMOUNT_A = "amount_a";

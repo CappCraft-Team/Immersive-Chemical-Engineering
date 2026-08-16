@@ -8,12 +8,12 @@ public class Config {
 
     public static final ForgeConfigSpec CONFIG_SPEC;
 
-    // Heat Exchanger Capacity
+    
     private static final IntValue SMALL_CAPACITY;
     private static final IntValue MEDIUM_CAPACITY;
     private static final IntValue LARGE_CAPACITY;
 
-    // Heat Exchanger Tick Multiplier
+    
     private static final DoubleValue SMALL_TICK_MULTIPLIER;
     private static final DoubleValue MEDIUM_TICK_MULTIPLIER;
     private static final DoubleValue LARGE_TICK_MULTIPLIER;

@@ -14,7 +14,7 @@ import net.minecraftforge.network.NetworkHooks;
 import team.cappcraft.immersivechemical.common.menu.HeatExchangerSmallMenu;
 import team.cappcraft.immersivechemical.common.tileentity.constant.HeatExchangerSizeVariants;
 
-/** Small-size registration details layered on the shared exchanger implementation. */
+
 public final class HeatExchangerSmallLogic
         extends AbstractHeatExchangerLogic<HeatExchangerSmallState> {
 

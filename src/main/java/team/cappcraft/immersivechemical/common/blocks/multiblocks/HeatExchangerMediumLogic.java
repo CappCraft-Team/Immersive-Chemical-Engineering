@@ -14,7 +14,7 @@ import net.minecraftforge.network.NetworkHooks;
 import team.cappcraft.immersivechemical.common.menu.HeatExchangerMediumMenu;
 import team.cappcraft.immersivechemical.common.tileentity.constant.HeatExchangerSizeVariants;
 
-/** Legacy medium port layout layered on the shared exchanger transaction logic. */
+
 public final class HeatExchangerMediumLogic
         extends AbstractHeatExchangerLogic<HeatExchangerMediumState> {
 

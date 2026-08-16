@@ -7,8 +7,11 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import team.cappcraft.immersivechemical.ICHEME_Contents;
 import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
+import team.cappcraft.immersivechemical.common.menu.HeatExchangerLargeMenu;
+import team.cappcraft.immersivechemical.common.menu.HeatExchangerMediumMenu;
+import team.cappcraft.immersivechemical.common.menu.HeatExchangerSmallMenu;
 
-/** Client-only menu registration kept separate from common class loading. */
+
 @Mod.EventBusSubscriber(
         modid = ImmersiveChemicalEngineering.MODID,
         value = Dist.CLIENT,
@@ -23,15 +26,15 @@ public final class HeatExchangerClientEvents {
         event.enqueueWork(() -> {
             MenuScreens.register(
                     ICHEME_Contents.HEAT_EXCHANGER_SMALL_MENU.get(),
-                    HeatExchangerSmallScreen::new
+                    HeatExchangerScreen<HeatExchangerSmallMenu>::new
             );
             MenuScreens.register(
                     ICHEME_Contents.HEAT_EXCHANGER_MEDIUM_MENU.get(),
-                    HeatExchangerMediumScreen::new
+                    HeatExchangerScreen<HeatExchangerMediumMenu>::new
             );
             MenuScreens.register(
                     ICHEME_Contents.HEAT_EXCHANGER_LARGE_MENU.get(),
-                    HeatExchangerLargeScreen::new
+                    HeatExchangerScreen<HeatExchangerLargeMenu>::new
             );
         });
     }

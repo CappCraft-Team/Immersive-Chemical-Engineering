@@ -19,7 +19,7 @@ import team.cappcraft.immersivechemical.common.network.HeatExchangerMenuAction;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-/** Shared four-tank menu, synchronization, and server-side action validation. */
+
 public abstract class AbstractHeatExchangerMenu<S extends HeatExchangerState>
         extends IEContainerMenu {
     public static final int TANK_COUNT = HeatExchangerMenuAction.TANK_COUNT;

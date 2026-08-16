@@ -1,5 +1,5 @@
-// Copy this file to kubejs/startup_scripts and restart the game.
-// KubeJS creates a source fluid, flowing fluid, block, and bucket for each entry.
+
+
 StartupEvents.registry('fluid', event => {
   event.create('icheme_test_superheated')
     .displayName('Superheated Test Fluid')

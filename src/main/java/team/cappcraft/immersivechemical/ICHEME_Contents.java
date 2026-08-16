@@ -190,8 +190,8 @@ public final class ICHEME_Contents {
                 .strength(3.0F, 15.0F)
                 .sound(SoundType.METAL)
                 .requiresCorrectToolForDrops()
-                // IE split multiblocks keep full collision while excluding their
-                // formed parts from ambient-occlusion neighbor tests.
+                
+                
                 .isViewBlocking((state, level, position) -> false)
                 .noOcclusion();
     }

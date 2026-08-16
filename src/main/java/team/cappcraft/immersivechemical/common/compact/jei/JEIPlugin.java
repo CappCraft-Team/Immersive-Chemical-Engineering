@@ -11,9 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import team.cappcraft.immersivechemical.ICHEME_Contents;
 import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
-import team.cappcraft.immersivechemical.client.gui.HeatExchangerLargeScreen;
-import team.cappcraft.immersivechemical.client.gui.HeatExchangerMediumScreen;
-import team.cappcraft.immersivechemical.client.gui.HeatExchangerSmallScreen;
+import team.cappcraft.immersivechemical.client.gui.HeatExchangerScreen;
 import team.cappcraft.immersivechemical.common.recipe.ConvertDirection;
 import team.cappcraft.immersivechemical.common.recipe.HeatExchangerDataRecipe;
 import team.cappcraft.immersivechemical.common.recipe.HeatExchangerEntry;
@@ -79,17 +77,7 @@ public class JEIPlugin implements IModPlugin {
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
         registration.addRecipeClickArea(
-                HeatExchangerSmallScreen.class,
-                81, 55, 16, 15,
-                IChemERecipeTypes.HEAT_EXCHANGER
-        );
-        registration.addRecipeClickArea(
-                HeatExchangerMediumScreen.class,
-                81, 55, 16, 15,
-                IChemERecipeTypes.HEAT_EXCHANGER
-        );
-        registration.addRecipeClickArea(
-                HeatExchangerLargeScreen.class,
+                HeatExchangerScreen.class,
                 81, 55, 16, 15,
                 IChemERecipeTypes.HEAT_EXCHANGER
         );

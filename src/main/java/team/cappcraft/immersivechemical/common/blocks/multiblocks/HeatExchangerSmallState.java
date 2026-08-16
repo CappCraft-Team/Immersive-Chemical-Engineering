@@ -4,7 +4,7 @@ import blusunrize.immersiveengineering.api.multiblocks.blocks.env.IInitialMultib
 import blusunrize.immersiveengineering.api.utils.CapabilityReference;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
-/** State marker for the small registration; storage and processing fields live in the base. */
+
 public final class HeatExchangerSmallState extends HeatExchangerState {
     public HeatExchangerSmallState(
             int tankCapacity,

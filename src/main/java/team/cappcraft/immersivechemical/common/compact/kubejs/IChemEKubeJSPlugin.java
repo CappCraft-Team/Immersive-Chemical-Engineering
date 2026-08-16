@@ -11,10 +11,10 @@ import net.minecraft.world.level.material.Fluid;
 import team.cappcraft.immersivechemical.common.recipe.ConvertDirection;
 import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRecipeRegistration;
 
-/**
- * Optional KubeJS recipe schema. The class is discovered by KubeJS only when
- * KubeJS is installed; IChemE has no required runtime dependency on it.
- */
+
+
+
+
 public final class IChemEKubeJSPlugin extends KubeJSPlugin {
     private static final RegistryComponent<Fluid> FLUID =
             new RegistryComponent<>(RegistryInfo.FLUID);

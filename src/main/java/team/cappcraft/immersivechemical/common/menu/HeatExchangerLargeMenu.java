@@ -7,7 +7,7 @@ import net.minecraft.world.entity.player.Inventory;
 import team.cappcraft.immersivechemical.ICHEME_Contents;
 import team.cappcraft.immersivechemical.common.blocks.multiblocks.HeatExchangerLargeState;
 
-/** Network/menu registration wrapper for the large machine. */
+
 public final class HeatExchangerLargeMenu
         extends AbstractHeatExchangerMenu<HeatExchangerLargeState> {
 

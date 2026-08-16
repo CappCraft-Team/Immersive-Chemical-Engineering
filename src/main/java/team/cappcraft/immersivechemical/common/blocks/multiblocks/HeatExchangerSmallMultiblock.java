@@ -35,13 +35,13 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-/**
- * The formation template for the small heat exchanger.
- *
- * <p>The structure is intentionally code-backed for this small 1x1x4 shape. It still uses IE's
- * public {@link TemplateMultiblock} formation and disassembly machinery, while avoiding a binary
- * structure file for four simple blocks.</p>
- */
+
+
+
+
+
+
+
 public final class HeatExchangerSmallMultiblock extends TemplateMultiblock {
 
     static final BlockPos MASTER_FROM_ORIGIN = BlockPos.ZERO;
@@ -76,10 +76,10 @@ public final class HeatExchangerSmallMultiblock extends TemplateMultiblock {
         );
     }
 
-    /**
-     * IE synchronizes every registered template to clients at login. Supplying a populated
-     * template here keeps the code-backed structure compatible with that synchronization path.
-     */
+    
+
+
+
     @Nonnull
     @Override
     public TemplateData getTemplate(@Nonnull Level level) {

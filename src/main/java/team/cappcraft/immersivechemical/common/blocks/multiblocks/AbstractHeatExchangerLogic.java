@@ -36,7 +36,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
-/** Shared tick, transaction, interaction, and capability behavior for all exchanger sizes. */
+
 public abstract class AbstractHeatExchangerLogic<S extends HeatExchangerState> implements
         IMultiblockLogic<S>,
         IServerTickableComponent<S> {
@@ -93,10 +93,10 @@ public abstract class AbstractHeatExchangerLogic<S extends HeatExchangerState> i
             CapabilityReference<IFluidHandler> automaticOutputB
     );
 
-    /**
-     * Converts a capability exposed on a formed part into the face of the adjacent block.
-     * IE's {@link CapabilityPosition#opposing(MultiblockFace)} is the inverse operation.
-     */
+    
+
+
+
     static MultiblockFace getAdjacentTargetFace(CapabilityPosition outputPort) {
         var outwardFace = Objects.requireNonNull(outputPort.side(), "Output port face");
         return new MultiblockFace(
@@ -205,10 +205,10 @@ public abstract class AbstractHeatExchangerLogic<S extends HeatExchangerState> i
         }
     }
 
-    /**
-     * Pushes at most one bucket into an adjacent handler using Forge's simulate-first transfer.
-     * The source tank is drained only after the target reports that it can accept the fluid.
-     */
+    
+
+
+
     static int pushOutputFluid(IFluidHandler target, LockableFluidTank source) {
         if (target == null || source.getFluid().isEmpty() || source.isLocked()) {
             return 0;
@@ -216,10 +216,10 @@ public abstract class AbstractHeatExchangerLogic<S extends HeatExchangerState> i
         return FluidUtil.tryFluidTransfer(target, source, AUTOMATIC_OUTPUT_RATE, true).getAmount();
     }
 
-    /**
-     * Converts both sides as one energy-balanced transaction. When recipe sides use different
-     * heat quanta, each side is scaled by the other side's value divided by their GCD.
-     */
+    
+
+
+
     private int exchangeAtomically(S state, HeatExchangerRecipe recipe) {
         int heatGcd = greatestCommonDivisor(recipe.ExchangeA.HeatValue, recipe.ExchangeB.HeatValue);
         int repetitionsA = recipe.ExchangeB.HeatValue / heatGcd;

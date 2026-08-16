@@ -15,9 +15,9 @@ import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * Forge registration and server-reload bridge for heat exchanger data recipes.
- */
+
+
+
 public final class HeatExchangerRecipeRegistration {
     public static final ResourceLocation ID = new ResourceLocation(
             ImmersiveChemicalEngineering.MODID, "heat_exchanger");
@@ -35,13 +35,13 @@ public final class HeatExchangerRecipeRegistration {
     private HeatExchangerRecipeRegistration() {
     }
 
-    /** Register this from the mod constructor on the mod event bus. */
+    
     public static void register(IEventBus modEventBus) {
         RECIPE_TYPES.register(modEventBus);
         RECIPE_SERIALIZERS.register(modEventBus);
     }
 
-    /** Register this method as a listener on {@code MinecraftForge.EVENT_BUS}. */
+    
     public static void onAddReloadListeners(AddReloadListenerEvent event) {
         RecipeManager recipeManager = event.getServerResources().getRecipeManager();
         event.addListener((ResourceManagerReloadListener) resourceManager -> replaceFrom(recipeManager));

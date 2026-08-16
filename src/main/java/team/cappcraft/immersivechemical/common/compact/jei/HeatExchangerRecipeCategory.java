@@ -19,13 +19,13 @@ import team.cappcraft.immersivechemical.common.recipe.HeatExchangerEntry;
 public class HeatExchangerRecipeCategory implements IRecipeCategory<HeatExchangerEntry> {
 
     public static final ResourceLocation TEXTURE = new ResourceLocation(
-            ImmersiveChemicalEngineering.MODID, "textures/gui/heatexchanger_common.png");
+            ImmersiveChemicalEngineering.MODID, "textures/gui/heatexchanger.png");
 
     private final IDrawable background;
     private final IDrawable icon;
 
     public HeatExchangerRecipeCategory(IGuiHelper guiHelper) {
-        // Reuse the top tank panel from the machine GUI so JEI and the menu share a visual language.
+        
         this.background = guiHelper.createDrawable(TEXTURE, 15, 20, 145, 45);
         this.icon = guiHelper.createDrawableItemStack(
                 new ItemStack(ICHEME_Contents.HEAT_EXCHANGER_SMALL.blockItem().get()));
@@ -53,7 +53,7 @@ public class HeatExchangerRecipeCategory implements IRecipeCategory<HeatExchange
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, HeatExchangerEntry recipe, IFocusGroup focuses) {
-        // Fluid input
+        
         IRecipeSlotBuilder inputSlot = builder.addSlot(RecipeIngredientRole.INPUT, 20, 14);
         IRecipeSlotBuilder outputSlot = builder.addSlot(RecipeIngredientRole.OUTPUT, 110, 14);
 

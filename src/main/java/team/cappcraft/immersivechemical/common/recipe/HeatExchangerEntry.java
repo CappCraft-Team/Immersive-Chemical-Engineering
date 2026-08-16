@@ -16,29 +16,29 @@ public class HeatExchangerEntry {
     public final int HeatValue;
     public final ConvertDirection Direction;
 
-    /**
-     * Create a HeatExchangeRecipeEntry instance
-     *
-     * @param fluidA    need to be registered in FluidRegistry
-     * @param fluidB    need to be registered in FluidRegistry
-     * @param heatValue how much heat to release/consume from Input to Output,
-     *                  with their correspond amount of fluid to be consumed or produced,
-     *                  this always positive
-     */
+    
+
+
+
+
+
+
+
+
     public HeatExchangerEntry(@Nonnull FluidStack fluidA, @Nonnull FluidStack fluidB, int heatValue) {
         this(fluidA, fluidB, heatValue, ConvertDirection.TWO_WAY);
     }
 
-    /**
-     * Create a HeatExchangeRecipeEntry instance
-     *
-     * @param fluidA    need to be registered in FluidRegistry
-     * @param fluidB    need to be registered in FluidRegistry
-     * @param heatValue how much heat to release/consume from Input to Output,
-     *                  with their correspond amount of fluid to be consumed or produced,
-     *                  this always positive
-     * @param direction set if this entry can just convert from one to another
-     */
+    
+
+
+
+
+
+
+
+
+
     public HeatExchangerEntry(@Nonnull FluidStack fluidA, @Nonnull FluidStack fluidB, int heatValue, ConvertDirection direction) {
         Objects.requireNonNull(fluidA, "fluidA");
         Objects.requireNonNull(fluidB, "fluidB");

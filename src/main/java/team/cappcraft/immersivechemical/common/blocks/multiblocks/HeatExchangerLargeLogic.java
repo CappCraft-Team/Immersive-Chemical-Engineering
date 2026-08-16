@@ -14,7 +14,7 @@ import net.minecraftforge.network.NetworkHooks;
 import team.cappcraft.immersivechemical.common.menu.HeatExchangerLargeMenu;
 import team.cappcraft.immersivechemical.common.tileentity.constant.HeatExchangerSizeVariants;
 
-/** Legacy large port layout layered on the shared exchanger transaction logic. */
+
 public final class HeatExchangerLargeLogic
         extends AbstractHeatExchangerLogic<HeatExchangerLargeState> {
 

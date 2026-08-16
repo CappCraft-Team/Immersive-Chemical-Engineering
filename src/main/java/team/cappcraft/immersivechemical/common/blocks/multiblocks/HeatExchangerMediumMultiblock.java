@@ -37,12 +37,12 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-/** Code-backed 5x2x2 legacy medium heat-exchanger formation template. */
+
 public final class HeatExchangerMediumMultiblock extends TemplateMultiblock {
 
-    /** Legacy offset-zero master: center-width, lower layer, rear depth row. */
+    
     static final BlockPos MASTER_FROM_ORIGIN = new BlockPos(2, 0, 1);
-    /** The hammer targets the upper radiator at one end of the rear row. */
+    
     static final BlockPos TRIGGER_FROM_ORIGIN = new BlockPos(0, 1, 1);
     static final BlockPos SIZE = new BlockPos(5, 2, 2);
 
@@ -85,7 +85,7 @@ public final class HeatExchangerMediumMultiblock extends TemplateMultiblock {
         return position.getX() == 0;
     }
 
-    /** Supplies the real template data IE synchronizes to clients during login. */
+    
     @Nonnull
     @Override
     public TemplateData getTemplate(@Nonnull Level level) {
@@ -157,7 +157,7 @@ public final class HeatExchangerMediumMultiblock extends TemplateMultiblock {
         return true;
     }
 
-    /** Preserve legacy top/bottom hammer clicks by using the player's horizontal direction. */
+    
     @Override
     public boolean createStructure(
             Level level,

@@ -12,30 +12,17 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.ModList;
 import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
 import team.cappcraft.immersivechemical.common.menu.AbstractHeatExchangerMenu;
-import team.cappcraft.immersivechemical.common.menu.HeatExchangerSmallMenu;
 import team.cappcraft.immersivechemical.common.network.HeatExchangerMenuAction;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/** Small registration wrapper for the shared legacy four-tank screen. */
-public final class HeatExchangerSmallScreen
-        extends HeatExchangerScreen<HeatExchangerSmallMenu> {
-    public HeatExchangerSmallScreen(
-            HeatExchangerSmallMenu menu,
-            Inventory inventory,
-            Component title
-    ) {
-        super(menu, inventory, title);
-    }
-}
 
-/** Faithful 1.20.1 port of the legacy screen shared by every exchanger size. */
-abstract class HeatExchangerScreen<M extends AbstractHeatExchangerMenu<?>>
+public class HeatExchangerScreen<M extends AbstractHeatExchangerMenu<?>>
         extends AbstractContainerScreen<M> {
     private static final ResourceLocation BACKGROUND = new ResourceLocation(
             ImmersiveChemicalEngineering.MODID,
-            "textures/gui/heatexchanger_common.png"
+            "textures/gui/heatexchanger.png"
     );
 
     private static final int GUI_WIDTH = 175;
@@ -64,7 +51,7 @@ abstract class HeatExchangerScreen<M extends AbstractHeatExchangerMenu<?>>
     private final Button[] filterButtons = new Button[AbstractHeatExchangerMenu.TANK_COUNT];
     private Button resetAllButton;
 
-    protected HeatExchangerScreen(
+    public HeatExchangerScreen(
             M menu,
             Inventory inventory,
             Component title
@@ -327,8 +314,8 @@ abstract class HeatExchangerScreen<M extends AbstractHeatExchangerMenu<?>>
             return;
         }
 
-        // JEI owns the tooltip over this shared click area. Drawing the machine status here as
-        // well places both tooltips at the cursor and makes the labels appear overprinted.
+        
+        
         if (!ModList.get().isLoaded("jei")
                 && isHovering(STATUS_X, STATUS_Y, TANK_SIZE, 15, mouseX, mouseY)) {
             Component status = Component.translatable(menu.isProcessing()
@@ -361,7 +348,7 @@ abstract class HeatExchangerScreen<M extends AbstractHeatExchangerMenu<?>>
         return tooltip;
     }
 
-    /** Clickable/narratable button whose visuals are supplied by the legacy atlas. */
+    
     private static final class AtlasButton extends Button {
         private AtlasButton(
                 int x,
@@ -381,7 +368,7 @@ abstract class HeatExchangerScreen<M extends AbstractHeatExchangerMenu<?>>
                 int mouseY,
                 float partialTick
         ) {
-            // The matching atlas icon was already rendered in renderBg.
+            
         }
     }
 }

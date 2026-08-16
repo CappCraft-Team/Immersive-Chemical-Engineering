@@ -15,13 +15,13 @@ import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-/**
- * A small insertion-ordered directed graph used by the heat exchanger registry.
- *
- * <p>The implementation is deliberately dependency-free. Traversal and equal-cost
- * path selection follow edge insertion order, which makes recipe selection stable
- * across runs.</p>
- */
+
+
+
+
+
+
+
 final class DirectedConversionGraph<N, E> {
     private final Map<N, LinkedHashMap<N, Edge<N, E>>> outgoing = new LinkedHashMap<>();
 
