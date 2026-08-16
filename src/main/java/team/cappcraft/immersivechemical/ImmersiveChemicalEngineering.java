@@ -27,8 +27,7 @@ public class ImmersiveChemicalEngineering {
         ICHEME_Contents.MENUS.register(modEventBus);
         HeatExchangerRecipeRegistration.register(modEventBus);
 
-        MinecraftForge.EVENT_BUS.addListener(
-                HeatExchangerRecipeRegistration::onAddReloadListeners);
+        MinecraftForge.EVENT_BUS.addListener(HeatExchangerRecipeRegistration::onAddReloadListeners);
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.CONFIG_SPEC);
         modEventBus.addListener(this::commonSetup);
@@ -37,11 +36,15 @@ public class ImmersiveChemicalEngineering {
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
-        event.enqueueWork(() -> {
-            MultiblockHandler.registerMultiblock(ICHEME_Contents.HEAT_EXCHANGER_SMALL_TEMPLATE);
-            MultiblockHandler.registerMultiblock(ICHEME_Contents.HEAT_EXCHANGER_MEDIUM_TEMPLATE);
-            MultiblockHandler.registerMultiblock(ICHEME_Contents.HEAT_EXCHANGER_LARGE_TEMPLATE);
-            LOGGER.info("Immersive Chemical Engineering multiblocks registered.");
-        });
+        event.enqueueWork(
+                () -> {
+                    MultiblockHandler.registerMultiblock(
+                            ICHEME_Contents.HEAT_EXCHANGER_SMALL_TEMPLATE);
+                    MultiblockHandler.registerMultiblock(
+                            ICHEME_Contents.HEAT_EXCHANGER_MEDIUM_TEMPLATE);
+                    MultiblockHandler.registerMultiblock(
+                            ICHEME_Contents.HEAT_EXCHANGER_LARGE_TEMPLATE);
+                    LOGGER.info("Immersive Chemical Engineering multiblocks registered.");
+                });
     }
 }

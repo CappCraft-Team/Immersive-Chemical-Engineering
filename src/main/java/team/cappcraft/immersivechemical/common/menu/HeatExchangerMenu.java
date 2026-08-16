@@ -3,6 +3,8 @@ package team.cappcraft.immersivechemical.common.menu;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.env.IMultiblockContext;
 import blusunrize.immersiveengineering.common.gui.IEContainerMenu;
 import blusunrize.immersiveengineering.common.gui.sync.GenericContainerData;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -19,9 +21,6 @@ import team.cappcraft.immersivechemical.common.blocks.multiblocks.HeatExchangerS
 import team.cappcraft.immersivechemical.common.network.HeatExchangerMenuAction;
 import team.cappcraft.immersivechemical.common.tileentity.constant.HeatExchangerSizeVariants;
 
-import javax.annotation.Nullable;
-import java.util.Optional;
-
 public final class HeatExchangerMenu extends IEContainerMenu {
     public static final int TANK_COUNT = HeatExchangerMenuAction.TANK_COUNT;
     private static final int PLAYER_INVENTORY_START = 0;
@@ -35,14 +34,10 @@ public final class HeatExchangerMenu extends IEContainerMenu {
     private final BlockPos masterPos;
     private final BlockPos interactionPos;
 
-    @Nullable
-    private final HeatExchangerState serverState;
-    @Nullable
-    private final IMultiblockContext<HeatExchangerState> serverContext;
-    @Nullable
-    private final Level serverLevel;
-    @Nullable
-    private final Block expectedFormedBlock;
+    @Nullable private final HeatExchangerState serverState;
+    @Nullable private final IMultiblockContext<HeatExchangerState> serverContext;
+    @Nullable private final Level serverLevel;
+    @Nullable private final Block expectedFormedBlock;
 
     private int syncedCapacity = 1;
     private int syncedProgress;
@@ -56,13 +51,12 @@ public final class HeatExchangerMenu extends IEContainerMenu {
             HeatExchangerState state,
             IMultiblockContext<HeatExchangerState> context,
             BlockPos masterPos,
-            BlockPos interactionPos
-    ) {
-        super(multiblockCtx(
-                ICHEME_Contents.menuType(size),
-                containerId,
-                new MultiblockMenuContext<>(context, masterPos)
-        ));
+            BlockPos interactionPos) {
+        super(
+                multiblockCtx(
+                        ICHEME_Contents.menuType(size),
+                        containerId,
+                        new MultiblockMenuContext<>(context, masterPos)));
         this.serverState = state;
         this.serverContext = context;
         this.serverLevel = context.getLevel().getRawLevel();
@@ -81,8 +75,7 @@ public final class HeatExchangerMenu extends IEContainerMenu {
             HeatExchangerSizeVariants size,
             int containerId,
             Inventory inventory,
-            BlockPos masterPos
-    ) {
+            BlockPos masterPos) {
         super(clientCtx(ICHEME_Contents.menuType(size), containerId));
         this.serverState = null;
         this.serverContext = null;
@@ -102,24 +95,24 @@ public final class HeatExchangerMenu extends IEContainerMenu {
             HeatExchangerSizeVariants size,
             int containerId,
             Inventory inventory,
-            FriendlyByteBuf extraData
-    ) {
+            FriendlyByteBuf extraData) {
         BlockPos masterPos = extraData.readBlockPos();
         return new HeatExchangerMenu(size, containerId, inventory, masterPos);
     }
 
     private void registerSyncedData() {
-        addGenericData(GenericContainerData.int32(
-                () -> serverState == null
-                        ? syncedCapacity
-                        : serverState.getTankCapacity(HeatExchangerState.INPUT_A),
-                value -> {
-                    syncedCapacity = Math.max(1, value);
-                    for (FluidTank tank : syncedTanks) {
-                        tank.setCapacity(syncedCapacity);
-                    }
-                }
-        ));
+        addGenericData(
+                GenericContainerData.int32(
+                        () ->
+                                serverState == null
+                                        ? syncedCapacity
+                                        : serverState.getTankCapacity(HeatExchangerState.INPUT_A),
+                        value -> {
+                            syncedCapacity = Math.max(1, value);
+                            for (FluidTank tank : syncedTanks) {
+                                tank.setCapacity(syncedCapacity);
+                            }
+                        }));
 
         for (FluidTank tank : syncedTanks) {
             addGenericData(GenericContainerData.fluid(tank));
@@ -127,37 +120,39 @@ public final class HeatExchangerMenu extends IEContainerMenu {
 
         for (int tankIndex = 0; tankIndex < TANK_COUNT; ++tankIndex) {
             int syncedIndex = tankIndex;
-            addGenericData(GenericContainerData.bool(
-                    () -> serverState == null
-                            ? syncedTypeLocks[syncedIndex]
-                            : serverState.isTankTypeLocked(syncedIndex),
-                    value -> syncedTypeLocks[syncedIndex] = value
-            ));
+            addGenericData(
+                    GenericContainerData.bool(
+                            () ->
+                                    serverState == null
+                                            ? syncedTypeLocks[syncedIndex]
+                                            : serverState.isTankTypeLocked(syncedIndex),
+                            value -> syncedTypeLocks[syncedIndex] = value));
         }
 
-        addGenericData(GenericContainerData.int32(
-                () -> serverState == null ? syncedProgress : serverState.getExchangeProgress(),
-                value -> syncedProgress = Math.max(0, value)
-        ));
-        addGenericData(GenericContainerData.int32(
-                () -> serverState == null ? syncedDuration : serverState.getExchangeDuration(),
-                value -> syncedDuration = Math.max(1, value)
-        ));
-        addGenericData(GenericContainerData.bool(
-                () -> serverState == null ? syncedProcessing : serverState.isProcessing(),
-                value -> syncedProcessing = value
-        ));
+        addGenericData(
+                GenericContainerData.int32(
+                        () ->
+                                serverState == null
+                                        ? syncedProgress
+                                        : serverState.getExchangeProgress(),
+                        value -> syncedProgress = Math.max(0, value)));
+        addGenericData(
+                GenericContainerData.int32(
+                        () ->
+                                serverState == null
+                                        ? syncedDuration
+                                        : serverState.getExchangeDuration(),
+                        value -> syncedDuration = Math.max(1, value)));
+        addGenericData(
+                GenericContainerData.bool(
+                        () -> serverState == null ? syncedProcessing : serverState.isProcessing(),
+                        value -> syncedProcessing = value));
     }
 
     private void addPlayerInventory(Inventory inventory) {
         for (int row = 0; row < 3; ++row) {
             for (int column = 0; column < 9; ++column) {
-                addSlot(new Slot(
-                        inventory,
-                        column + row * 9 + 9,
-                        8 + column * 18,
-                        126 + row * 18
-                ));
+                addSlot(new Slot(inventory, column + row * 9 + 9, 8 + column * 18, 126 + row * 18));
             }
         }
         for (int column = 0; column < 9; ++column) {
@@ -204,7 +199,9 @@ public final class HeatExchangerMenu extends IEContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        if (serverState == null || serverContext == null || serverLevel == null
+        if (serverState == null
+                || serverContext == null
+                || serverLevel == null
                 || expectedFormedBlock == null) {
             return true;
         }
@@ -214,10 +211,10 @@ public final class HeatExchangerMenu extends IEContainerMenu {
                 && serverContext.isValid().getAsBoolean()
                 && serverLevel.getBlockState(masterPos).is(expectedFormedBlock)
                 && player.distanceToSqr(
-                        interactionPos.getX() + 0.5D,
-                        interactionPos.getY() + 0.5D,
-                        interactionPos.getZ() + 0.5D
-                ) <= MAX_DISTANCE_SQUARED;
+                                interactionPos.getX() + 0.5D,
+                                interactionPos.getY() + 0.5D,
+                                interactionPos.getZ() + 0.5D)
+                        <= MAX_DISTANCE_SQUARED;
     }
 
     @Override
@@ -236,13 +233,14 @@ public final class HeatExchangerMenu extends IEContainerMenu {
         }
 
         HeatExchangerMenuAction.Command command = decoded.get();
-        boolean changed = switch (command.action()) {
-            case CLEAR_TANK -> serverState.clearTank(command.tankIndex());
-            case LOCK_FILTER -> serverState.setTankTypeLocked(command.tankIndex(), true);
-            case UNLOCK_FILTER -> serverState.setTankTypeLocked(command.tankIndex(), false);
-            case CLEAR_SIDE -> serverState.clearTankSide(command.tankIndex());
-            case CLEAR_ALL -> serverState.clearAllTanks();
-        };
+        boolean changed =
+                switch (command.action()) {
+                    case CLEAR_TANK -> serverState.clearTank(command.tankIndex());
+                    case LOCK_FILTER -> serverState.setTankTypeLocked(command.tankIndex(), true);
+                    case UNLOCK_FILTER -> serverState.setTankTypeLocked(command.tankIndex(), false);
+                    case CLEAR_SIDE -> serverState.clearTankSide(command.tankIndex());
+                    case CLEAR_ALL -> serverState.clearAllTanks();
+                };
         if (changed) {
             serverContext.markDirtyAndSync();
         }

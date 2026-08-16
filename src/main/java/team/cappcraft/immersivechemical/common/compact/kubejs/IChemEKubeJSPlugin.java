@@ -11,24 +11,20 @@ import net.minecraft.world.level.material.Fluid;
 import team.cappcraft.immersivechemical.common.recipe.ConvertDirection;
 import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRecipeRegistration;
 
-
-
-
-
 public final class IChemEKubeJSPlugin extends KubeJSPlugin {
     private static final RegistryComponent<Fluid> FLUID =
             new RegistryComponent<>(RegistryInfo.FLUID);
     private static final EnumComponent<ConvertDirection> DIRECTION =
             new EnumComponent<>(ConvertDirection.class);
 
-    private static final RecipeSchema HEAT_EXCHANGER = new RecipeSchema(
-            FLUID.key("fluid_a"),
-            NumberComponent.ANY_INT.key("amount_a"),
-            FLUID.key("fluid_b"),
-            NumberComponent.ANY_INT.key("amount_b"),
-            NumberComponent.ANY_INT.key("heat"),
-            DIRECTION.key("direction")
-    );
+    private static final RecipeSchema HEAT_EXCHANGER =
+            new RecipeSchema(
+                    FLUID.key("fluid_a"),
+                    NumberComponent.ANY_INT.key("amount_a"),
+                    FLUID.key("fluid_b"),
+                    NumberComponent.ANY_INT.key("amount_b"),
+                    NumberComponent.ANY_INT.key("heat"),
+                    DIRECTION.key("direction"));
 
     @Override
     public void registerRecipeSchemas(RegisterRecipeSchemasEvent event) {

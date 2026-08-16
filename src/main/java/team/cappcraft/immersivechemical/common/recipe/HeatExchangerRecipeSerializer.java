@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 import io.netty.handler.codec.DecoderException;
+import java.util.Objects;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -12,25 +13,8 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.fluids.FluidStack;
 
-import java.util.Objects;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-public final class HeatExchangerRecipeSerializer implements RecipeSerializer<HeatExchangerDataRecipe> {
+public final class HeatExchangerRecipeSerializer
+        implements RecipeSerializer<HeatExchangerDataRecipe> {
     static final String FLUID_A = "fluid_a";
     static final String AMOUNT_A = "amount_a";
     static final String FLUID_B = "fluid_b";
@@ -43,17 +27,20 @@ public final class HeatExchangerRecipeSerializer implements RecipeSerializer<Hea
         Objects.requireNonNull(recipeId, "recipeId");
         Objects.requireNonNull(json, "json");
         try {
-            ResourceLocation fluidAId = parseResourceLocation(getRequiredString(json, FLUID_A), FLUID_A);
+            ResourceLocation fluidAId =
+                    parseResourceLocation(getRequiredString(json, FLUID_A), FLUID_A);
             int amountA = getPositiveInt(json, AMOUNT_A);
-            ResourceLocation fluidBId = parseResourceLocation(getRequiredString(json, FLUID_B), FLUID_B);
+            ResourceLocation fluidBId =
+                    parseResourceLocation(getRequiredString(json, FLUID_B), FLUID_B);
             int amountB = getPositiveInt(json, AMOUNT_B);
             int heat = getPositiveInt(json, HEAT);
-            ConvertDirection direction = ConvertDirection.fromSerializedName(
-                    getRequiredString(json, DIRECTION));
+            ConvertDirection direction =
+                    ConvertDirection.fromSerializedName(getRequiredString(json, DIRECTION));
             return createRecipe(recipeId, fluidAId, amountA, fluidBId, amountB, heat, direction);
         } catch (RuntimeException exception) {
             throw new JsonSyntaxException(
-                    "Invalid heat exchanger recipe " + recipeId + ": " + exception.getMessage(), exception);
+                    "Invalid heat exchanger recipe " + recipeId + ": " + exception.getMessage(),
+                    exception);
         }
     }
 
@@ -70,15 +57,25 @@ public final class HeatExchangerRecipeSerializer implements RecipeSerializer<Hea
             int directionOrdinal = buffer.readVarInt();
             ConvertDirection[] directions = ConvertDirection.values();
             if (directionOrdinal < 0 || directionOrdinal >= directions.length) {
-                throw new DecoderException("Invalid conversion direction ordinal: " + directionOrdinal);
+                throw new DecoderException(
+                        "Invalid conversion direction ordinal: " + directionOrdinal);
             }
             return createRecipe(
-                    recipeId, fluidAId, amountA, fluidBId, amountB, heat, directions[directionOrdinal]);
+                    recipeId,
+                    fluidAId,
+                    amountA,
+                    fluidBId,
+                    amountB,
+                    heat,
+                    directions[directionOrdinal]);
         } catch (DecoderException exception) {
             throw exception;
         } catch (RuntimeException exception) {
             throw new DecoderException(
-                    "Invalid network heat exchanger recipe " + recipeId + ": " + exception.getMessage(),
+                    "Invalid network heat exchanger recipe "
+                            + recipeId
+                            + ": "
+                            + exception.getMessage(),
                     exception);
         }
     }
@@ -106,22 +103,26 @@ public final class HeatExchangerRecipeSerializer implements RecipeSerializer<Hea
             ResourceLocation fluidBId,
             int amountB,
             int heat,
-            ConvertDirection direction
-    ) {
+            ConvertDirection direction) {
         Fluid fluidA = getRegisteredFluid(fluidAId, FLUID_A);
         Fluid fluidB = getRegisteredFluid(fluidBId, FLUID_B);
-        HeatExchangerEntry entry = new HeatExchangerEntry(
-                new FluidStack(fluidA, amountA),
-                new FluidStack(fluidB, amountB),
-                heat,
-                direction);
+        HeatExchangerEntry entry =
+                new HeatExchangerEntry(
+                        new FluidStack(fluidA, amountA),
+                        new FluidStack(fluidB, amountB),
+                        heat,
+                        direction);
         return new HeatExchangerDataRecipe(recipeId, entry);
     }
 
     private static Fluid getRegisteredFluid(ResourceLocation id, String field) {
-        Fluid fluid = BuiltInRegistries.FLUID.getOptional(id)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Unknown fluid ID in '" + field + "': " + id));
+        Fluid fluid =
+                BuiltInRegistries.FLUID
+                        .getOptional(id)
+                        .orElseThrow(
+                                () ->
+                                        new IllegalArgumentException(
+                                                "Unknown fluid ID in '" + field + "': " + id));
         if (fluid == Fluids.EMPTY) {
             throw new IllegalArgumentException("'" + field + "' may not use minecraft:empty");
         }
@@ -142,7 +143,8 @@ public final class HeatExchangerRecipeSerializer implements RecipeSerializer<Hea
     private static ResourceLocation parseResourceLocation(String value, String field) {
         ResourceLocation id = ResourceLocation.tryParse(value);
         if (id == null) {
-            throw new IllegalArgumentException("Invalid resource location in '" + field + "': " + value);
+            throw new IllegalArgumentException(
+                    "Invalid resource location in '" + field + "': " + value);
         }
         return id;
     }
@@ -158,7 +160,8 @@ public final class HeatExchangerRecipeSerializer implements RecipeSerializer<Hea
         try {
             return requirePositive(primitive.getAsBigDecimal().intValueExact(), field);
         } catch (ArithmeticException exception) {
-            throw new IllegalArgumentException("'" + field + "' must be a 32-bit integer", exception);
+            throw new IllegalArgumentException(
+                    "'" + field + "' must be a 32-bit integer", exception);
         }
     }
 

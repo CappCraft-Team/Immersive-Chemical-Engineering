@@ -2,12 +2,11 @@ package team.cappcraft.immersivechemical.common.tileentity.constant;
 
 import blusunrize.immersiveengineering.api.multiblocks.blocks.util.CapabilityPosition;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.util.RelativeBlockFace;
+import java.util.function.Predicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import team.cappcraft.immersivechemical.Config;
 import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
-
-import java.util.function.Predicate;
 
 public enum HeatExchangerSizeVariants {
     SMALL(
@@ -26,8 +25,7 @@ public enum HeatExchangerSizeVariants {
             new BlockPos(0, 0, 1),
             new BlockPos(0, 0, 3),
             new BlockPos(0, 0, 2),
-            position -> position.getZ() == 0 || position.getZ() == 3
-    ),
+            position -> position.getZ() == 0 || position.getZ() == 3),
     MEDIUM(
             "heat_exchanger_medium",
             new BlockPos(2, 0, 1),
@@ -44,8 +42,7 @@ public enum HeatExchangerSizeVariants {
             new BlockPos(1, 0, 0),
             new BlockPos(0, 0, 1),
             new BlockPos(1, 0, 1),
-            position -> position.getX() == 0
-    ),
+            position -> position.getX() == 0),
     LARGE(
             "heat_exchanger_large",
             new BlockPos(1, 0, 3),
@@ -62,12 +59,12 @@ public enum HeatExchangerSizeVariants {
             new BlockPos(0, 0, 5),
             new BlockPos(2, 0, 6),
             new BlockPos(2, 0, 5),
-            position -> position.getZ() == 6
-                    || (position.getX() == 1
-                    && position.getY() == 1
-                    && position.getZ() >= 1
-                    && position.getZ() <= 5)
-    );
+            position ->
+                    position.getZ() == 6
+                            || (position.getX() == 1
+                                    && position.getY() == 1
+                                    && position.getZ() >= 1
+                                    && position.getZ() <= 5));
 
     private final ResourceLocation id;
     private final BlockPos masterPos;
@@ -102,8 +99,7 @@ public enum HeatExchangerSizeVariants {
             BlockPos comparatorOutputA,
             BlockPos comparatorInputB,
             BlockPos comparatorOutputB,
-            Predicate<BlockPos> radiatorPredicate
-    ) {
+            Predicate<BlockPos> radiatorPredicate) {
         this.id = new ResourceLocation(ImmersiveChemicalEngineering.MODID, id);
         this.masterPos = masterPos;
         this.triggerPos = triggerPos;
@@ -192,18 +188,24 @@ public enum HeatExchangerSizeVariants {
 
     public int getCapacity() {
         switch (this) {
-            case SMALL: return Config.getSmallCapacity();
-            case MEDIUM: return Config.getMediumCapacity();
-            case LARGE: return Config.getLargeCapacity();
+            case SMALL:
+                return Config.getSmallCapacity();
+            case MEDIUM:
+                return Config.getMediumCapacity();
+            case LARGE:
+                return Config.getLargeCapacity();
         }
         throw new IllegalStateException("Unknown size: " + this);
     }
 
     public float getTickMultiplier() {
         switch (this) {
-            case SMALL: return (float) Config.getSmallTickMultiplier();
-            case MEDIUM: return (float) Config.getMediumTickMultiplier();
-            case LARGE: return (float) Config.getLargeTickMultiplier();
+            case SMALL:
+                return (float) Config.getSmallTickMultiplier();
+            case MEDIUM:
+                return (float) Config.getMediumTickMultiplier();
+            case LARGE:
+                return (float) Config.getLargeTickMultiplier();
         }
         throw new IllegalStateException("Unknown size: " + this);
     }

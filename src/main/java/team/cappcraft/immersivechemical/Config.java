@@ -8,12 +8,10 @@ public class Config {
 
     public static final ForgeConfigSpec CONFIG_SPEC;
 
-    
     private static final IntValue SMALL_CAPACITY;
     private static final IntValue MEDIUM_CAPACITY;
     private static final IntValue LARGE_CAPACITY;
 
-    
     private static final DoubleValue SMALL_TICK_MULTIPLIER;
     private static final DoubleValue MEDIUM_TICK_MULTIPLIER;
     private static final DoubleValue LARGE_TICK_MULTIPLIER;
@@ -24,27 +22,28 @@ public class Config {
         builder.comment("Heat Exchanger Settings").push("heat_exchanger");
 
         builder.comment("Fluid capacity for each heat exchanger size (mB)").push("capacity");
-        SMALL_CAPACITY = builder
-                .comment("Capacity of the Small Heat Exchanger")
-                .defineInRange("small", 5000, 1, Integer.MAX_VALUE);
-        MEDIUM_CAPACITY = builder
-                .comment("Capacity of the Medium Heat Exchanger")
-                .defineInRange("medium", 10000, 1, Integer.MAX_VALUE);
-        LARGE_CAPACITY = builder
-                .comment("Capacity of the Large Heat Exchanger")
-                .defineInRange("large", 30000, 1, Integer.MAX_VALUE);
+        SMALL_CAPACITY =
+                builder.comment("Capacity of the Small Heat Exchanger")
+                        .defineInRange("small", 5000, 1, Integer.MAX_VALUE);
+        MEDIUM_CAPACITY =
+                builder.comment("Capacity of the Medium Heat Exchanger")
+                        .defineInRange("medium", 10000, 1, Integer.MAX_VALUE);
+        LARGE_CAPACITY =
+                builder.comment("Capacity of the Large Heat Exchanger")
+                        .defineInRange("large", 30000, 1, Integer.MAX_VALUE);
         builder.pop();
 
-        builder.comment("Tick multiplier for each heat exchanger size. Lower = faster.").push("tick_multiplier");
-        SMALL_TICK_MULTIPLIER = builder
-                .comment("Tick multiplier for Small Heat Exchanger")
-                .defineInRange("small", 0.8, 1e-7, 1e7);
-        MEDIUM_TICK_MULTIPLIER = builder
-                .comment("Tick multiplier for Medium Heat Exchanger")
-                .defineInRange("medium", 0.4, 1e-7, 1e7);
-        LARGE_TICK_MULTIPLIER = builder
-                .comment("Tick multiplier for Large Heat Exchanger")
-                .defineInRange("large", 0.2, 1e-7, 1e7);
+        builder.comment("Tick multiplier for each heat exchanger size. Lower = faster.")
+                .push("tick_multiplier");
+        SMALL_TICK_MULTIPLIER =
+                builder.comment("Tick multiplier for Small Heat Exchanger")
+                        .defineInRange("small", 0.8, 1e-7, 1e7);
+        MEDIUM_TICK_MULTIPLIER =
+                builder.comment("Tick multiplier for Medium Heat Exchanger")
+                        .defineInRange("medium", 0.4, 1e-7, 1e7);
+        LARGE_TICK_MULTIPLIER =
+                builder.comment("Tick multiplier for Large Heat Exchanger")
+                        .defineInRange("large", 0.2, 1e-7, 1e7);
         builder.pop();
 
         builder.pop();

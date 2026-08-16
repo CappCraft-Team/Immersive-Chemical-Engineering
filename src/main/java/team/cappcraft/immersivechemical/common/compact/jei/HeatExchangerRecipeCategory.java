@@ -18,17 +18,19 @@ import team.cappcraft.immersivechemical.common.recipe.HeatExchangerEntry;
 
 public class HeatExchangerRecipeCategory implements IRecipeCategory<HeatExchangerEntry> {
 
-    public static final ResourceLocation TEXTURE = new ResourceLocation(
-            ImmersiveChemicalEngineering.MODID, "textures/gui/heatexchanger.png");
+    public static final ResourceLocation TEXTURE =
+            new ResourceLocation(
+                    ImmersiveChemicalEngineering.MODID, "textures/gui/heatexchanger.png");
 
     private final IDrawable background;
     private final IDrawable icon;
 
     public HeatExchangerRecipeCategory(IGuiHelper guiHelper) {
-        
+
         this.background = guiHelper.createDrawable(TEXTURE, 15, 20, 145, 45);
-        this.icon = guiHelper.createDrawableItemStack(
-                new ItemStack(ICHEME_Contents.HEAT_EXCHANGER_SMALL.blockItem().get()));
+        this.icon =
+                guiHelper.createDrawableItemStack(
+                        new ItemStack(ICHEME_Contents.HEAT_EXCHANGER_SMALL.blockItem().get()));
     }
 
     @Override
@@ -52,8 +54,9 @@ public class HeatExchangerRecipeCategory implements IRecipeCategory<HeatExchange
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, HeatExchangerEntry recipe, IFocusGroup focuses) {
-        
+    public void setRecipe(
+            IRecipeLayoutBuilder builder, HeatExchangerEntry recipe, IFocusGroup focuses) {
+
         IRecipeSlotBuilder inputSlot = builder.addSlot(RecipeIngredientRole.INPUT, 20, 14);
         IRecipeSlotBuilder outputSlot = builder.addSlot(RecipeIngredientRole.OUTPUT, 110, 14);
 

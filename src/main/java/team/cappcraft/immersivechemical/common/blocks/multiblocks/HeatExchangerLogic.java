@@ -1,14 +1,16 @@
 package team.cappcraft.immersivechemical.common.blocks.multiblocks;
 
 import blusunrize.immersiveengineering.api.multiblocks.blocks.component.IServerTickableComponent;
-import blusunrize.immersiveengineering.api.multiblocks.blocks.env.IMultiblockContext;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.env.IInitialMultiblockContext;
+import blusunrize.immersiveengineering.api.multiblocks.blocks.env.IMultiblockContext;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.logic.IMultiblockLogic;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.util.CapabilityPosition;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.util.MultiblockFace;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.util.ShapeType;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.util.StoredCapability;
-import blusunrize.immersiveengineering.api.utils.CapabilityReference;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Function;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -36,13 +38,9 @@ import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRegistry;
 import team.cappcraft.immersivechemical.common.tileentity.LockableFluidTank;
 import team.cappcraft.immersivechemical.common.tileentity.constant.HeatExchangerSizeVariants;
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Function;
-
-public final class HeatExchangerLogic implements
-        IMultiblockLogic<HeatExchangerState>,
-        IServerTickableComponent<HeatExchangerState> {
+public final class HeatExchangerLogic
+        implements IMultiblockLogic<HeatExchangerState>,
+                IServerTickableComponent<HeatExchangerState> {
 
     private static final int RETRY_DELAY_TICKS = 20;
     private static final int AUTOMATIC_OUTPUT_RATE = 1000;
@@ -66,27 +64,22 @@ public final class HeatExchangerLogic implements
     }
 
     @Override
-    public HeatExchangerState createInitialState(IInitialMultiblockContext<HeatExchangerState> context) {
+    public HeatExchangerState createInitialState(
+            IInitialMultiblockContext<HeatExchangerState> context) {
         return new HeatExchangerState(
                 size.getCapacity(),
                 context,
                 context.getCapabilityAt(
-                        ForgeCapabilities.FLUID_HANDLER,
-                        getAdjacentTargetFace(outputA)
-                ),
+                        ForgeCapabilities.FLUID_HANDLER, getAdjacentTargetFace(outputA)),
                 context.getCapabilityAt(
-                        ForgeCapabilities.FLUID_HANDLER,
-                        getAdjacentTargetFace(outputB)
-                )
-        );
+                        ForgeCapabilities.FLUID_HANDLER, getAdjacentTargetFace(outputB)));
     }
 
     static MultiblockFace getAdjacentTargetFace(CapabilityPosition outputPort) {
         var outwardFace = Objects.requireNonNull(outputPort.side(), "Output port face");
         return new MultiblockFace(
                 outwardFace.getOpposite(),
-                outwardFace.offsetRelative(outputPort.posInMultiblock(), 1)
-        );
+                outwardFace.offsetRelative(outputPort.posInMultiblock(), 1));
     }
 
     @Override
@@ -101,16 +94,14 @@ public final class HeatExchangerLogic implements
             Player player,
             InteractionHand hand,
             BlockHitResult hit,
-            boolean isClient
-    ) {
+            boolean isClient) {
         if (hand != InteractionHand.MAIN_HAND || player.isShiftKeyDown() || player.isSpectator()) {
             return InteractionResult.PASS;
         }
         if (isClient) {
             return InteractionResult.SUCCESS;
         }
-        if (!(player instanceof ServerPlayer serverPlayer)
-                || !context.isValid().getAsBoolean()) {
+        if (!(player instanceof ServerPlayer serverPlayer) || !context.isValid().getAsBoolean()) {
             return InteractionResult.PASS;
         }
 
@@ -118,8 +109,7 @@ public final class HeatExchangerLogic implements
                 context,
                 serverPlayer,
                 context.getLevel().toAbsolute(masterPosition),
-                context.getLevel().toAbsolute(posInMultiblock)
-        );
+                context.getLevel().toAbsolute(posInMultiblock));
         return InteractionResult.CONSUME;
     }
 
@@ -127,21 +117,20 @@ public final class HeatExchangerLogic implements
             IMultiblockContext<HeatExchangerState> context,
             ServerPlayer player,
             BlockPos masterPos,
-            BlockPos interactionPos
-    ) {
+            BlockPos interactionPos) {
         HeatExchangerState state = context.getState();
-        SimpleMenuProvider provider = new SimpleMenuProvider(
-                (containerId, inventory, ignoredPlayer) -> new HeatExchangerMenu(
-                        size,
-                        containerId,
-                        inventory,
-                        state,
-                        context,
-                        masterPos,
-                        interactionPos
-                ),
-                Component.translatable(size.getContainerKey())
-        );
+        SimpleMenuProvider provider =
+                new SimpleMenuProvider(
+                        (containerId, inventory, ignoredPlayer) ->
+                                new HeatExchangerMenu(
+                                        size,
+                                        containerId,
+                                        inventory,
+                                        state,
+                                        context,
+                                        masterPos,
+                                        interactionPos),
+                        Component.translatable(size.getContainerKey()));
         NetworkHooks.openScreen(player, provider, masterPos);
     }
 
@@ -156,12 +145,12 @@ public final class HeatExchangerLogic implements
             return;
         }
 
-        Optional<HeatExchangerRecipe> foundRecipe = HeatExchangerRegistry.REGISTRY.findRecipe(
-                state.Tanks[HeatExchangerState.INPUT_A],
-                state.Tanks[HeatExchangerState.INPUT_B],
-                state.Tanks[HeatExchangerState.OUTPUT_A],
-                state.Tanks[HeatExchangerState.OUTPUT_B]
-        );
+        Optional<HeatExchangerRecipe> foundRecipe =
+                HeatExchangerRegistry.REGISTRY.findRecipe(
+                        state.Tanks[HeatExchangerState.INPUT_A],
+                        state.Tanks[HeatExchangerState.INPUT_B],
+                        state.Tanks[HeatExchangerState.OUTPUT_A],
+                        state.Tanks[HeatExchangerState.OUTPUT_B]);
         if (foundRecipe.isEmpty()) {
             state.cooldown = RETRY_DELAY_TICKS;
             state.tickSinceLastExchange = 0;
@@ -185,9 +174,8 @@ public final class HeatExchangerLogic implements
             return;
         }
 
-        state.tickRequired = Math.max(1, (int)Math.ceil(
-                transferredHeat * size.getTickMultiplier()
-        ));
+        state.tickRequired =
+                Math.max(1, (int) Math.ceil(transferredHeat * size.getTickMultiplier()));
         setProcessing(context, state, true);
         context.markDirtyAndSync();
     }
@@ -248,9 +236,16 @@ public final class HeatExchangerLogic implements
         int filledA = outputTankA.fill(batchA.output(), FluidAction.EXECUTE);
         if (filledA != batchA.output().getAmount()) {
             rollbackTransaction(
-                    inputTankA, drainedA, outputTankA, batchA.output(), filledA,
-                    inputTankB, drainedB, outputTankB, batchB.output(), 0
-            );
+                    inputTankA,
+                    drainedA,
+                    outputTankA,
+                    batchA.output(),
+                    filledA,
+                    inputTankB,
+                    drainedB,
+                    outputTankB,
+                    batchB.output(),
+                    0);
             logTransactionFailure("first output fill");
             return 0;
         }
@@ -258,9 +253,16 @@ public final class HeatExchangerLogic implements
         int filledB = outputTankB.fill(batchB.output(), FluidAction.EXECUTE);
         if (filledB != batchB.output().getAmount()) {
             rollbackTransaction(
-                    inputTankA, drainedA, outputTankA, batchA.output(), filledA,
-                    inputTankB, drainedB, outputTankB, batchB.output(), filledB
-            );
+                    inputTankA,
+                    drainedA,
+                    outputTankA,
+                    batchA.output(),
+                    filledA,
+                    inputTankB,
+                    drainedB,
+                    outputTankB,
+                    batchB.output(),
+                    filledB);
             logTransactionFailure("second output fill");
             return 0;
         }
@@ -268,32 +270,26 @@ public final class HeatExchangerLogic implements
     }
 
     private static ExchangeBatch createBatch(
-            HeatExchangerEntry entry,
-            ConvertDirection direction,
-            int repetitions
-    ) {
+            HeatExchangerEntry entry, ConvertDirection direction, int repetitions) {
         FluidStack input = scale(entry.getInput(direction), repetitions);
         FluidStack output = scale(entry.getOutput(direction), repetitions);
-        long heat = (long)entry.HeatValue * repetitions;
+        long heat = (long) entry.HeatValue * repetitions;
         if (input.isEmpty() || output.isEmpty() || heat > Integer.MAX_VALUE) {
             return null;
         }
-        return new ExchangeBatch(input, output, (int)heat);
+        return new ExchangeBatch(input, output, (int) heat);
     }
 
     private static FluidStack scale(FluidStack stack, int repetitions) {
-        long amount = (long)stack.getAmount() * repetitions;
+        long amount = (long) stack.getAmount() * repetitions;
         if (stack.isEmpty() || repetitions <= 0 || amount > Integer.MAX_VALUE) {
             return FluidStack.EMPTY;
         }
-        return new FluidStack(stack, (int)amount);
+        return new FluidStack(stack, (int) amount);
     }
 
     private static boolean canExchange(
-            ExchangeBatch batch,
-            LockableFluidTank input,
-            LockableFluidTank output
-    ) {
+            ExchangeBatch batch, LockableFluidTank input, LockableFluidTank output) {
         FluidStack simulatedDrain = input.drain(batch.input(), FluidAction.SIMULATE);
         return sameFluidAndAmount(simulatedDrain, batch.input())
                 && output.fill(batch.output(), FluidAction.SIMULATE) == batch.output().getAmount();
@@ -309,18 +305,13 @@ public final class HeatExchangerLogic implements
             FluidStack drainedB,
             LockableFluidTank outputB,
             FluidStack producedB,
-            int filledB
-    ) {
+            int filledB) {
         rollbackOutput(outputB, producedB, filledB);
         rollbackOutput(outputA, producedA, filledA);
         rollbackInputs(inputA, drainedA, inputB, drainedB);
     }
 
-    private static void rollbackOutput(
-            LockableFluidTank output,
-            FluidStack produced,
-            int filled
-    ) {
+    private static void rollbackOutput(LockableFluidTank output, FluidStack produced, int filled) {
         if (filled <= 0) {
             return;
         }
@@ -329,8 +320,7 @@ public final class HeatExchangerLogic implements
             ImmersiveChemicalEngineering.LOGGER.error(
                     "Heat exchanger rollback removed {}/{} mB from an output tank",
                     removed.getAmount(),
-                    filled
-            );
+                    filled);
         }
     }
 
@@ -338,8 +328,7 @@ public final class HeatExchangerLogic implements
             LockableFluidTank inputA,
             FluidStack drainedA,
             LockableFluidTank inputB,
-            FluidStack drainedB
-    ) {
+            FluidStack drainedB) {
         restoreInput(inputB, drainedB);
         restoreInput(inputA, drainedA);
     }
@@ -353,8 +342,7 @@ public final class HeatExchangerLogic implements
             ImmersiveChemicalEngineering.LOGGER.error(
                     "Heat exchanger rollback restored {}/{} mB to an input tank",
                     restored,
-                    drained.getAmount()
-            );
+                    drained.getAmount());
         }
     }
 
@@ -362,8 +350,7 @@ public final class HeatExchangerLogic implements
         ImmersiveChemicalEngineering.LOGGER.error(
                 "{} heat exchanger changed during atomic exchange at {}; rolled back",
                 size.name().toLowerCase(),
-                stage
-        );
+                stage);
     }
 
     private static int greatestCommonDivisor(int a, int b) {
@@ -375,8 +362,7 @@ public final class HeatExchangerLogic implements
         return a;
     }
 
-    private record ExchangeBatch(FluidStack input, FluidStack output, int heat) {
-    }
+    private record ExchangeBatch(FluidStack input, FluidStack output, int heat) {}
 
     private static boolean sameFluidAndAmount(FluidStack actual, FluidStack expected) {
         return !actual.isEmpty()
@@ -387,8 +373,7 @@ public final class HeatExchangerLogic implements
     private static void setProcessing(
             IMultiblockContext<HeatExchangerState> context,
             HeatExchangerState state,
-            boolean processing
-    ) {
+            boolean processing) {
         if (state.processing != processing) {
             state.processing = processing;
             context.markDirtyAndSync();
@@ -399,23 +384,18 @@ public final class HeatExchangerLogic implements
     public <T> LazyOptional<T> getCapability(
             IMultiblockContext<HeatExchangerState> context,
             CapabilityPosition position,
-            Capability<T> capability
-    ) {
+            Capability<T> capability) {
         if (capability != ForgeCapabilities.FLUID_HANDLER) {
             return LazyOptional.empty();
         }
 
-        StoredCapability<IFluidHandler> selected = selectFluidCapability(
-                context.getState(),
-                position
-        );
+        StoredCapability<IFluidHandler> selected =
+                selectFluidCapability(context.getState(), position);
         return selected == null ? LazyOptional.empty() : selected.cast(context);
     }
 
     private StoredCapability<IFluidHandler> selectFluidCapability(
-            HeatExchangerState state,
-            CapabilityPosition position
-    ) {
+            HeatExchangerState state, CapabilityPosition position) {
         if (inputA.equals(position)) {
             return state.inputACapability;
         }
@@ -433,14 +413,14 @@ public final class HeatExchangerLogic implements
         }
 
         BlockPos requested = position.posInMultiblock();
-        StoredCapability<IFluidHandler> sideA = unsidedCapability(
-                state.inputACapability,
-                state.outputACapability,
-                state.portACapability,
-                inputA.posInMultiblock(),
-                outputA.posInMultiblock(),
-                requested
-        );
+        StoredCapability<IFluidHandler> sideA =
+                unsidedCapability(
+                        state.inputACapability,
+                        state.outputACapability,
+                        state.portACapability,
+                        inputA.posInMultiblock(),
+                        outputA.posInMultiblock(),
+                        requested);
         if (sideA != null) {
             return sideA;
         }
@@ -450,8 +430,7 @@ public final class HeatExchangerLogic implements
                 state.portBCapability,
                 inputB.posInMultiblock(),
                 outputB.posInMultiblock(),
-                requested
-        );
+                requested);
     }
 
     private static StoredCapability<IFluidHandler> unsidedCapability(
@@ -460,8 +439,7 @@ public final class HeatExchangerLogic implements
             StoredCapability<IFluidHandler> combined,
             BlockPos inputPosition,
             BlockPos outputPosition,
-            BlockPos requested
-    ) {
+            BlockPos requested) {
         boolean isInput = inputPosition.equals(requested);
         boolean isOutput = outputPosition.equals(requested);
         if (isInput && isOutput) {

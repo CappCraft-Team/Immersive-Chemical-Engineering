@@ -2,12 +2,6 @@ package team.cappcraft.immersivechemical.common.network;
 
 import java.util.Optional;
 
-
-
-
-
-
-
 public enum HeatExchangerMenuAction {
     CLEAR_TANK(true),
     LOCK_FILTER(true),
@@ -27,10 +21,12 @@ public enum HeatExchangerMenuAction {
     public int encodeButton(int tankIndex) {
         if (usesTankIndex) {
             if (!isTankIndex(tankIndex)) {
-                throw new IllegalArgumentException("Invalid heat exchanger tank index: " + tankIndex);
+                throw new IllegalArgumentException(
+                        "Invalid heat exchanger tank index: " + tankIndex);
             }
             if (this == CLEAR_SIDE && tankIndex >= 2) {
-                throw new IllegalArgumentException("Invalid heat exchanger side index: " + tankIndex);
+                throw new IllegalArgumentException(
+                        "Invalid heat exchanger side index: " + tankIndex);
             }
         } else if (tankIndex != 0) {
             throw new IllegalArgumentException("Non-tank actions require index zero");
@@ -63,6 +59,5 @@ public enum HeatExchangerMenuAction {
         return tankIndex >= 0 && tankIndex < TANK_COUNT;
     }
 
-    public record Command(HeatExchangerMenuAction action, int tankIndex) {
-    }
+    public record Command(HeatExchangerMenuAction action, int tankIndex) {}
 }

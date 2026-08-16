@@ -11,6 +11,11 @@ import blusunrize.immersiveengineering.api.multiblocks.blocks.registry.Multibloc
 import blusunrize.immersiveengineering.api.multiblocks.blocks.registry.MultiblockPartBlock;
 import blusunrize.immersiveengineering.common.register.IEBlocks;
 import com.mojang.blaze3d.vertex.PoseStack;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import javax.annotation.Nonnull;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -34,12 +39,6 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
 import team.cappcraft.immersivechemical.common.tileentity.constant.HeatExchangerSizeVariants;
 
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
 public final class HeatExchangerMultiblock extends TemplateMultiblock {
 
     private final HeatExchangerSizeVariants variant;
@@ -48,14 +47,8 @@ public final class HeatExchangerMultiblock extends TemplateMultiblock {
 
     public HeatExchangerMultiblock(
             HeatExchangerSizeVariants variant,
-            Supplier<MultiblockRegistration<HeatExchangerState>> registration
-    ) {
-        super(
-                variant.getId(),
-                variant.getMasterPos(),
-                variant.getTriggerPos(),
-                variant.getSize()
-        );
+            Supplier<MultiblockRegistration<HeatExchangerState>> registration) {
+        super(variant.getId(), variant.getMasterPos(), variant.getTriggerPos(), variant.getSize());
         this.variant = variant;
         this.registration = registration;
     }
@@ -66,16 +59,17 @@ public final class HeatExchangerMultiblock extends TemplateMultiblock {
         BlockState radiator = IEBlocks.MetalDecoration.RADIATOR.get().defaultBlockState();
         BlockState sheetmetal = IEBlocks.Metals.SHEETMETAL.get(EnumMetals.IRON).defaultBlockState();
         BlockPos size = variant.getSize();
-        List<StructureBlockInfo> structure = new ArrayList<>(size.getX() * size.getY() * size.getZ());
+        List<StructureBlockInfo> structure =
+                new ArrayList<>(size.getX() * size.getY() * size.getZ());
         for (int y = 0; y < size.getY(); ++y) {
             for (int z = 0; z < size.getZ(); ++z) {
                 for (int x = 0; x < size.getX(); ++x) {
                     BlockPos position = new BlockPos(x, y, z);
-                    structure.add(new StructureBlockInfo(
-                            position,
-                            variant.isRadiator(position) ? radiator : sheetmetal,
-                            null
-                    ));
+                    structure.add(
+                            new StructureBlockInfo(
+                                    position,
+                                    variant.isRadiator(position) ? radiator : sheetmetal,
+                                    null));
                 }
             }
         }
@@ -97,16 +91,18 @@ public final class HeatExchangerMultiblock extends TemplateMultiblock {
                 CompoundTag serialized = new CompoundTag();
                 serialized.put("size", integerList(size.getX(), size.getY(), size.getZ()));
 
-                BlockState radiator = blocks.stream()
-                        .filter(block -> variant.isRadiator(block.pos()))
-                        .findFirst()
-                        .orElseThrow()
-                        .state();
-                BlockState sheetmetal = blocks.stream()
-                        .filter(block -> !variant.isRadiator(block.pos()))
-                        .findFirst()
-                        .orElseThrow()
-                        .state();
+                BlockState radiator =
+                        blocks.stream()
+                                .filter(block -> variant.isRadiator(block.pos()))
+                                .findFirst()
+                                .orElseThrow()
+                                .state();
+                BlockState sheetmetal =
+                        blocks.stream()
+                                .filter(block -> !variant.isRadiator(block.pos()))
+                                .findFirst()
+                                .orElseThrow()
+                                .state();
                 ListTag palette = new ListTag();
                 palette.add(NbtUtils.writeBlockState(radiator));
                 palette.add(NbtUtils.writeBlockState(sheetmetal));
@@ -115,11 +111,10 @@ public final class HeatExchangerMultiblock extends TemplateMultiblock {
                 ListTag serializedBlocks = new ListTag();
                 for (StructureBlockInfo block : blocks) {
                     CompoundTag blockTag = new CompoundTag();
-                    blockTag.put("pos", integerList(
-                            block.pos().getX(),
-                            block.pos().getY(),
-                            block.pos().getZ()
-                    ));
+                    blockTag.put(
+                            "pos",
+                            integerList(
+                                    block.pos().getX(), block.pos().getY(), block.pos().getZ()));
                     blockTag.putInt("state", variant.isRadiator(block.pos()) ? 0 : 1);
                     serializedBlocks.add(blockTag);
                 }
@@ -129,9 +124,7 @@ public final class HeatExchangerMultiblock extends TemplateMultiblock {
 
                 StructureTemplate template = new StructureTemplate();
                 template.load(
-                        level.registryAccess().lookup(Registries.BLOCK).orElseThrow(),
-                        serialized
-                );
+                        level.registryAccess().lookup(Registries.BLOCK).orElseThrow(), serialized);
                 current = new TemplateData(template, blocks, radiator);
                 generatedTemplate = current;
             }
@@ -159,15 +152,9 @@ public final class HeatExchangerMultiblock extends TemplateMultiblock {
     }
 
     @Override
-    public boolean createStructure(
-            Level level,
-            BlockPos position,
-            Direction side,
-            Player player
-    ) {
-        Direction formationSide = side.getAxis() == Direction.Axis.Y
-                ? player.getDirection().getOpposite()
-                : side;
+    public boolean createStructure(Level level, BlockPos position, Direction side, Player player) {
+        Direction formationSide =
+                side.getAxis() == Direction.Axis.Y ? player.getDirection().getOpposite() : side;
         return super.createStructure(level, position, formationSide, player);
     }
 
@@ -178,17 +165,18 @@ public final class HeatExchangerMultiblock extends TemplateMultiblock {
             BlockPos worldPosition,
             boolean mirrored,
             Direction clickDirection,
-            Vec3i offsetFromMaster
-    ) {
+            Vec3i offsetFromMaster) {
         MultiblockRegistration<HeatExchangerState> multiblock = registration.get();
         MultiblockPartBlock<HeatExchangerState> formedBlock = multiblock.block().get();
-        BlockState formedState = formedBlock.defaultBlockState()
-                .setValue(IEProperties.MULTIBLOCKSLAVE, !Vec3i.ZERO.equals(offsetFromMaster));
+        BlockState formedState =
+                formedBlock
+                        .defaultBlockState()
+                        .setValue(
+                                IEProperties.MULTIBLOCKSLAVE, !Vec3i.ZERO.equals(offsetFromMaster));
         if (formedState.hasProperty(IEProperties.FACING_HORIZONTAL)) {
-            formedState = formedState.setValue(
-                    IEProperties.FACING_HORIZONTAL,
-                    clickDirection.getOpposite()
-            );
+            formedState =
+                    formedState.setValue(
+                            IEProperties.FACING_HORIZONTAL, clickDirection.getOpposite());
         }
         if (formedState.hasProperty(IEProperties.MIRRORED)) {
             formedState = formedState.setValue(IEProperties.MIRRORED, mirrored);
@@ -198,22 +186,16 @@ public final class HeatExchangerMultiblock extends TemplateMultiblock {
         level.setBlock(worldPosition, formedState, 0);
         if (level.getBlockEntity(worldPosition) instanceof MultiblockBlockEntityDummy<?> dummy) {
             dummy.getHelper().setPositionInMB(originalBlock.pos());
-        } else if (!(level.getBlockEntity(worldPosition) instanceof MultiblockBlockEntityMaster<?>)) {
+        } else if (!(level.getBlockEntity(worldPosition)
+                instanceof MultiblockBlockEntityMaster<?>)) {
             ImmersiveChemicalEngineering.LOGGER.error(
                     "Expected a heat exchanger multiblock block entity at {} during formation",
-                    worldPosition
-            );
+                    worldPosition);
         }
 
         LevelChunk chunk = level.getChunkAt(worldPosition);
         level.markAndNotifyBlock(
-                worldPosition,
-                chunk,
-                oldState,
-                formedState,
-                Block.UPDATE_ALL,
-                512
-        );
+                worldPosition, chunk, oldState, formedState, Block.UPDATE_ALL, 512);
     }
 
     @Override
@@ -242,30 +224,30 @@ public final class HeatExchangerMultiblock extends TemplateMultiblock {
             }
         }
         int sheetmetalCount = size.getX() * size.getY() * size.getZ() - radiatorCount;
-        consumer.accept(new ClientMultiblocks.MultiblockManualData() {
-            @Override
-            public NonNullList<ItemStack> getTotalMaterials() {
-                NonNullList<ItemStack> materials = NonNullList.create();
-                materials.add(new ItemStack(
-                        IEBlocks.Metals.SHEETMETAL.get(EnumMetals.IRON),
-                        sheetmetalCount
-                ));
-                materials.add(new ItemStack(
-                        IEBlocks.MetalDecoration.RADIATOR.get(),
-                        radiatorCount
-                ));
-                return materials;
-            }
+        consumer.accept(
+                new ClientMultiblocks.MultiblockManualData() {
+                    @Override
+                    public NonNullList<ItemStack> getTotalMaterials() {
+                        NonNullList<ItemStack> materials = NonNullList.create();
+                        materials.add(
+                                new ItemStack(
+                                        IEBlocks.Metals.SHEETMETAL.get(EnumMetals.IRON),
+                                        sheetmetalCount));
+                        materials.add(
+                                new ItemStack(
+                                        IEBlocks.MetalDecoration.RADIATOR.get(), radiatorCount));
+                        return materials;
+                    }
 
-            @Override
-            public boolean canRenderFormedStructure() {
-                return false;
-            }
+                    @Override
+                    public boolean canRenderFormedStructure() {
+                        return false;
+                    }
 
-            @Override
-            public void renderFormedStructure(PoseStack poseStack, MultiBufferSource buffers) {
-            }
-        });
+                    @Override
+                    public void renderFormedStructure(
+                            PoseStack poseStack, MultiBufferSource buffers) {}
+                });
     }
 
     @Override

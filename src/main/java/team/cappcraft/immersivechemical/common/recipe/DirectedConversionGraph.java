@@ -15,13 +15,6 @@ import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-
-
-
-
-
-
-
 final class DirectedConversionGraph<N, E> {
     private final Map<N, LinkedHashMap<N, Edge<N, E>>> outgoing = new LinkedHashMap<>();
 
@@ -55,7 +48,8 @@ final class DirectedConversionGraph<N, E> {
 
         addVertex(source);
         addVertex(target);
-        return outgoing.get(source).putIfAbsent(target, new Edge<>(source, target, value, weight)) == null;
+        return outgoing.get(source).putIfAbsent(target, new Edge<>(source, target, value, weight))
+                == null;
     }
 
     Optional<E> getEdgeValue(N source, N target) {
@@ -108,9 +102,10 @@ final class DirectedConversionGraph<N, E> {
         Map<N, Long> distances = new HashMap<>();
         Map<N, Edge<N, E>> previous = new HashMap<>();
         Set<N> settled = new HashSet<>();
-        PriorityQueue<NodeDistance<N>> pending = new PriorityQueue<>(
-                Comparator.comparingLong(NodeDistance<N>::distance)
-                        .thenComparingLong(NodeDistance<N>::order));
+        PriorityQueue<NodeDistance<N>> pending =
+                new PriorityQueue<>(
+                        Comparator.comparingLong(NodeDistance<N>::distance)
+                                .thenComparingLong(NodeDistance<N>::order));
 
         long insertionOrder = 0;
         distances.put(start, 0L);
@@ -118,7 +113,8 @@ final class DirectedConversionGraph<N, E> {
 
         while (!pending.isEmpty()) {
             NodeDistance<N> current = pending.remove();
-            if (!Objects.equals(distances.get(current.node), current.distance) || !settled.add(current.node)) {
+            if (!Objects.equals(distances.get(current.node), current.distance)
+                    || !settled.add(current.node)) {
                 continue;
             }
             if (current.node.equals(target)) {

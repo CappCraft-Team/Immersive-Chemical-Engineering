@@ -1,5 +1,6 @@
 plugins {
     id 'net.minecraftforge.gradle' version '6.0.54'
+    id 'com.diffplug.spotless' version '6.25.0'
 }
 
 group = 'team.cappcraft.icheme'
@@ -73,4 +74,11 @@ dependencies {
     runtimeOnly fg.deobf("dev.latvian.mods:kubejs-forge:${version_kubejs}")
     runtimeOnly fg.deobf("dev.latvian.mods:rhino-forge:${version_rhino}")
     runtimeOnly fg.deobf("dev.architectury:architectury-forge:${version_architectury}")
+}
+
+spotless {
+    java {
+        googleJavaFormat('1.22.0').aosp()
+        target 'src/main/java/**/*.java'
+    }
 }

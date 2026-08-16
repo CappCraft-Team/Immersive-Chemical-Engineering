@@ -1,12 +1,15 @@
 package team.cappcraft.immersivechemical.common.compact.jei;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Stream;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
-import mezz.jei.api.registration.IGuiHandlerRegistration;
-import mezz.jei.api.registration.IRecipeCategoryRegistration;
-import mezz.jei.api.registration.IRecipeCatalystRegistration;
-import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.registration.IGuiHandlerRegistration;
+import mezz.jei.api.registration.IRecipeCatalystRegistration;
+import mezz.jei.api.registration.IRecipeCategoryRegistration;
+import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -18,18 +21,15 @@ import team.cappcraft.immersivechemical.common.recipe.HeatExchangerDataRecipe;
 import team.cappcraft.immersivechemical.common.recipe.HeatExchangerEntry;
 import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRecipeRegistration;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Stream;
-
 @JeiPlugin
 public class JEIPlugin implements IModPlugin {
 
     public static final RecipeType<HeatExchangerEntry> HEAT_EXCHANGER_RECIPE_TYPE =
-            RecipeType.create(ImmersiveChemicalEngineering.MODID, "heat_exchanger", HeatExchangerEntry.class);
+            RecipeType.create(
+                    ImmersiveChemicalEngineering.MODID, "heat_exchanger", HeatExchangerEntry.class);
 
-    private static final ResourceLocation PLUGIN_ID = new ResourceLocation(
-            ImmersiveChemicalEngineering.MODID, "jei_plugin");
+    private static final ResourceLocation PLUGIN_ID =
+            new ResourceLocation(ImmersiveChemicalEngineering.MODID, "jei_plugin");
 
     @Override
     public ResourceLocation getPluginUid() {
@@ -49,13 +49,15 @@ public class JEIPlugin implements IModPlugin {
             return;
         }
 
-        List<HeatExchangerEntry> entries = connection.getRecipeManager()
-                .getAllRecipesFor(HeatExchangerRecipeRegistration.HEAT_EXCHANGER_TYPE.get())
-                .stream()
-                .sorted(Comparator.comparing(recipe -> recipe.getId().toString()))
-                .map(HeatExchangerDataRecipe::getEntry)
-                .flatMap(JEIPlugin::directionalDisplays)
-                .toList();
+        List<HeatExchangerEntry> entries =
+                connection
+                        .getRecipeManager()
+                        .getAllRecipesFor(HeatExchangerRecipeRegistration.HEAT_EXCHANGER_TYPE.get())
+                        .stream()
+                        .sorted(Comparator.comparing(recipe -> recipe.getId().toString()))
+                        .map(HeatExchangerDataRecipe::getEntry)
+                        .flatMap(JEIPlugin::directionalDisplays)
+                        .toList();
 
         if (!entries.isEmpty()) {
             registration.addRecipes(JEIPlugin.HEAT_EXCHANGER_RECIPE_TYPE, entries);
@@ -66,25 +68,19 @@ public class JEIPlugin implements IModPlugin {
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
         registration.addRecipeCatalyst(
                 new ItemStack(ICHEME_Contents.HEAT_EXCHANGER_SMALL.blockItem().get()),
-                JEIPlugin.HEAT_EXCHANGER_RECIPE_TYPE
-        );
+                JEIPlugin.HEAT_EXCHANGER_RECIPE_TYPE);
         registration.addRecipeCatalyst(
                 new ItemStack(ICHEME_Contents.HEAT_EXCHANGER_MEDIUM.blockItem().get()),
-                JEIPlugin.HEAT_EXCHANGER_RECIPE_TYPE
-        );
+                JEIPlugin.HEAT_EXCHANGER_RECIPE_TYPE);
         registration.addRecipeCatalyst(
                 new ItemStack(ICHEME_Contents.HEAT_EXCHANGER_LARGE.blockItem().get()),
-                JEIPlugin.HEAT_EXCHANGER_RECIPE_TYPE
-        );
+                JEIPlugin.HEAT_EXCHANGER_RECIPE_TYPE);
     }
 
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
         registration.addRecipeClickArea(
-                HeatExchangerScreen.class,
-                81, 55, 16, 15,
-                JEIPlugin.HEAT_EXCHANGER_RECIPE_TYPE
-        );
+                HeatExchangerScreen.class, 81, 55, 16, 15, JEIPlugin.HEAT_EXCHANGER_RECIPE_TYPE);
     }
 
     private static Stream<HeatExchangerEntry> directionalDisplays(HeatExchangerEntry entry) {
@@ -96,14 +92,11 @@ public class JEIPlugin implements IModPlugin {
                         entry.FluidHot,
                         entry.FluidCold,
                         entry.HeatValue,
-                        ConvertDirection.COOL_DOWN
-                ),
+                        ConvertDirection.COOL_DOWN),
                 new HeatExchangerEntry(
                         entry.FluidHot,
                         entry.FluidCold,
                         entry.HeatValue,
-                        ConvertDirection.HEAT_UP
-                )
-        );
+                        ConvertDirection.HEAT_UP));
     }
 }

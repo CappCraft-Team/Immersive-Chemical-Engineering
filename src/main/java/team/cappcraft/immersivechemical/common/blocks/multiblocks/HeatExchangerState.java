@@ -4,23 +4,14 @@ import blusunrize.immersiveengineering.api.multiblocks.blocks.env.IInitialMultib
 import blusunrize.immersiveengineering.api.multiblocks.blocks.logic.IMultiblockState;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.util.StoredCapability;
 import blusunrize.immersiveengineering.api.utils.CapabilityReference;
+import java.util.Objects;
+import javax.annotation.Nullable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import team.cappcraft.immersivechemical.common.tileentity.LockableFluidTank;
-
-import javax.annotation.Nullable;
-import java.util.Objects;
-
-
-
-
-
-
-
-
 
 public class HeatExchangerState implements IMultiblockState {
 
@@ -55,38 +46,38 @@ public class HeatExchangerState implements IMultiblockState {
             int tankCapacity,
             IInitialMultiblockContext<?> context,
             CapabilityReference<IFluidHandler> automaticOutputA,
-            CapabilityReference<IFluidHandler> automaticOutputB
-    ) {
+            CapabilityReference<IFluidHandler> automaticOutputB) {
         Runnable markDirty = context.getMarkDirtyRunnable();
         Runnable sync = context.getSyncRunnable();
-        this.Tanks = new LockableFluidTank[]{
-                createTank(tankCapacity, markDirty, sync),
-                createTank(tankCapacity, markDirty, sync),
-                createTank(tankCapacity, markDirty, sync),
-                createTank(tankCapacity, markDirty, sync)
-        };
+        this.Tanks =
+                new LockableFluidTank[] {
+                    createTank(tankCapacity, markDirty, sync),
+                    createTank(tankCapacity, markDirty, sync),
+                    createTank(tankCapacity, markDirty, sync),
+                    createTank(tankCapacity, markDirty, sync)
+                };
 
-        this.inputACapability = new StoredCapability<>(
-                new PortFluidHandler(Tanks[INPUT_A], null));
-        this.outputACapability = new StoredCapability<>(
-                new PortFluidHandler(null, Tanks[OUTPUT_A]));
-        this.portACapability = new StoredCapability<>(
-                new PortFluidHandler(Tanks[INPUT_A], Tanks[OUTPUT_A]));
-        this.inputBCapability = new StoredCapability<>(
-                new PortFluidHandler(Tanks[INPUT_B], null));
-        this.outputBCapability = new StoredCapability<>(
-                new PortFluidHandler(null, Tanks[OUTPUT_B]));
-        this.portBCapability = new StoredCapability<>(
-                new PortFluidHandler(Tanks[INPUT_B], Tanks[OUTPUT_B]));
+        this.inputACapability = new StoredCapability<>(new PortFluidHandler(Tanks[INPUT_A], null));
+        this.outputACapability =
+                new StoredCapability<>(new PortFluidHandler(null, Tanks[OUTPUT_A]));
+        this.portACapability =
+                new StoredCapability<>(new PortFluidHandler(Tanks[INPUT_A], Tanks[OUTPUT_A]));
+        this.inputBCapability = new StoredCapability<>(new PortFluidHandler(Tanks[INPUT_B], null));
+        this.outputBCapability =
+                new StoredCapability<>(new PortFluidHandler(null, Tanks[OUTPUT_B]));
+        this.portBCapability =
+                new StoredCapability<>(new PortFluidHandler(Tanks[INPUT_B], Tanks[OUTPUT_B]));
         this.automaticOutputA = Objects.requireNonNull(automaticOutputA, "automaticOutputA");
         this.automaticOutputB = Objects.requireNonNull(automaticOutputB, "automaticOutputB");
     }
 
     private static LockableFluidTank createTank(int capacity, Runnable markDirty, Runnable sync) {
-        return new LockableFluidTank(capacity, ignored -> {
-            markDirty.run();
-            sync.run();
-        });
+        return new LockableFluidTank(
+                capacity,
+                ignored -> {
+                    markDirty.run();
+                    sync.run();
+                });
     }
 
     @Override
@@ -160,16 +151,14 @@ public class HeatExchangerState implements IMultiblockState {
         return processing;
     }
 
-    
     public int getComparatorOutput(int tankIndex) {
         if (!isTankIndex(tankIndex)) {
             return 0;
         }
         LockableFluidTank tank = Tanks[tankIndex];
-        return (int)(15L * tank.getFluidAmount() / Math.max(1, tank.getCapacity()));
+        return (int) (15L * tank.getFluidAmount() / Math.max(1, tank.getCapacity()));
     }
 
-    
     public boolean clearTank(int tankIndex) {
         if (!isTankIndex(tankIndex)) {
             return false;
@@ -196,7 +185,6 @@ public class HeatExchangerState implements IMultiblockState {
         return changed;
     }
 
-    
     public boolean clearTankSide(int sideIndex) {
         if (sideIndex < 0 || sideIndex > 1) {
             return false;
@@ -204,10 +192,6 @@ public class HeatExchangerState implements IMultiblockState {
         int firstTank = sideIndex * 2;
         return clearTank(firstTank) | clearTank(firstTank + 1);
     }
-
-    
-
-
 
     public boolean setTankTypeLocked(int tankIndex, boolean locked) {
         if (!isTankIndex(tankIndex)) {
@@ -236,12 +220,11 @@ public class HeatExchangerState implements IMultiblockState {
     }
 
     private static final class PortFluidHandler implements IFluidHandler {
-        @Nullable
-        private final LockableFluidTank input;
-        @Nullable
-        private final LockableFluidTank output;
+        @Nullable private final LockableFluidTank input;
+        @Nullable private final LockableFluidTank output;
 
-        private PortFluidHandler(@Nullable LockableFluidTank input, @Nullable LockableFluidTank output) {
+        private PortFluidHandler(
+                @Nullable LockableFluidTank input, @Nullable LockableFluidTank output) {
             this.input = input;
             this.output = output;
         }

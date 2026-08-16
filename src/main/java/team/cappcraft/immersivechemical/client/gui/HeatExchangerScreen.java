@@ -1,6 +1,8 @@
 package team.cappcraft.immersivechemical.client.gui;
 
 import blusunrize.immersiveengineering.client.utils.GuiHelper;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -10,9 +12,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import team.cappcraft.immersivechemical.ICHEME_Contents;
@@ -21,19 +23,14 @@ import team.cappcraft.immersivechemical.common.menu.HeatExchangerMenu;
 import team.cappcraft.immersivechemical.common.network.HeatExchangerMenuAction;
 import team.cappcraft.immersivechemical.common.tileentity.constant.HeatExchangerSizeVariants;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Mod.EventBusSubscriber(
         modid = ImmersiveChemicalEngineering.MODID,
         value = Dist.CLIENT,
-        bus = Mod.EventBusSubscriber.Bus.MOD
-)
+        bus = Mod.EventBusSubscriber.Bus.MOD)
 public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMenu> {
-    private static final ResourceLocation BACKGROUND = new ResourceLocation(
-            ImmersiveChemicalEngineering.MODID,
-            "textures/gui/heatexchanger.png"
-    );
+    private static final ResourceLocation BACKGROUND =
+            new ResourceLocation(
+                    ImmersiveChemicalEngineering.MODID, "textures/gui/heatexchanger.png");
 
     private static final int GUI_WIDTH = 175;
     private static final int GUI_HEIGHT = 207;
@@ -61,11 +58,7 @@ public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMe
     private final Button[] filterButtons = new Button[HeatExchangerMenu.TANK_COUNT];
     private Button resetAllButton;
 
-    public HeatExchangerScreen(
-            HeatExchangerMenu menu,
-            Inventory inventory,
-            Component title
-    ) {
+    public HeatExchangerScreen(HeatExchangerMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         imageWidth = GUI_WIDTH;
         imageHeight = GUI_HEIGHT;
@@ -75,14 +68,13 @@ public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMe
 
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
-        event.enqueueWork(() -> {
-            for (HeatExchangerSizeVariants variant : HeatExchangerSizeVariants.values()) {
-                MenuScreens.register(
-                        ICHEME_Contents.menuType(variant),
-                        HeatExchangerScreen::new
-                );
-            }
-        });
+        event.enqueueWork(
+                () -> {
+                    for (HeatExchangerSizeVariants variant : HeatExchangerSizeVariants.values()) {
+                        MenuScreens.register(
+                                ICHEME_Contents.menuType(variant), HeatExchangerScreen::new);
+                    }
+                });
     }
 
     @Override
@@ -90,41 +82,50 @@ public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMe
         super.init();
         for (int sideIndex = 0; sideIndex < sideResetButtons.length; ++sideIndex) {
             int side = sideIndex;
-            sideResetButtons[side] = addRenderableWidget(new AtlasButton(
-                    leftPos + SIDE_RESET_X[side],
-                    topPos + RESET_Y,
-                    TANK_SIZE,
-                    TANK_SIZE,
-                    Component.translatable("gui.immersivechemical.heat_exchanger_small.clear_side"),
-                    ignored -> sendAction(HeatExchangerMenuAction.CLEAR_SIDE, side)
-            ));
+            sideResetButtons[side] =
+                    addRenderableWidget(
+                            new AtlasButton(
+                                    leftPos + SIDE_RESET_X[side],
+                                    topPos + RESET_Y,
+                                    TANK_SIZE,
+                                    TANK_SIZE,
+                                    Component.translatable(
+                                            "gui.immersivechemical.heat_exchanger_small.clear_side"),
+                                    ignored ->
+                                            sendAction(HeatExchangerMenuAction.CLEAR_SIDE, side)));
         }
 
-        resetAllButton = addRenderableWidget(new AtlasButton(
-                leftPos + RESET_ALL_X,
-                topPos + RESET_ALL_Y,
-                TANK_SIZE,
-                TANK_SIZE,
-                Component.translatable("gui.immersivechemical.heat_exchanger_small.clear_all"),
-                ignored -> sendAction(HeatExchangerMenuAction.CLEAR_ALL, 0)
-        ));
+        resetAllButton =
+                addRenderableWidget(
+                        new AtlasButton(
+                                leftPos + RESET_ALL_X,
+                                topPos + RESET_ALL_Y,
+                                TANK_SIZE,
+                                TANK_SIZE,
+                                Component.translatable(
+                                        "gui.immersivechemical.heat_exchanger_small.clear_all"),
+                                ignored -> sendAction(HeatExchangerMenuAction.CLEAR_ALL, 0)));
 
         for (int tankIndex = 0; tankIndex < HeatExchangerMenu.TANK_COUNT; ++tankIndex) {
             int index = tankIndex;
-            filterButtons[index] = addRenderableWidget(Button.builder(
-                    Component.literal("F"),
-                    ignored -> sendAction(
-                            menu.isTankTypeLocked(index)
-                                    ? HeatExchangerMenuAction.UNLOCK_FILTER
-                                    : HeatExchangerMenuAction.LOCK_FILTER,
-                            index
-                    )
-            ).bounds(
-                    leftPos + FILTER_X[index],
-                    topPos + FILTER_Y[index],
-                    FILTER_BUTTON_SIZE,
-                    FILTER_BUTTON_SIZE
-            ).build());
+            filterButtons[index] =
+                    addRenderableWidget(
+                            Button.builder(
+                                            Component.literal("F"),
+                                            ignored ->
+                                                    sendAction(
+                                                            menu.isTankTypeLocked(index)
+                                                                    ? HeatExchangerMenuAction
+                                                                            .UNLOCK_FILTER
+                                                                    : HeatExchangerMenuAction
+                                                                            .LOCK_FILTER,
+                                                            index))
+                                    .bounds(
+                                            leftPos + FILTER_X[index],
+                                            topPos + FILTER_Y[index],
+                                            FILTER_BUTTON_SIZE,
+                                            FILTER_BUTTON_SIZE)
+                                    .build());
         }
         updateButtons();
     }
@@ -159,9 +160,7 @@ public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMe
     private void sendAction(HeatExchangerMenuAction action, int tankIndex) {
         if (minecraft != null && minecraft.gameMode != null) {
             minecraft.gameMode.handleInventoryButtonClick(
-                    menu.containerId,
-                    action.encodeButton(tankIndex)
-            );
+                    menu.containerId, action.encodeButton(tankIndex));
         }
     }
 
@@ -173,12 +172,7 @@ public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMe
     }
 
     @Override
-    protected void renderBg(
-            GuiGraphics graphics,
-            float partialTick,
-            int mouseX,
-            int mouseY
-    ) {
+    protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
         graphics.blit(
                 BACKGROUND,
                 leftPos,
@@ -188,8 +182,7 @@ public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMe
                 GUI_WIDTH,
                 GUI_HEIGHT,
                 TEXTURE_SIZE,
-                TEXTURE_SIZE
-        );
+                TEXTURE_SIZE);
 
         for (int sideIndex = 0; sideIndex < SIDE_RESET_X.length; ++sideIndex) {
             graphics.blit(
@@ -201,8 +194,7 @@ public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMe
                     TANK_SIZE,
                     TANK_SIZE,
                     TEXTURE_SIZE,
-                    TEXTURE_SIZE
-            );
+                    TEXTURE_SIZE);
         }
         graphics.blit(
                 BACKGROUND,
@@ -213,8 +205,7 @@ public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMe
                 TANK_SIZE,
                 TANK_SIZE,
                 TEXTURE_SIZE,
-                TEXTURE_SIZE
-        );
+                TEXTURE_SIZE);
         graphics.blit(
                 BACKGROUND,
                 leftPos + STATUS_X,
@@ -224,8 +215,7 @@ public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMe
                 TANK_SIZE,
                 15,
                 TEXTURE_SIZE,
-                TEXTURE_SIZE
-        );
+                TEXTURE_SIZE);
 
         for (int tankIndex = 0; tankIndex < HeatExchangerMenu.TANK_COUNT; ++tankIndex) {
             FluidStack fluid = menu.getTankFluid(tankIndex);
@@ -237,8 +227,7 @@ public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMe
                         leftPos + TANK_X[tankIndex],
                         topPos + TANK_Y[tankIndex],
                         TANK_SIZE,
-                        TANK_SIZE
-                );
+                        TANK_SIZE);
             }
         }
         graphics.flush();
@@ -250,8 +239,7 @@ public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMe
                         topPos + TANK_Y[tankIndex] - 1,
                         TANK_SIZE + 2,
                         TANK_SIZE + 2,
-                        0xFFFFB52E
-                );
+                        0xFFFFB52E);
             }
         }
     }
@@ -260,13 +248,7 @@ public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMe
     protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
         graphics.drawCenteredString(font, title, imageWidth / 2, titleLabelY, 0xFF3F3F3F);
         graphics.drawString(
-                font,
-                playerInventoryTitle,
-                inventoryLabelX,
-                inventoryLabelY,
-                0xFF3F3F3F,
-                false
-        );
+                font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, 0xFF3F3F3F, false);
     }
 
     @Override
@@ -274,13 +256,7 @@ public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMe
         super.renderTooltip(graphics, mouseX, mouseY);
         for (int tankIndex = 0; tankIndex < HeatExchangerMenu.TANK_COUNT; ++tankIndex) {
             if (isHovering(
-                    TANK_X[tankIndex],
-                    TANK_Y[tankIndex],
-                    TANK_SIZE,
-                    TANK_SIZE,
-                    mouseX,
-                    mouseY
-            )) {
+                    TANK_X[tankIndex], TANK_Y[tankIndex], TANK_SIZE, TANK_SIZE, mouseX, mouseY)) {
                 graphics.renderComponentTooltip(font, tankTooltip(tankIndex), mouseX, mouseY);
                 return;
             }
@@ -290,11 +266,11 @@ public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMe
                     FILTER_BUTTON_SIZE,
                     FILTER_BUTTON_SIZE,
                     mouseX,
-                    mouseY
-            )) {
-                String key = menu.isTankTypeLocked(tankIndex)
-                        ? "gui.immersivechemical.heat_exchanger_small.unlock_filter"
-                        : "gui.immersivechemical.heat_exchanger_small.lock_filter";
+                    mouseY)) {
+                String key =
+                        menu.isTankTypeLocked(tankIndex)
+                                ? "gui.immersivechemical.heat_exchanger_small.unlock_filter"
+                                : "gui.immersivechemical.heat_exchanger_small.lock_filter";
                 graphics.renderTooltip(font, Component.translatable(key), mouseX, mouseY);
                 return;
             }
@@ -302,45 +278,33 @@ public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMe
 
         for (int sideIndex = 0; sideIndex < SIDE_RESET_X.length; ++sideIndex) {
             if (isHovering(
-                    SIDE_RESET_X[sideIndex],
-                    RESET_Y,
-                    TANK_SIZE,
-                    TANK_SIZE,
-                    mouseX,
-                    mouseY
-            )) {
+                    SIDE_RESET_X[sideIndex], RESET_Y, TANK_SIZE, TANK_SIZE, mouseX, mouseY)) {
                 graphics.renderTooltip(
                         font,
-                        Component.translatable("gui.immersivechemical.heat_exchanger_small.clear_side"),
+                        Component.translatable(
+                                "gui.immersivechemical.heat_exchanger_small.clear_side"),
                         mouseX,
-                        mouseY
-                );
+                        mouseY);
                 return;
             }
         }
 
-        if (isHovering(
-                RESET_ALL_X,
-                RESET_ALL_Y,
-                TANK_SIZE,
-                TANK_SIZE,
-                mouseX,
-                mouseY
-        )) {
+        if (isHovering(RESET_ALL_X, RESET_ALL_Y, TANK_SIZE, TANK_SIZE, mouseX, mouseY)) {
             graphics.renderTooltip(
                     font,
                     Component.translatable("gui.immersivechemical.heat_exchanger_small.clear_all"),
                     mouseX,
-                    mouseY
-            );
+                    mouseY);
             return;
         }
 
         if (!ModList.get().isLoaded("jei")
                 && isHovering(STATUS_X, STATUS_Y, TANK_SIZE, 15, mouseX, mouseY)) {
-            Component status = Component.translatable(menu.isProcessing()
-                    ? "gui.immersivechemical.heat_exchanger_small.processing"
-                    : "gui.immersivechemical.heat_exchanger_small.idle");
+            Component status =
+                    Component.translatable(
+                            menu.isProcessing()
+                                    ? "gui.immersivechemical.heat_exchanger_small.processing"
+                                    : "gui.immersivechemical.heat_exchanger_small.idle");
             graphics.renderTooltip(font, status, mouseX, mouseY);
         }
     }
@@ -349,45 +313,38 @@ public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMe
         List<Component> tooltip = new ArrayList<>();
         FluidStack fluid = menu.getTankFluid(tankIndex);
         if (fluid.isEmpty()) {
-            tooltip.add(Component.translatable("gui.immersivechemical.heat_exchanger_small.empty")
-                    .withStyle(ChatFormatting.GRAY));
+            tooltip.add(
+                    Component.translatable("gui.immersivechemical.heat_exchanger_small.empty")
+                            .withStyle(ChatFormatting.GRAY));
         } else {
             tooltip.add(fluid.getDisplayName());
         }
-        tooltip.add(Component.translatable(
-                "gui.immersivechemical.heat_exchanger_small.amount",
-                fluid.getAmount(),
-                menu.getTankCapacity(tankIndex)
-        ).withStyle(ChatFormatting.GRAY));
-        tooltip.add(Component.translatable(menu.isTankTypeLocked(tankIndex)
-                ? "gui.immersivechemical.heat_exchanger_small.filter_locked"
-                : "gui.immersivechemical.heat_exchanger_small.filter_open")
-                .withStyle(menu.isTankTypeLocked(tankIndex)
-                        ? ChatFormatting.GOLD
-                        : ChatFormatting.DARK_GRAY));
+        tooltip.add(
+                Component.translatable(
+                                "gui.immersivechemical.heat_exchanger_small.amount",
+                                fluid.getAmount(),
+                                menu.getTankCapacity(tankIndex))
+                        .withStyle(ChatFormatting.GRAY));
+        tooltip.add(
+                Component.translatable(
+                                menu.isTankTypeLocked(tankIndex)
+                                        ? "gui.immersivechemical.heat_exchanger_small.filter_locked"
+                                        : "gui.immersivechemical.heat_exchanger_small.filter_open")
+                        .withStyle(
+                                menu.isTankTypeLocked(tankIndex)
+                                        ? ChatFormatting.GOLD
+                                        : ChatFormatting.DARK_GRAY));
         return tooltip;
     }
 
     private static final class AtlasButton extends Button {
         private AtlasButton(
-                int x,
-                int y,
-                int width,
-                int height,
-                Component narration,
-                OnPress onPress
-        ) {
+                int x, int y, int width, int height, Component narration, OnPress onPress) {
             super(x, y, width, height, narration, onPress, DEFAULT_NARRATION);
         }
 
         @Override
         protected void renderWidget(
-                GuiGraphics graphics,
-                int mouseX,
-                int mouseY,
-                float partialTick
-        ) {
-            
-        }
+                GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {}
     }
 }

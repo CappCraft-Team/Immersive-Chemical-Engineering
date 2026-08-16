@@ -1,14 +1,13 @@
 package team.cappcraft.immersivechemical.common.tileentity;
 
+import java.util.Objects;
+import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
-
-import javax.annotation.Nullable;
-import java.util.Objects;
-import java.util.function.Consumer;
 
 public class LockableFluidTank extends FluidTank {
     public static final String TAG_LOCKED = "Locked";
@@ -22,7 +21,8 @@ public class LockableFluidTank extends FluidTank {
 
     public LockableFluidTank(int capacity, Consumer<FluidStack> onContentChanged) {
         super(requirePositiveCapacity(capacity));
-        this.onContentChangedConsumer = Objects.requireNonNull(onContentChanged, "onContentChanged");
+        this.onContentChangedConsumer =
+                Objects.requireNonNull(onContentChanged, "onContentChanged");
     }
 
     @Override
@@ -41,9 +41,10 @@ public class LockableFluidTank extends FluidTank {
         Objects.requireNonNull(nbt, "nbt");
         locked = nbt.getBoolean(TAG_LOCKED);
         lockedType = nbt.getBoolean(TAG_LOCKED_TYPE);
-        lockedFluid = nbt.contains(TAG_LOCKED_FLUID, Tag.TAG_COMPOUND)
-                ? FluidStack.loadFluidStackFromNBT(nbt.getCompound(TAG_LOCKED_FLUID))
-                : FluidStack.EMPTY;
+        lockedFluid =
+                nbt.contains(TAG_LOCKED_FLUID, Tag.TAG_COMPOUND)
+                        ? FluidStack.loadFluidStackFromNBT(nbt.getCompound(TAG_LOCKED_FLUID))
+                        : FluidStack.EMPTY;
 
         super.readFromNBT(nbt);
         if (lockedType && lockedFluid.isEmpty() && !fluid.isEmpty()) {
