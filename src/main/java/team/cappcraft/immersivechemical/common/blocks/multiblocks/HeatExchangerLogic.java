@@ -6,9 +6,9 @@ import blusunrize.immersiveengineering.api.multiblocks.blocks.env.IMultiblockCon
 import blusunrize.immersiveengineering.api.multiblocks.blocks.logic.IMultiblockLogic;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.util.CapabilityPosition;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.util.MultiblockFace;
+import blusunrize.immersiveengineering.api.multiblocks.blocks.util.RelativeBlockFace;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.util.ShapeType;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.util.StoredCapability;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import net.minecraft.core.BlockPos;
@@ -76,7 +76,7 @@ public final class HeatExchangerLogic
     }
 
     static MultiblockFace getAdjacentTargetFace(CapabilityPosition outputPort) {
-        var outwardFace = Objects.requireNonNull(outputPort.side(), "Output port face");
+        RelativeBlockFace outwardFace = outputPort.side();
         return new MultiblockFace(
                 outwardFace.getOpposite(),
                 outwardFace.offsetRelative(outputPort.posInMultiblock(), 1));
@@ -159,7 +159,7 @@ public final class HeatExchangerLogic
             return;
         }
 
-        if (++state.tickSinceLastExchange < Math.max(1, state.tickRequired)) {
+        if (++state.tickSinceLastExchange < state.tickRequired) {
             setProcessing(context, state, true);
             context.markMasterDirty();
             return;
@@ -174,8 +174,7 @@ public final class HeatExchangerLogic
             return;
         }
 
-        state.tickRequired =
-                Math.max(1, (int) Math.ceil(transferredHeat * size.getTickMultiplier()));
+        state.tickRequired = (int) Math.ceil(transferredHeat * size.getTickMultiplier());
         setProcessing(context, state, true);
         context.markDirtyAndSync();
     }
@@ -282,7 +281,7 @@ public final class HeatExchangerLogic
 
     private static FluidStack scale(FluidStack stack, int repetitions) {
         long amount = (long) stack.getAmount() * repetitions;
-        if (stack.isEmpty() || repetitions <= 0 || amount > Integer.MAX_VALUE) {
+        if (stack.isEmpty() || amount > Integer.MAX_VALUE) {
             return FluidStack.EMPTY;
         }
         return new FluidStack(stack, (int) amount);

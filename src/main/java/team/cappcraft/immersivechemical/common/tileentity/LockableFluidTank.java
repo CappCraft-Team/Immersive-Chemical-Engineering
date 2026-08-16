@@ -1,8 +1,6 @@
 package team.cappcraft.immersivechemical.common.tileentity;
 
-import java.util.Objects;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraftforge.fluids.FluidStack;
@@ -20,14 +18,13 @@ public class LockableFluidTank extends FluidTank {
     private FluidStack lockedFluid = FluidStack.EMPTY;
 
     public LockableFluidTank(int capacity, Consumer<FluidStack> onContentChanged) {
-        super(requirePositiveCapacity(capacity));
-        this.onContentChangedConsumer =
-                Objects.requireNonNull(onContentChanged, "onContentChanged");
+        super(capacity);
+        this.onContentChangedConsumer = onContentChanged;
     }
 
     @Override
     public boolean isFluidValid(FluidStack stack) {
-        if (locked || stack == null || stack.isEmpty()) {
+        if (locked) {
             return false;
         }
         if (lockedType && (lockedFluid.isEmpty() || !lockedFluid.isFluidEqual(stack))) {
@@ -38,7 +35,6 @@ public class LockableFluidTank extends FluidTank {
 
     @Override
     public FluidTank readFromNBT(CompoundTag nbt) {
-        Objects.requireNonNull(nbt, "nbt");
         locked = nbt.getBoolean(TAG_LOCKED);
         lockedType = nbt.getBoolean(TAG_LOCKED_TYPE);
         lockedFluid =
@@ -58,7 +54,6 @@ public class LockableFluidTank extends FluidTank {
 
     @Override
     public CompoundTag writeToNBT(CompoundTag nbt) {
-        Objects.requireNonNull(nbt, "nbt");
         super.writeToNBT(nbt);
         nbt.putBoolean(TAG_LOCKED, locked);
         nbt.putBoolean(TAG_LOCKED_TYPE, lockedType);
@@ -72,8 +67,7 @@ public class LockableFluidTank extends FluidTank {
 
     @Override
     public int fill(FluidStack resource, FluidAction action) {
-        Objects.requireNonNull(action, "action");
-        if (locked || resource == null || resource.isEmpty()) {
+        if (locked) {
             return 0;
         }
         return super.fill(resource, action);
@@ -81,27 +75,23 @@ public class LockableFluidTank extends FluidTank {
 
     @Override
     public FluidStack drain(FluidStack resource, FluidAction action) {
-        Objects.requireNonNull(action, "action");
-        if (locked || resource == null || resource.isEmpty()) {
+        if (locked) {
             return FluidStack.EMPTY;
         }
-        FluidStack drained = super.drain(resource, action);
-        return drained == null ? FluidStack.EMPTY : drained;
+        return super.drain(resource, action);
     }
 
     @Override
     public FluidStack drain(int maxDrain, FluidAction action) {
-        Objects.requireNonNull(action, "action");
-        if (locked || maxDrain <= 0 || fluid.isEmpty()) {
+        if (locked) {
             return FluidStack.EMPTY;
         }
-        FluidStack drained = super.drain(maxDrain, action);
-        return drained == null ? FluidStack.EMPTY : drained;
+        return super.drain(maxDrain, action);
     }
 
     @Override
-    public void setFluid(@Nullable FluidStack stack) {
-        if (stack == null || stack.isEmpty()) {
+    public void setFluid(FluidStack stack) {
+        if (stack.isEmpty()) {
             super.setFluid(FluidStack.EMPTY);
             return;
         }
@@ -146,12 +136,5 @@ public class LockableFluidTank extends FluidTank {
 
     private static FluidStack copyType(FluidStack stack) {
         return new FluidStack(stack, 1);
-    }
-
-    private static int requirePositiveCapacity(int capacity) {
-        if (capacity <= 0) {
-            throw new IllegalArgumentException("Tank capacity must be positive");
-        }
-        return capacity;
     }
 }

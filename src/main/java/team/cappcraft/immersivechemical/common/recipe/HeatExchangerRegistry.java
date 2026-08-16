@@ -6,10 +6,8 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
@@ -27,10 +25,9 @@ public class HeatExchangerRegistry {
             new DirectedConversionGraph<>();
 
     public synchronized void replaceRegisteredEntries(Collection<HeatExchangerEntry> entries) {
-        Objects.requireNonNull(entries, "entries");
         List<HeatExchangerEntry> snapshot = new ArrayList<>(entries.size());
         for (HeatExchangerEntry entry : entries) {
-            snapshot.add(copyEntry(Objects.requireNonNull(entry, "entry")));
+            snapshot.add(copyEntry(entry));
         }
 
         registeredEntries.clear();
@@ -138,35 +135,29 @@ public class HeatExchangerRegistry {
     }
 
     public synchronized Optional<Fluid> findFarthest(
-            @Nonnull Fluid input, ConvertDirection direction, int tempLimit) {
-        Objects.requireNonNull(input, "input");
+            Fluid input, ConvertDirection direction, int tempLimit) {
         List<Fluid> reachable = findReachable(input, direction);
-        Comparator<Fluid> temperatureComparator =
-                Comparator.comparingInt(HeatExchangerRegistry::temperature);
-
-        if (direction == ConvertDirection.COOL_DOWN) {
-            return reachable.stream()
-                    .filter(fluid -> temperature(fluid) >= tempLimit)
-                    .min(temperatureComparator);
-        }
-        if (direction == ConvertDirection.HEAT_UP) {
-            return reachable.stream()
-                    .filter(fluid -> temperature(fluid) <= tempLimit)
-                    .max(temperatureComparator);
-        }
-        throw new IllegalArgumentException("A concrete conversion direction is required");
+        return switch (direction) {
+            case COOL_DOWN ->
+                    reachable.stream()
+                            .filter(fluid -> temperature(fluid) >= tempLimit)
+                            .min(Comparator.comparingInt(HeatExchangerRegistry::temperature));
+            case HEAT_UP ->
+                    reachable.stream()
+                            .filter(fluid -> temperature(fluid) <= tempLimit)
+                            .max(Comparator.comparingInt(HeatExchangerRegistry::temperature));
+            case TWO_WAY ->
+                    throw new IllegalArgumentException(
+                            "A concrete conversion direction is required");
+        };
     }
 
-    public synchronized List<Fluid> findReachable(
-            @Nonnull Fluid input, ConvertDirection direction) {
-        Objects.requireNonNull(input, "input");
+    public synchronized List<Fluid> findReachable(Fluid input, ConvertDirection direction) {
         return getFluidGraph(direction).reachableDepthFirst(input);
     }
 
     public synchronized Optional<HeatExchangerEntry> findOrGenerateEntry(
-            @Nonnull Fluid input, @Nonnull Fluid output, ConvertDirection direction) {
-        Objects.requireNonNull(input, "input");
-        Objects.requireNonNull(output, "output");
+            Fluid input, Fluid output, ConvertDirection direction) {
         DirectedConversionGraph<Fluid, HeatExchangerEntry> graph = getFluidGraph(direction);
 
         if (input == output) {
@@ -219,7 +210,6 @@ public class HeatExchangerRegistry {
     }
 
     static Optional<ComposedConversion> composeConversionAmounts(List<ConversionStep> steps) {
-        Objects.requireNonNull(steps, "steps");
         if (steps.isEmpty()) {
             return Optional.empty();
         }
@@ -231,8 +221,8 @@ public class HeatExchangerRegistry {
         relativeRepetitions.add(new Fraction(numerator, denominator));
 
         for (int index = 1; index < steps.size(); ++index) {
-            ConversionStep previous = Objects.requireNonNull(steps.get(index - 1), "step");
-            ConversionStep current = Objects.requireNonNull(steps.get(index), "step");
+            ConversionStep previous = steps.get(index - 1);
+            ConversionStep current = steps.get(index);
 
             numerator = numerator.multiply(BigInteger.valueOf(previous.outputAmount()));
             denominator = denominator.multiply(BigInteger.valueOf(current.inputAmount()));
@@ -309,11 +299,6 @@ public class HeatExchangerRegistry {
 
     public synchronized void insertEntryAsEdge(
             HeatExchangerEntry entry, int weight, boolean generated) {
-        Objects.requireNonNull(entry, "entry");
-        if (weight <= 0) {
-            throw new IllegalArgumentException("Conversion weight must be positive");
-        }
-
         Fluid hot = entry.FluidHot.getFluid();
         Fluid cold = entry.FluidCold.getFluid();
         boolean inserted = false;
@@ -333,31 +318,31 @@ public class HeatExchangerRegistry {
     }
 
     private Optional<Fluid> findClosestReachable(Fluid input, ConvertDirection direction) {
-        Comparator<Fluid> temperatureComparator =
-                Comparator.comparingInt(HeatExchangerRegistry::temperature);
-        if (direction == ConvertDirection.COOL_DOWN) {
-            return findReachable(input, direction).stream().max(temperatureComparator);
-        }
-        if (direction == ConvertDirection.HEAT_UP) {
-            return findReachable(input, direction).stream().min(temperatureComparator);
-        }
-        throw new IllegalArgumentException("A concrete conversion direction is required");
+        return switch (direction) {
+            case COOL_DOWN ->
+                    findReachable(input, direction).stream()
+                            .max(Comparator.comparingInt(HeatExchangerRegistry::temperature));
+            case HEAT_UP ->
+                    findReachable(input, direction).stream()
+                            .min(Comparator.comparingInt(HeatExchangerRegistry::temperature));
+            case TWO_WAY ->
+                    throw new IllegalArgumentException(
+                            "A concrete conversion direction is required");
+        };
     }
 
     private DirectedConversionGraph<Fluid, HeatExchangerEntry> getFluidGraph(
             ConvertDirection direction) {
-        Objects.requireNonNull(direction, "direction");
-        if (direction == ConvertDirection.COOL_DOWN) {
-            return coolDownFluidGraph;
-        }
-        if (direction == ConvertDirection.HEAT_UP) {
-            return heatUpFluidGraph;
-        }
-        throw new IllegalArgumentException("A concrete conversion direction is required");
+        return switch (direction) {
+            case COOL_DOWN -> coolDownFluidGraph;
+            case HEAT_UP -> heatUpFluidGraph;
+            case TWO_WAY ->
+                    throw new IllegalArgumentException(
+                            "A concrete conversion direction is required");
+        };
     }
 
     private static Fluid getPresentFluid(IFluidTank tank) {
-        Objects.requireNonNull(tank, "tank");
         FluidStack stack = tank.getFluid();
         return stack == null || stack.isEmpty() ? null : stack.getFluid();
     }

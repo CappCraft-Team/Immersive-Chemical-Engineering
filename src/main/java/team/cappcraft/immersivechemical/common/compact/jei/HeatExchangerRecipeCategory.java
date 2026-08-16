@@ -1,7 +1,6 @@
 package team.cappcraft.immersivechemical.common.compact.jei;
 
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
-import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
@@ -11,6 +10,7 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fluids.FluidStack;
 import team.cappcraft.immersivechemical.ICHEME_Contents;
 import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
 import team.cappcraft.immersivechemical.common.recipe.ConvertDirection;
@@ -56,26 +56,15 @@ public class HeatExchangerRecipeCategory implements IRecipeCategory<HeatExchange
     @Override
     public void setRecipe(
             IRecipeLayoutBuilder builder, HeatExchangerEntry recipe, IFocusGroup focuses) {
+        boolean heatUp = recipe.Direction == ConvertDirection.HEAT_UP;
+        FluidStack input = heatUp ? recipe.FluidCold : recipe.FluidHot;
+        FluidStack output = heatUp ? recipe.FluidHot : recipe.FluidCold;
 
-        IRecipeSlotBuilder inputSlot = builder.addSlot(RecipeIngredientRole.INPUT, 20, 14);
-        IRecipeSlotBuilder outputSlot = builder.addSlot(RecipeIngredientRole.OUTPUT, 110, 14);
-
-        if (recipe.Direction == ConvertDirection.HEAT_UP) {
-            inputSlot
-                    .setFluidRenderer(recipe.FluidCold.getAmount(), false, 16, 16)
-                    .addFluidStack(recipe.FluidCold.getFluid(), recipe.FluidCold.getAmount());
-            outputSlot
-                    .setFluidRenderer(recipe.FluidHot.getAmount(), false, 16, 16)
-                    .addFluidStack(recipe.FluidHot.getFluid(), recipe.FluidHot.getAmount());
-        } else if (recipe.Direction == ConvertDirection.COOL_DOWN) {
-            inputSlot
-                    .setFluidRenderer(recipe.FluidHot.getAmount(), false, 16, 16)
-                    .addFluidStack(recipe.FluidHot.getFluid(), recipe.FluidHot.getAmount());
-            outputSlot
-                    .setFluidRenderer(recipe.FluidCold.getAmount(), false, 16, 16)
-                    .addFluidStack(recipe.FluidCold.getFluid(), recipe.FluidCold.getAmount());
-        } else {
-            throw new IllegalArgumentException("JEI recipes must have a concrete direction");
-        }
+        builder.addSlot(RecipeIngredientRole.INPUT, 20, 14)
+                .setFluidRenderer(input.getAmount(), false, 16, 16)
+                .addFluidStack(input.getFluid(), input.getAmount());
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 110, 14)
+                .setFluidRenderer(output.getAmount(), false, 16, 16)
+                .addFluidStack(output.getFluid(), output.getAmount());
     }
 }

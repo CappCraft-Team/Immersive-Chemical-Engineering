@@ -4,7 +4,6 @@ import blusunrize.immersiveengineering.api.multiblocks.blocks.env.IInitialMultib
 import blusunrize.immersiveengineering.api.multiblocks.blocks.logic.IMultiblockState;
 import blusunrize.immersiveengineering.api.multiblocks.blocks.util.StoredCapability;
 import blusunrize.immersiveengineering.api.utils.CapabilityReference;
-import java.util.Objects;
 import javax.annotation.Nullable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -67,8 +66,8 @@ public class HeatExchangerState implements IMultiblockState {
                 new StoredCapability<>(new PortFluidHandler(null, Tanks[OUTPUT_B]));
         this.portBCapability =
                 new StoredCapability<>(new PortFluidHandler(Tanks[INPUT_B], Tanks[OUTPUT_B]));
-        this.automaticOutputA = Objects.requireNonNull(automaticOutputA, "automaticOutputA");
-        this.automaticOutputB = Objects.requireNonNull(automaticOutputB, "automaticOutputB");
+        this.automaticOutputA = automaticOutputA;
+        this.automaticOutputB = automaticOutputB;
     }
 
     private static LockableFluidTank createTank(int capacity, Runnable markDirty, Runnable sync) {
@@ -117,26 +116,23 @@ public class HeatExchangerState implements IMultiblockState {
         for (int i = 0; i < tanks.size() && i < Tanks.length; ++i) {
             Tanks[i].readFromNBT(tanks.getCompound(i));
         }
-        cooldown = Math.max(0, nbt.getInt(TAG_COOLDOWN));
-        tickSinceLastExchange = Math.max(0, nbt.getInt(TAG_TICK_SINCE_EXCHANGE));
-        tickRequired = Math.max(1, nbt.getInt(TAG_TICK_REQUIRED));
+        cooldown = nbt.getInt(TAG_COOLDOWN);
+        tickSinceLastExchange = nbt.getInt(TAG_TICK_SINCE_EXCHANGE);
+        tickRequired = nbt.getInt(TAG_TICK_REQUIRED);
         processing = nbt.getBoolean(TAG_PROCESSING);
     }
 
     public FluidStack getTankFluid(int tankIndex) {
-        if (!isTankIndex(tankIndex)) {
-            return FluidStack.EMPTY;
-        }
         FluidStack fluid = Tanks[tankIndex].getFluid();
         return fluid.isEmpty() ? FluidStack.EMPTY : fluid.copy();
     }
 
     public int getTankCapacity(int tankIndex) {
-        return isTankIndex(tankIndex) ? Tanks[tankIndex].getCapacity() : 0;
+        return Tanks[tankIndex].getCapacity();
     }
 
     public boolean isTankTypeLocked(int tankIndex) {
-        return isTankIndex(tankIndex) && Tanks[tankIndex].isLockedType();
+        return Tanks[tankIndex].isLockedType();
     }
 
     public int getExchangeProgress() {
@@ -152,18 +148,11 @@ public class HeatExchangerState implements IMultiblockState {
     }
 
     public int getComparatorOutput(int tankIndex) {
-        if (!isTankIndex(tankIndex)) {
-            return 0;
-        }
         LockableFluidTank tank = Tanks[tankIndex];
-        return (int) (15L * tank.getFluidAmount() / Math.max(1, tank.getCapacity()));
+        return (int) (15L * tank.getFluidAmount() / tank.getCapacity());
     }
 
     public boolean clearTank(int tankIndex) {
-        if (!isTankIndex(tankIndex)) {
-            return false;
-        }
-
         LockableFluidTank tank = Tanks[tankIndex];
         boolean changed = tank.isLocked() || tank.isLockedType() || !tank.getFluid().isEmpty();
         if (!changed) {
@@ -186,18 +175,11 @@ public class HeatExchangerState implements IMultiblockState {
     }
 
     public boolean clearTankSide(int sideIndex) {
-        if (sideIndex < 0 || sideIndex > 1) {
-            return false;
-        }
         int firstTank = sideIndex * 2;
         return clearTank(firstTank) | clearTank(firstTank + 1);
     }
 
     public boolean setTankTypeLocked(int tankIndex, boolean locked) {
-        if (!isTankIndex(tankIndex)) {
-            return false;
-        }
-
         LockableFluidTank tank = Tanks[tankIndex];
         if (tank.isLockedType() == locked || (locked && tank.getFluid().isEmpty())) {
             return false;
@@ -211,12 +193,7 @@ public class HeatExchangerState implements IMultiblockState {
     private void resetAfterManualTankChange() {
         cooldown = 0;
         tickSinceLastExchange = 0;
-        tickRequired = Math.max(1, tickRequired);
         processing = false;
-    }
-
-    private static boolean isTankIndex(int tankIndex) {
-        return tankIndex >= 0 && tankIndex < TANK_COUNT;
     }
 
     private static final class PortFluidHandler implements IFluidHandler {

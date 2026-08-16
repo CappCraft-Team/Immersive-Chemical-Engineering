@@ -19,7 +19,6 @@ final class DirectedConversionGraph<N, E> {
     private final Map<N, LinkedHashMap<N, Edge<N, E>>> outgoing = new LinkedHashMap<>();
 
     boolean addVertex(N vertex) {
-        Objects.requireNonNull(vertex, "vertex");
         if (outgoing.containsKey(vertex)) {
             return false;
         }
@@ -36,14 +35,8 @@ final class DirectedConversionGraph<N, E> {
     }
 
     boolean addEdge(N source, N target, E value, int weight) {
-        Objects.requireNonNull(source, "source");
-        Objects.requireNonNull(target, "target");
-        Objects.requireNonNull(value, "value");
         if (source.equals(target)) {
             throw new IllegalArgumentException("Self-loop conversions are not supported");
-        }
-        if (weight <= 0) {
-            throw new IllegalArgumentException("Edge weight must be positive");
         }
 
         addVertex(source);

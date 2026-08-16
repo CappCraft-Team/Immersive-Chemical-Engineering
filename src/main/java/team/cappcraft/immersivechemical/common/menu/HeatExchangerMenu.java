@@ -108,7 +108,7 @@ public final class HeatExchangerMenu extends IEContainerMenu {
                                         ? syncedCapacity
                                         : serverState.getTankCapacity(HeatExchangerState.INPUT_A),
                         value -> {
-                            syncedCapacity = Math.max(1, value);
+                            syncedCapacity = value;
                             for (FluidTank tank : syncedTanks) {
                                 tank.setCapacity(syncedCapacity);
                             }
@@ -135,14 +135,14 @@ public final class HeatExchangerMenu extends IEContainerMenu {
                                 serverState == null
                                         ? syncedProgress
                                         : serverState.getExchangeProgress(),
-                        value -> syncedProgress = Math.max(0, value)));
+                        value -> syncedProgress = value));
         addGenericData(
                 GenericContainerData.int32(
                         () ->
                                 serverState == null
                                         ? syncedDuration
                                         : serverState.getExchangeDuration(),
-                        value -> syncedDuration = Math.max(1, value)));
+                        value -> syncedDuration = value));
         addGenericData(
                 GenericContainerData.bool(
                         () -> serverState == null ? syncedProcessing : serverState.isProcessing(),
@@ -161,21 +161,15 @@ public final class HeatExchangerMenu extends IEContainerMenu {
     }
 
     public FluidStack getTankFluid(int tankIndex) {
-        if (!isTankIndex(tankIndex)) {
-            return FluidStack.EMPTY;
-        }
         FluidStack fluid = syncedTanks[tankIndex].getFluid();
         return fluid.isEmpty() ? FluidStack.EMPTY : fluid.copy();
     }
 
     public int getTankCapacity(int tankIndex) {
-        return isTankIndex(tankIndex) ? Math.max(1, syncedTanks[tankIndex].getCapacity()) : 0;
+        return syncedTanks[tankIndex].getCapacity();
     }
 
     public boolean isTankTypeLocked(int tankIndex) {
-        if (!isTankIndex(tankIndex)) {
-            return false;
-        }
         return serverState == null
                 ? syncedTypeLocks[tankIndex]
                 : serverState.isTankTypeLocked(tankIndex);
@@ -199,10 +193,7 @@ public final class HeatExchangerMenu extends IEContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        if (serverState == null
-                || serverContext == null
-                || serverLevel == null
-                || expectedFormedBlock == null) {
+        if (serverLevel == null) {
             return true;
         }
         return player.isAlive()
@@ -249,10 +240,6 @@ public final class HeatExchangerMenu extends IEContainerMenu {
 
     @Override
     public ItemStack quickMoveStack(Player player, int slotIndex) {
-        if (slotIndex < 0 || slotIndex >= slots.size()) {
-            return ItemStack.EMPTY;
-        }
-
         Slot slot = slots.get(slotIndex);
         if (!slot.hasItem()) {
             return ItemStack.EMPTY;
@@ -276,9 +263,5 @@ public final class HeatExchangerMenu extends IEContainerMenu {
             slot.setChanged();
         }
         return original;
-    }
-
-    private static boolean isTankIndex(int tankIndex) {
-        return tankIndex >= 0 && tankIndex < TANK_COUNT;
     }
 }

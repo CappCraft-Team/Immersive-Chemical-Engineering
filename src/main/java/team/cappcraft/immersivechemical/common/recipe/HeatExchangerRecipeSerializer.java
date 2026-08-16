@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 import io.netty.handler.codec.DecoderException;
-import java.util.Objects;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -24,8 +23,6 @@ public final class HeatExchangerRecipeSerializer
 
     @Override
     public HeatExchangerDataRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
-        Objects.requireNonNull(recipeId, "recipeId");
-        Objects.requireNonNull(json, "json");
         try {
             ResourceLocation fluidAId =
                     parseResourceLocation(getRequiredString(json, FLUID_A), FLUID_A);
@@ -46,8 +43,6 @@ public final class HeatExchangerRecipeSerializer
 
     @Override
     public HeatExchangerDataRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
-        Objects.requireNonNull(recipeId, "recipeId");
-        Objects.requireNonNull(buffer, "buffer");
         try {
             ResourceLocation fluidAId = buffer.readResourceLocation();
             int amountA = requirePositive(buffer.readVarInt(), AMOUNT_A);
@@ -82,8 +77,6 @@ public final class HeatExchangerRecipeSerializer
 
     @Override
     public void toNetwork(FriendlyByteBuf buffer, HeatExchangerDataRecipe recipe) {
-        Objects.requireNonNull(buffer, "buffer");
-        Objects.requireNonNull(recipe, "recipe");
         HeatExchangerEntry entry = recipe.getEntry();
         ResourceLocation hotId = getRegisteredFluidId(entry.FluidHot.getFluid());
         ResourceLocation coldId = getRegisteredFluidId(entry.FluidCold.getFluid());

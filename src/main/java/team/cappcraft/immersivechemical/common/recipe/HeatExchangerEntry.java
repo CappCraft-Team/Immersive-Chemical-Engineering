@@ -1,6 +1,5 @@
 package team.cappcraft.immersivechemical.common.recipe;
 
-import java.util.Objects;
 import javax.annotation.Nonnull;
 import net.minecraftforge.fluids.FluidStack;
 
@@ -11,22 +10,9 @@ public class HeatExchangerEntry {
     public final ConvertDirection Direction;
 
     public HeatExchangerEntry(
-            @Nonnull FluidStack fluidA,
-            @Nonnull FluidStack fluidB,
-            int heatValue,
-            ConvertDirection direction) {
-        Objects.requireNonNull(fluidA, "fluidA");
-        Objects.requireNonNull(fluidB, "fluidB");
-        this.Direction = Objects.requireNonNull(direction, "direction");
-
-        if (fluidA.isEmpty() || fluidB.isEmpty()) {
-            throw new IllegalArgumentException("Heat exchanger fluids must be non-empty");
-        }
-        if (fluidA.getAmount() <= 0 || fluidB.getAmount() <= 0) {
-            throw new IllegalArgumentException("Heat exchanger fluid amounts must be positive");
-        }
-        if (heatValue <= 0) {
-            throw new IllegalArgumentException("Heat value must be positive");
+            FluidStack fluidA, FluidStack fluidB, int heatValue, ConvertDirection direction) {
+        if (fluidA.isEmpty() || fluidB.isEmpty() || heatValue <= 0) {
+            throw new IllegalArgumentException("Heat exchanger fluids and heat must be positive");
         }
         if (fluidA.getFluid() == fluidB.getFluid()) {
             throw new IllegalArgumentException(
@@ -40,33 +26,26 @@ public class HeatExchangerEntry {
                     "Heat exchanger fluids must have different temperatures");
         }
 
-        if (temperatureA > temperatureB) {
-            this.FluidHot = fluidA.copy();
-            this.FluidCold = fluidB.copy();
-        } else {
-            this.FluidHot = fluidB.copy();
-            this.FluidCold = fluidA.copy();
-        }
+        boolean aIsHot = temperatureA > temperatureB;
+        this.FluidHot = (aIsHot ? fluidA : fluidB).copy();
+        this.FluidCold = (aIsHot ? fluidB : fluidA).copy();
         this.HeatValue = heatValue;
+        this.Direction = direction;
     }
 
     public FluidStack getInput(ConvertDirection direction) {
-        switch (direction) {
-            case COOL_DOWN:
-                return FluidHot.copy();
-            case HEAT_UP:
-                return FluidCold.copy();
-        }
-        throw new IllegalArgumentException("Invalid direction:" + direction);
+        return switch (direction) {
+            case COOL_DOWN -> FluidHot.copy();
+            case HEAT_UP -> FluidCold.copy();
+            case TWO_WAY -> throw new IllegalArgumentException("A concrete direction is required");
+        };
     }
 
     public FluidStack getOutput(ConvertDirection direction) {
-        switch (direction) {
-            case COOL_DOWN:
-                return FluidCold.copy();
-            case HEAT_UP:
-                return FluidHot.copy();
-        }
-        throw new IllegalArgumentException("Invalid direction:" + direction);
+        return switch (direction) {
+            case COOL_DOWN -> FluidCold.copy();
+            case HEAT_UP -> FluidHot.copy();
+            case TWO_WAY -> throw new IllegalArgumentException("A concrete direction is required");
+        };
     }
 }

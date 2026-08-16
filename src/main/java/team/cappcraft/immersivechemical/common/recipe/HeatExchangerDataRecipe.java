@@ -1,6 +1,5 @@
 package team.cappcraft.immersivechemical.common.recipe;
 
-import java.util.Objects;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
@@ -15,8 +14,8 @@ public final class HeatExchangerDataRecipe implements Recipe<Container> {
     private final HeatExchangerEntry entry;
 
     public HeatExchangerDataRecipe(ResourceLocation id, HeatExchangerEntry entry) {
-        this.id = Objects.requireNonNull(id, "id");
-        this.entry = copyEntry(Objects.requireNonNull(entry, "entry"));
+        this.id = id;
+        this.entry = copyEntry(entry);
     }
 
     public HeatExchangerEntry getEntry() {

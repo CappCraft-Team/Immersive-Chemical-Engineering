@@ -158,10 +158,8 @@ public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMe
     }
 
     private void sendAction(HeatExchangerMenuAction action, int tankIndex) {
-        if (minecraft != null && minecraft.gameMode != null) {
-            minecraft.gameMode.handleInventoryButtonClick(
-                    menu.containerId, action.encodeButton(tankIndex));
-        }
+        minecraft.gameMode.handleInventoryButtonClick(
+                menu.containerId, action.encodeButton(tankIndex));
     }
 
     @Override

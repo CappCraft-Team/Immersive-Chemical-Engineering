@@ -1,7 +1,6 @@
 package team.cappcraft.immersivechemical.common.recipe;
 
 import java.util.Locale;
-import java.util.Objects;
 
 public enum ConvertDirection {
     COOL_DOWN,
@@ -13,7 +12,6 @@ public enum ConvertDirection {
     }
 
     public static ConvertDirection fromSerializedName(String name) {
-        Objects.requireNonNull(name, "name");
         String normalized = name.toLowerCase(Locale.ROOT);
         for (ConvertDirection direction : values()) {
             if (direction.getSerializedName().equals(normalized)) {
@@ -24,12 +22,10 @@ public enum ConvertDirection {
     }
 
     public ConvertDirection getOpposite() {
-        switch (this) {
-            case COOL_DOWN:
-                return HEAT_UP;
-            case HEAT_UP:
-                return COOL_DOWN;
-        }
-        throw new IllegalArgumentException(String.format("No opposite for:%s", this));
+        return switch (this) {
+            case COOL_DOWN -> HEAT_UP;
+            case HEAT_UP -> COOL_DOWN;
+            case TWO_WAY -> throw new IllegalArgumentException("No opposite for: " + this);
+        };
     }
 }
