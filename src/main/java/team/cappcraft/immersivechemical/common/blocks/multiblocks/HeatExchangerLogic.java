@@ -177,31 +177,29 @@ public final class HeatExchangerLogic
                 sideAAbsorbs ? HeatExchangerState.OUTPUT_B : HeatExchangerState.OUTPUT_A;
 
         boolean processed = false;
+        int heatReleased =
+                exchangeSide(
+                        state.Tanks[releasingInput],
+                        state.Tanks[releasingOutput],
+                        releasingEntry,
+                        releasingDirection,
+                        rate);
+        if (heatReleased > 0) {
+            state.heatBuffer += heatReleased;
+            processed = true;
+        }
+
         long heatCost = Math.min(rate, absorbingEntry.HeatValue);
         if (state.heatBuffer >= heatCost) {
-            int heatMoved =
+            int heatAbsorbed =
                     exchangeSide(
                             state.Tanks[absorbingInput],
                             state.Tanks[absorbingOutput],
                             absorbingEntry,
                             absorbingDirection,
                             rate);
-            if (heatMoved > 0) {
-                state.heatBuffer -= heatMoved;
-                processed = true;
-            }
-        }
-
-        if (!processed) {
-            int heatMoved =
-                    exchangeSide(
-                            state.Tanks[releasingInput],
-                            state.Tanks[releasingOutput],
-                            releasingEntry,
-                            releasingDirection,
-                            rate);
-            if (heatMoved > 0) {
-                state.heatBuffer += heatMoved;
+            if (heatAbsorbed > 0) {
+                state.heatBuffer -= heatAbsorbed;
                 processed = true;
             }
         }
