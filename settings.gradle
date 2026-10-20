@@ -12,4 +12,4 @@ plugins {
     id 'org.gradle.toolchains.foojay-resolver-convention' version '0.5.0'
 }
 
-rootProject.name = "IChemE-1.20.1"
+rootProject.name = "ImmChemE-1.20.1"

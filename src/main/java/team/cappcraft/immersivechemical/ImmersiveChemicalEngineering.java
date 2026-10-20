@@ -22,10 +22,10 @@ public class ImmersiveChemicalEngineering {
     @SuppressWarnings("removal")
     public ImmersiveChemicalEngineering(FMLJavaModLoadingContext context) {
         IEventBus modEventBus = context.getModEventBus();
-        ICHEME_Contents.BLOCKS.register(modEventBus);
-        ICHEME_Contents.ITEMS.register(modEventBus);
-        ICHEME_Contents.BLOCK_ENTITIES.register(modEventBus);
-        ICHEME_Contents.MENUS.register(modEventBus);
+        IMMCHEME_Contents.BLOCKS.register(modEventBus);
+        IMMCHEME_Contents.ITEMS.register(modEventBus);
+        IMMCHEME_Contents.BLOCK_ENTITIES.register(modEventBus);
+        IMMCHEME_Contents.MENUS.register(modEventBus);
         HeatExchangerRecipeRegistration.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.addListener(HeatExchangerRecipeRegistration::onAddReloadListeners);
@@ -40,11 +40,11 @@ public class ImmersiveChemicalEngineering {
         event.enqueueWork(
                 () -> {
                     MultiblockHandler.registerMultiblock(
-                            ICHEME_Contents.HEAT_EXCHANGER_SMALL_TEMPLATE);
+                            IMMCHEME_Contents.HEAT_EXCHANGER_SMALL_TEMPLATE);
                     MultiblockHandler.registerMultiblock(
-                            ICHEME_Contents.HEAT_EXCHANGER_MEDIUM_TEMPLATE);
+                            IMMCHEME_Contents.HEAT_EXCHANGER_MEDIUM_TEMPLATE);
                     MultiblockHandler.registerMultiblock(
-                            ICHEME_Contents.HEAT_EXCHANGER_LARGE_TEMPLATE);
+                            IMMCHEME_Contents.HEAT_EXCHANGER_LARGE_TEMPLATE);
                     LOGGER.info("Immersive Chemical Engineering multiblocks registered.");
                 });
     }

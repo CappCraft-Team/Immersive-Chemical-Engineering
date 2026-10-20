@@ -13,7 +13,7 @@ import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import team.cappcraft.immersivechemical.ICHEME_Contents;
+import team.cappcraft.immersivechemical.IMMCHEME_Contents;
 import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
 import team.cappcraft.immersivechemical.client.gui.HeatExchangerScreen;
 import team.cappcraft.immersivechemical.common.recipe.ConvertDirection;
@@ -67,13 +67,13 @@ public class JEIPlugin implements IModPlugin {
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
         registration.addRecipeCatalyst(
-                new ItemStack(ICHEME_Contents.HEAT_EXCHANGER_SMALL.blockItem().get()),
+                new ItemStack(IMMCHEME_Contents.HEAT_EXCHANGER_SMALL.blockItem().get()),
                 JEIPlugin.HEAT_EXCHANGER_RECIPE_TYPE);
         registration.addRecipeCatalyst(
-                new ItemStack(ICHEME_Contents.HEAT_EXCHANGER_MEDIUM.blockItem().get()),
+                new ItemStack(IMMCHEME_Contents.HEAT_EXCHANGER_MEDIUM.blockItem().get()),
                 JEIPlugin.HEAT_EXCHANGER_RECIPE_TYPE);
         registration.addRecipeCatalyst(
-                new ItemStack(ICHEME_Contents.HEAT_EXCHANGER_LARGE.blockItem().get()),
+                new ItemStack(IMMCHEME_Contents.HEAT_EXCHANGER_LARGE.blockItem().get()),
                 JEIPlugin.HEAT_EXCHANGER_RECIPE_TYPE);
     }
 

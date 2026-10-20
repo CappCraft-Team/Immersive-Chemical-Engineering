@@ -11,7 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
-import team.cappcraft.immersivechemical.ICHEME_Contents;
+import team.cappcraft.immersivechemical.IMMCHEME_Contents;
 import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
 import team.cappcraft.immersivechemical.common.recipe.ConvertDirection;
 import team.cappcraft.immersivechemical.common.recipe.HeatExchangerEntry;
@@ -30,7 +30,7 @@ public class HeatExchangerRecipeCategory implements IRecipeCategory<HeatExchange
         this.background = guiHelper.createDrawable(TEXTURE, 15, 20, 145, 45);
         this.icon =
                 guiHelper.createDrawableItemStack(
-                        new ItemStack(ICHEME_Contents.HEAT_EXCHANGER_SMALL.blockItem().get()));
+                        new ItemStack(IMMCHEME_Contents.HEAT_EXCHANGER_SMALL.blockItem().get()));
     }
 
     @Override

@@ -17,7 +17,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import team.cappcraft.immersivechemical.ICHEME_Contents;
+import team.cappcraft.immersivechemical.IMMCHEME_Contents;
 import team.cappcraft.immersivechemical.ImmersiveChemicalEngineering;
 import team.cappcraft.immersivechemical.common.menu.HeatExchangerMenu;
 import team.cappcraft.immersivechemical.common.network.HeatExchangerMenuAction;
@@ -72,7 +72,7 @@ public class HeatExchangerScreen extends AbstractContainerScreen<HeatExchangerMe
                 () -> {
                     for (HeatExchangerSizeVariants variant : HeatExchangerSizeVariants.values()) {
                         MenuScreens.register(
-                                ICHEME_Contents.menuType(variant), HeatExchangerScreen::new);
+                                IMMCHEME_Contents.menuType(variant), HeatExchangerScreen::new);
                     }
                 });
     }

@@ -25,7 +25,7 @@ import team.cappcraft.immersivechemical.common.menu.HeatExchangerMenu;
 import team.cappcraft.immersivechemical.common.tileentity.constant.HeatExchangerSizeVariants;
 
 /** 本模组所有注册内容的集中入口：方块、物品、方块实体、菜单类型与多方块结构。 */
-public final class ICHEME_Contents {
+public final class IMMCHEME_Contents {
 
     // ======== 各类注册表 ========
 
@@ -49,7 +49,7 @@ public final class ICHEME_Contents {
             new HeatExchangerLogic(HeatExchangerSizeVariants.SMALL);
     public static final HeatExchangerMultiblock HEAT_EXCHANGER_SMALL_TEMPLATE =
             new HeatExchangerMultiblock(
-                    HeatExchangerSizeVariants.SMALL, () -> ICHEME_Contents.HEAT_EXCHANGER_SMALL);
+                    HeatExchangerSizeVariants.SMALL, () -> IMMCHEME_Contents.HEAT_EXCHANGER_SMALL);
     public static final MultiblockRegistration<HeatExchangerState> HEAT_EXCHANGER_SMALL =
             registerHeatExchanger(
                     HeatExchangerSizeVariants.SMALL,
@@ -60,7 +60,7 @@ public final class ICHEME_Contents {
             new HeatExchangerLogic(HeatExchangerSizeVariants.MEDIUM);
     public static final HeatExchangerMultiblock HEAT_EXCHANGER_MEDIUM_TEMPLATE =
             new HeatExchangerMultiblock(
-                    HeatExchangerSizeVariants.MEDIUM, () -> ICHEME_Contents.HEAT_EXCHANGER_MEDIUM);
+                    HeatExchangerSizeVariants.MEDIUM, () -> IMMCHEME_Contents.HEAT_EXCHANGER_MEDIUM);
     public static final MultiblockRegistration<HeatExchangerState> HEAT_EXCHANGER_MEDIUM =
             registerHeatExchanger(
                     HeatExchangerSizeVariants.MEDIUM,
@@ -71,7 +71,7 @@ public final class ICHEME_Contents {
             new HeatExchangerLogic(HeatExchangerSizeVariants.LARGE);
     public static final HeatExchangerMultiblock HEAT_EXCHANGER_LARGE_TEMPLATE =
             new HeatExchangerMultiblock(
-                    HeatExchangerSizeVariants.LARGE, () -> ICHEME_Contents.HEAT_EXCHANGER_LARGE);
+                    HeatExchangerSizeVariants.LARGE, () -> IMMCHEME_Contents.HEAT_EXCHANGER_LARGE);
     public static final MultiblockRegistration<HeatExchangerState> HEAT_EXCHANGER_LARGE =
             registerHeatExchanger(
                     HeatExchangerSizeVariants.LARGE,

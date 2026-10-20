@@ -16,7 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
-import team.cappcraft.immersivechemical.ICHEME_Contents;
+import team.cappcraft.immersivechemical.IMMCHEME_Contents;
 import team.cappcraft.immersivechemical.common.blocks.multiblocks.HeatExchangerState;
 import team.cappcraft.immersivechemical.common.network.HeatExchangerMenuAction;
 import team.cappcraft.immersivechemical.common.tileentity.constant.HeatExchangerSizeVariants;
@@ -52,7 +52,7 @@ public final class HeatExchangerMenu extends IEContainerMenu {
             BlockPos interactionPos) {
         super(
                 multiblockCtx(
-                        ICHEME_Contents.menuType(size),
+                        IMMCHEME_Contents.menuType(size),
                         containerId,
                         new MultiblockMenuContext<>(context, masterPos)));
         this.serverState = state;
@@ -60,7 +60,7 @@ public final class HeatExchangerMenu extends IEContainerMenu {
         this.serverLevel = context.getLevel().getRawLevel();
         this.masterPos = masterPos.immutable();
         this.interactionPos = interactionPos.immutable();
-        this.expectedFormedBlock = ICHEME_Contents.registration(size).block().get();
+        this.expectedFormedBlock = IMMCHEME_Contents.registration(size).block().get();
 
         for (int tankIndex = 0; tankIndex < TANK_COUNT; ++tankIndex) {
             syncedTanks[tankIndex] = state.Tanks[tankIndex];
@@ -74,7 +74,7 @@ public final class HeatExchangerMenu extends IEContainerMenu {
             int containerId,
             Inventory inventory,
             BlockPos masterPos) {
-        super(clientCtx(ICHEME_Contents.menuType(size), containerId));
+        super(clientCtx(IMMCHEME_Contents.menuType(size), containerId));
         this.serverState = null;
         this.serverContext = null;
         this.serverLevel = null;

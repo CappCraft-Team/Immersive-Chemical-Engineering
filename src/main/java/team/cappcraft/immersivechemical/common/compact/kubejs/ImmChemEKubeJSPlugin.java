@@ -11,7 +11,7 @@ import net.minecraft.world.level.material.Fluid;
 import team.cappcraft.immersivechemical.common.recipe.ConvertDirection;
 import team.cappcraft.immersivechemical.common.recipe.HeatExchangerRecipeRegistration;
 
-public final class IChemEKubeJSPlugin extends KubeJSPlugin {
+public final class ImmChemEKubeJSPlugin extends KubeJSPlugin {
     private static final RegistryComponent<Fluid> FLUID =
             new RegistryComponent<>(RegistryInfo.FLUID);
     private static final EnumComponent<ConvertDirection> DIRECTION =
